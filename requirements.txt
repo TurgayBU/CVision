@@ -1,0 +1,11 @@
+Flask==2.3.3
+flask-cors==4.0.0
+PyPDF2==3.0.1
+openai==0.28.1
+python-dotenv==1.0.0
+werkzeug==2.3.7
+langchain==0.0.340
+sentence-transformers==2.2.2
+faiss-cpu==1.7.4
+torch==2.1.0
+transformers==4.35.0
