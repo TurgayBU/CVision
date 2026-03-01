@@ -4,11 +4,21 @@ import hashlib
 import mysql.connector
 from mysql.connector import Error
 from datetime import timedelta
-import config  # config.py dosyasını import et
+import config
+from config import DB_CONFIG, UPLOAD_FOLDER, ALLOWED_EXTENSIONS
+import os
+from werkzeug.utils import secure_filename
+import json
+from datetime import datetime
+
+# CVProcessor sınıfını import et
+from extract_cv import CVProcessor
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
 app.permanent_session_lifetime = timedelta(days=config.SESSION_LIFETIME_DAYS)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = config.MAX_CONTENT_LENGTH
 CORS(app)
 
 
@@ -20,6 +30,47 @@ def get_db():
     except Error as e:
         print(f"Veritabanı bağlantı hatası: {e}")
         return None
+
+
+def allowed_file(filename):
+    """Dosya uzantısı kontrolü"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def save_links_to_database(user_id, links):
+    """Kullanıcının linklerini veritabanına kaydet"""
+    conn = get_db()
+    if not conn:
+        return False
+
+    cursor = conn.cursor()
+
+    try:
+        # Linkleri JSON formatında kaydet
+        links_json = json.dumps(links)
+
+        # users tablosuna linkleri kaydet (yeni kolon eklemeniz gerekebilir)
+        # Veya yeni bir tablo oluşturabilirsiniz: user_links
+        cursor.execute("""
+            UPDATE users 
+            SET linkedin_url = %s, github_url = %s, portfolio_url = %s 
+            WHERE user_id = %s
+        """, (
+            links.get('linkedin'),
+            links.get('github'),
+            links.get('portfolio'),
+            user_id
+        ))
+
+        conn.commit()
+        return True
+    except Error as e:
+        print(f"Link kaydetme hatası: {e}")
+        conn.rollback()
+        return False
+    finally:
+        cursor.close()
+        conn.close()
 
 
 # Ana sayfa - index.html'i göster
@@ -155,6 +206,7 @@ def forgot_password():
         user = cursor.fetchone()
 
         if user:
+            # Gerçek uygulamada burada e-posta gönderme işlemi yapılır
             return jsonify({
                 'success': True,
                 'message': f'Şifre sıfırlama bağlantısı {email} adresine gönderildi'
@@ -199,115 +251,232 @@ def logout():
     })
 
 
-# Dashboard
+# Dashboard - CV ve link yükleme sayfası
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('index'))
+    return render_template('cv_and_link_upload.html', session=session)
 
-    return f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Dashboard - CVision</title>
-        <style>
-            * {{
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                font-family: 'Segoe UI', sans-serif;
-            }}
-            body {{
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 20px;
-            }}
-            .container {{
-                background: white;
-                border-radius: 20px;
-                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-                width: 100%;
-                max-width: 500px;
-                padding: 40px;
-            }}
-            .header {{
-                text-align: center;
-                margin-bottom: 30px;
-            }}
-            .header h1 {{
-                color: #333;
-                font-size: 28px;
-            }}
-            .welcome-box {{
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                padding: 25px;
-                border-radius: 10px;
-                color: white;
-                text-align: center;
-                margin-bottom: 25px;
-            }}
-            .info-card {{
-                background: #f8f9fa;
-                padding: 20px;
-                border-radius: 10px;
-                margin-bottom: 20px;
-            }}
-            .info-card p {{
-                margin: 10px 0;
-                color: #555;
-            }}
-            .btn {{
-                width: 100%;
-                padding: 14px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                border: none;
-                border-radius: 10px;
-                color: white;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-            }}
-            .btn:hover {{
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(102,126,234,0.4);
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>CVision</h1>
-            </div>
 
-            <div class="welcome-box">
-                <h2>Hoş Geldiniz, {session.get('fullname', session['username'])}!</h2>
-                <p>Başarıyla giriş yaptınız.</p>
-            </div>
+# CV ve linkleri yükleme API'si
+@app.route('/api/upload-cv-links', methods=['POST'])
+def upload_cv_links():
+    if 'user_id' not in session:
+        return jsonify({
+            'success': False,
+            'message': 'Oturum açmanız gerekiyor'
+        }), 401
 
-            <div class="info-card">
-                <p><strong>Kullanıcı ID:</strong> {session['user_id']}</p>
-                <p><strong>Kullanıcı Adı:</strong> {session['username']}</p>
-            </div>
+    user_id = session['user_id']
 
-            <button class="btn" onclick="logout()">Çıkış Yap</button>
-        </div>
+    try:
+        # Form verilerini al
+        linkedin_url = request.form.get('linkedin')
+        github_url = request.form.get('github')
+        portfolio_url = request.form.get('portfolio')
+        notes = request.form.get('notes')
 
-        <script>
-            function logout() {{
-                fetch('/api/logout')
-                    .then(response => response.json())
-                    .then(data => {{
-                        if(data.success) window.location.href = '/';
-                    }});
-            }}
-        </script>
-    </body>
-    </html>
-    """
+        # Linkleri kaydet
+        links = {
+            'linkedin': linkedin_url,
+            'github': github_url,
+            'portfolio': portfolio_url,
+            'notes': notes
+        }
+
+        # Linkleri veritabanına kaydet
+        save_links_to_database(user_id, links)
+
+        # CV dosyasını kontrol et
+        if 'cv' not in request.files:
+            return jsonify({
+                'success': False,
+                'message': 'CV dosyası bulunamadı'
+            }), 400
+
+        file = request.files['cv']
+
+        if file.filename == '':
+            return jsonify({
+                'success': False,
+                'message': 'Dosya seçilmedi'
+            }), 400
+
+        if not allowed_file(file.filename):
+            return jsonify({
+                'success': False,
+                'message': 'Desteklenmeyen dosya türü. Sadece PDF, DOC ve DOCX dosyaları yüklenebilir.'
+            }), 400
+
+        # Dosyayı güvenli isimle kaydet
+        filename = secure_filename(file.filename)
+        # Kullanıcı ID'sini dosya adına ekle
+        filename = f"user_{user_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}"
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+        # CV'yi işle ve veritabanına kaydet
+        processor = CVProcessor(DB_CONFIG)
+
+        # İş bilgilerini notlardan al (opsiyonel)
+        job_info = {
+            'title': notes if notes else None,
+            'url': linkedin_url,
+            'location': None
+        }
+
+        cv_id = processor.save_cv_to_database(user_id, file_path, job_info)
+        processor.disconnect_db()
+
+        if cv_id:
+            return jsonify({
+                'success': True,
+                'message': 'CV ve linkler başarıyla yüklendi!'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'CV işlenirken bir hata oluştu'
+            }), 500
+
+    except Exception as e:
+        print(f"CV yükleme hatası: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Bir hata oluştu: {str(e)}'
+        }), 500
+
+
+# Kullanıcının CV'lerini listeleme API'si
+@app.route('/api/user-cvs', methods=['GET'])
+def get_user_cvs():
+    if 'user_id' not in session:
+        return jsonify({
+            'success': False,
+            'message': 'Oturum açmanız gerekiyor'
+        }), 401
+
+    user_id = session['user_id']
+
+    try:
+        processor = CVProcessor(DB_CONFIG)
+        cvs = processor.get_user_cvs(user_id)
+        processor.disconnect_db()
+
+        return jsonify({
+            'success': True,
+            'cvs': cvs
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'CV listesi alınırken hata: {str(e)}'
+        }), 500
+
+
+# CV detaylarını getirme API'si
+@app.route('/api/cv-details/<int:cv_id>', methods=['GET'])
+def get_cv_details(cv_id):
+    if 'user_id' not in session:
+        return jsonify({
+            'success': False,
+            'message': 'Oturum açmanız gerekiyor'
+        }), 401
+
+    user_id = session['user_id']
+
+    conn = get_db()
+    if not conn:
+        return jsonify({
+            'success': False,
+            'message': 'Veritabanı bağlantı hatası'
+        }), 500
+
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT cv_id, cv_file_path, cv_text, cv_skills, cv_experience, 
+                   cv_education, cv_languages, analyzed_at, job_title, job_url, job_location
+            FROM cv_analyses 
+            WHERE cv_id = %s AND user_id = %s
+        """, (cv_id, user_id))
+
+        cv = cursor.fetchone()
+
+        if cv:
+            # JSON alanlarını parse et
+            if cv['cv_skills']:
+                cv['cv_skills'] = json.loads(cv['cv_skills'])
+            if cv['cv_experience']:
+                cv['cv_experience'] = json.loads(cv['cv_experience'])
+            if cv['cv_education']:
+                cv['cv_education'] = json.loads(cv['cv_education'])
+            if cv['cv_languages']:
+                cv['cv_languages'] = json.loads(cv['cv_languages'])
+
+            return jsonify({
+                'success': True,
+                'cv': cv
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'CV bulunamadı'
+            }), 404
+
+    except Error as e:
+        return jsonify({
+            'success': False,
+            'message': f'Veritabanı hatası: {str(e)}'
+        }), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# Users tablosuna link kolonlarını eklemek için SQL (bir kere çalıştırın)
+@app.route('/api/setup-database', methods=['GET'])
+def setup_database():
+    """Users tablosuna link kolonlarını ekle (sadece geliştirme için)"""
+    if not app.debug:
+        return jsonify({'success': False, 'message': 'Bu işlem sadece geliştirme modunda çalışır'}), 403
+
+    conn = get_db()
+    if not conn:
+        return jsonify({'success': False, 'message': 'Veritabanı bağlantı hatası'}), 500
+
+    cursor = conn.cursor()
+
+    try:
+        # Users tablosuna yeni kolonlar ekle
+        cursor.execute("""
+            ALTER TABLE users 
+            ADD COLUMN IF NOT EXISTS linkedin_url VARCHAR(255),
+            ADD COLUMN IF NOT EXISTS github_url VARCHAR(255),
+            ADD COLUMN IF NOT EXISTS portfolio_url VARCHAR(255),
+            ADD COLUMN IF NOT EXISTS notes TEXT
+        """)
+        conn.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Veritabanı başarıyla güncellendi'
+        })
+
+    except Error as e:
+        return jsonify({
+            'success': False,
+            'message': f'Veritabanı hatası: {str(e)}'
+        }), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 
 if __name__ == '__main__':
+    # Upload klasörünü oluştur
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(debug=config.DEBUG, port=config.PORT)
