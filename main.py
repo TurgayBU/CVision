@@ -10,6 +10,7 @@ import os
 from werkzeug.utils import secure_filename
 import json
 from datetime import datetime
+from cv_ai_extract import AICVResponseGroq as AICVResponse
 
 # CVProcessor sınıfını import et
 from extract_cv import CVProcessor
@@ -46,11 +47,6 @@ def save_links_to_database(user_id, links):
     cursor = conn.cursor()
 
     try:
-        # Linkleri JSON formatında kaydet
-        links_json = json.dumps(links)
-
-        # users tablosuna linkleri kaydet (yeni kolon eklemeniz gerekebilir)
-        # Veya yeni bir tablo oluşturabilirsiniz: user_links
         cursor.execute("""
             UPDATE users 
             SET linkedin_url = %s, github_url = %s, portfolio_url = %s 
@@ -89,7 +85,6 @@ def login():
     password = data.get('password')
     remember = data.get('remember', False)
 
-    # Şifreyi hashle
     password_hash = hashlib.sha256(password.encode()).hexdigest()
 
     conn = get_db()
@@ -154,7 +149,6 @@ def register():
     cursor = conn.cursor()
 
     try:
-        # name ve surname alanlarını username'den ayır
         name_parts = username.split()
         name = name_parts[0] if name_parts else username
         surname = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
@@ -206,7 +200,6 @@ def forgot_password():
         user = cursor.fetchone()
 
         if user:
-            # Gerçek uygulamada burada e-posta gönderme işlemi yapılır
             return jsonify({
                 'success': True,
                 'message': f'Şifre sıfırlama bağlantısı {email} adresine gönderildi'
@@ -259,7 +252,7 @@ def dashboard():
     return render_template('cv_and_link_upload.html', session=session)
 
 
-# CV ve linkleri yükleme API'si
+# CV ve linkleri yükleme API'si (GÜNCELLENDİ - yönlendirme eklendi)
 @app.route('/api/upload-cv-links', methods=['POST'])
 def upload_cv_links():
     if 'user_id' not in session:
@@ -271,13 +264,11 @@ def upload_cv_links():
     user_id = session['user_id']
 
     try:
-        # Form verilerini al
         linkedin_url = request.form.get('linkedin')
         github_url = request.form.get('github')
         portfolio_url = request.form.get('portfolio')
         notes = request.form.get('notes')
 
-        # Linkleri kaydet
         links = {
             'linkedin': linkedin_url,
             'github': github_url,
@@ -285,10 +276,6 @@ def upload_cv_links():
             'notes': notes
         }
 
-        # Linkleri veritabanına kaydet
-        save_links_to_database(user_id, links)
-
-        # CV dosyasını kontrol et
         if 'cv' not in request.files:
             return jsonify({
                 'success': False,
@@ -309,30 +296,29 @@ def upload_cv_links():
                 'message': 'Desteklenmeyen dosya türü. Sadece PDF, DOC ve DOCX dosyaları yüklenebilir.'
             }), 400
 
-        # Dosyayı güvenli isimle kaydet
         filename = secure_filename(file.filename)
-        # Kullanıcı ID'sini dosya adına ekle
         filename = f"user_{user_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}"
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        # CV'yi işle ve veritabanına kaydet
         processor = CVProcessor(DB_CONFIG)
 
-        # İş bilgilerini notlardan al (opsiyonel)
         job_info = {
             'title': notes if notes else None,
             'url': linkedin_url,
             'location': None
         }
 
-        cv_id = processor.save_cv_to_database(user_id, file_path, job_info)
+        cv_text_id = processor.save_cv_to_database(user_id, file_path, job_info)
         processor.disconnect_db()
 
-        if cv_id:
+        if cv_text_id:
+            # BAŞARILI YÜKLEME - CV_TEXT_ID ile analiz sayfasına yönlendir
             return jsonify({
                 'success': True,
-                'message': 'CV ve linkler başarıyla yüklendi!'
+                'message': 'CV ve linkler başarıyla yüklendi! Analiz sayfasına yönlendiriliyorsunuz...',
+                'redirect': f'/cv-analysis?cv_id={cv_text_id}',
+                'cv_text_id': cv_text_id
             })
         else:
             return jsonify({
@@ -407,7 +393,6 @@ def get_cv_details(cv_id):
         cv = cursor.fetchone()
 
         if cv:
-            # JSON alanlarını parse et
             if cv['cv_skills']:
                 cv['cv_skills'] = json.loads(cv['cv_skills'])
             if cv['cv_experience']:
@@ -437,10 +422,9 @@ def get_cv_details(cv_id):
         conn.close()
 
 
-# Users tablosuna link kolonlarını eklemek için SQL (bir kere çalıştırın)
+# Users tablosuna link kolonlarını eklemek için SQL
 @app.route('/api/setup-database', methods=['GET'])
 def setup_database():
-    """Users tablosuna link kolonlarını ekle (sadece geliştirme için)"""
     if not app.debug:
         return jsonify({'success': False, 'message': 'Bu işlem sadece geliştirme modunda çalışır'}), 403
 
@@ -451,7 +435,6 @@ def setup_database():
     cursor = conn.cursor()
 
     try:
-        # Users tablosuna yeni kolonlar ekle
         cursor.execute("""
             ALTER TABLE users 
             ADD COLUMN IF NOT EXISTS linkedin_url VARCHAR(255),
@@ -476,7 +459,140 @@ def setup_database():
         conn.close()
 
 
+# CV Analiz Sayfası
+@app.route('/cv-analysis')
+def cv_analysis():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('cv_analysis.html', session=session)
+
+
+# CV Analiz Sonucunu Kaydet
+@app.route('/save-cv-analysis', methods=['POST'])
+def save_cv_analysis():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Oturum açmanız gerekiyor'}), 401
+
+    data = request.json
+    user_id = data.get('user_id')
+    cv_text_id = data.get('cv_text_id')  # Burada cv_text_id geliyor
+    cv_data = data.get('cv_data')
+
+    print(f"📥 Gelen veri: user_id={user_id}, cv_text_id={cv_text_id}, cv_data={cv_data}")
+
+    ai_cv = AICVResponse(DB_CONFIG, config.api_key)
+
+    try:
+        # cv_text_id'yi mutlaka gönder!
+        if ai_cv.SaveInDatabase(cv_data, user_id, cv_text_id):
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Veritabanına kaydedilemedi'})
+
+    except Exception as e:
+        print(f"❌ Hata: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+    finally:
+        ai_cv.disconnect()
+# Kullanıcının cv_text kayıtlarını getir
+@app.route('/api/user-cv-texts', methods=['GET'])
+def get_user_cv_texts():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Oturum açmanız gerekiyor'}), 401
+
+    user_id = session['user_id']
+
+    try:
+        processor = CVProcessor(DB_CONFIG)
+        cvs = processor.get_user_cvs(user_id)
+        processor.disconnect_db()
+
+        return jsonify({
+            'success': True,
+            'cvs': cvs
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# CV istatistiklerini getir
+@app.route('/api/cv-stats', methods=['GET'])
+def get_cv_stats():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Oturum açmanız gerekiyor'}), 401
+
+    user_id = session['user_id']
+
+    conn = get_db()
+    if not conn:
+        return jsonify({'success': False, 'error': 'Veritabanı bağlantı hatası'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("SELECT COUNT(*) as total FROM cv_text WHERE user_id = %s", (user_id,))
+        total = cursor.fetchone()['total']
+
+        cursor.execute("SELECT COUNT(*) as analyzed FROM cv_analyses WHERE user_id = %s", (user_id,))
+        analyzed = cursor.fetchone()['analyzed']
+
+        pending = total - analyzed
+
+        return jsonify({
+            'success': True,
+            'stats': {
+                'total': total,
+                'analyzed': analyzed,
+                'pending': max(0, pending)
+            }
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# CV analiz API'si
+@app.route('/analyze-cv', methods=['POST'])
+def analyze_cv():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Oturum açmanız gerekiyor'}), 401
+
+    data = request.json
+    user_id = data.get('user_id')
+    cv_text_id = data.get('cv_text_id')
+
+    ai_cv = AICVResponse(DB_CONFIG, config.api_key)
+
+    try:
+        raw_text = ai_cv.Get_CV_Text(user_id, cv_text_id)
+
+        if not raw_text:
+            return jsonify({'success': False, 'error': 'CV metni bulunamadı'})
+
+        cv_data = ai_cv.PromptingAI(raw_text)
+
+        if cv_data:
+            return jsonify({
+                'success': True,
+                'cv_data': cv_data,
+                'raw_text': raw_text[:500] + '...' if len(raw_text) > 500 else raw_text
+            })
+        else:
+            return jsonify({'success': False, 'error': 'AI analizi başarısız'})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+    finally:
+        ai_cv.disconnect()
+
+
 if __name__ == '__main__':
-    # Upload klasörünü oluştur
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     app.run(debug=config.DEBUG, port=config.PORT)

@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CV ve Link Yükleme</title>
 
-    <!-- CSS stilleri burada olmalı -->
     <style>
-        /* Tüm CSS stilleri buraya gelecek */
         * {
             margin: 0;
             padding: 0;
@@ -103,6 +101,11 @@
             background-color: #0056b3;
         }
 
+        .submit-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
         .message {
             padding: 10px;
             margin-bottom: 20px;
@@ -146,7 +149,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="linkedin">LinkedIn Profil Linki</label>
+                    <label for="linkedin">Link of Job</label>
                     <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/username" required>
                 </div>
 
@@ -165,7 +168,7 @@
                     <textarea id="notes" name="notes" placeholder="Eklemek istediğiniz notlar..."></textarea>
                 </div>
 
-                <button type="submit" class="submit-btn">Yükle</button>
+                <button type="submit" class="submit-btn" id="submitBtn">Yükle</button>
             </form>
         </div>
     </div>
@@ -197,9 +200,12 @@
 
             const formData = new FormData(this);
             const messageDiv = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
 
-            // Burada CV ve linkleri yüklemek için API çağrısı yapılacak
-            // Örnek:
+            // Butonu devre dışı bırak ve metnini değiştir
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Yükleniyor...';
+
             fetch('/api/upload-cv-links', {
                 method: 'POST',
                 body: formData
@@ -211,11 +217,30 @@
 
                 if (data.success) {
                     this.reset();
+
+                    // Yönlendirme varsa sayfayı yönlendir
+                    if (data.redirect) {
+                        messageDiv.textContent += ' Yönlendiriliyorsunuz...';
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 2000);
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Yükle';
+                    }
+                } else {
+                    // Hata durumunda butonu tekrar aktif et
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Yükle';
                 }
             })
             .catch(error => {
                 messageDiv.className = 'message error';
                 messageDiv.textContent = 'Bir hata oluştu: ' + error;
+
+                // Hata durumunda butonu tekrar aktif et
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Yükle';
             });
         });
     </script>
