@@ -5,7 +5,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'database': 'cvision',
     'user': 'root',
-    'password': 'Yeni0000',  # MySQL şifreni buraya yaz
+    'password': 'your  sql password',  # MySQL şifreni buraya yaz
     'port': 3306
 }
 
