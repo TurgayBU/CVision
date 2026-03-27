@@ -20,6 +20,8 @@ MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
 # Upload klasörünü oluştur
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+api_key="REDACTED"
+
 # Uygulama ayarları
 DEBUG = True
 PORT = 5000

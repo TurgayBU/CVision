@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>İş İlanı Çekici</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .job-item { padding: 15px; border: 1px solid #ddd; margin: 10px 0; border-radius: 5px; cursor: pointer; }
+        .job-item:hover { background: #f0f2f5; }
+        .preview { color: #666; font-size: 0.9em; margin-top: 5px; }
+        .job-detail { background: #f9f9f9; padding: 20px; border-radius: 5px; margin-top: 20px; }
+        .job-detail h3 { margin-top: 0; color: #333; }
+        .job-description { white-space: pre-wrap; background: white; padding: 15px; border-radius: 5px; border: 1px solid #ddd; max-height: 500px; overflow-y: auto; }
+        .source-badge { background: #667eea; color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.8em; display: inline-block; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .back-btn { background: #6c757d; margin-right: 10px; }
+        .stats { color: #666; font-size: 0.9em; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 İş İlanı Çekici</h1>
+            <div>
+                <button class="back-btn" onclick="showList()" id="backBtn" style="display: none;">← Listeye Dön</button>
+                <button onclick="logout()">Çıkış Yap</button>
+            </div>
+        </div>
+
+        <!-- Yeni İlan Çekme Formu -->
+        <div class="card" id="extractCard">
+            <h3>Yeni İlan Çek</h3>
+            <input type="url" id="jobUrl" placeholder="LinkedIn iş ilanı URL" />
+            <textarea id="jobNotes" placeholder="Notlar (opsiyonel)"></textarea>
+            <button onclick="extractJob()">İlanı Çek ve Kaydet</button>
+            <div id="result" style="margin-top: 10px;"></div>
+        </div>
+
+        <!-- Kayıtlı İlanlar Listesi -->
+        <div class="card" id="listCard">
+            <h3>Kayıtlı İlanlarım</h3>
+            <div id="jobList">Yükleniyor...</div>
+        </div>
+
+        <!-- İlan Detayı Gösterimi -->
+        <div class="card" id="detailCard" style="display: none;">
+            <div id="jobDetailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde ilanları getir
+        loadJobs();
+
+        // Çıkış
+        function logout() {
+            fetch('/api/logout').then(() => window.location.href = '/');
+        }
+
+        // Liste görünümüne dön
+        function showList() {
+            document.getElementById('detailCard').style.display = 'none';
+            document.getElementById('extractCard').style.display = 'block';
+            document.getElementById('listCard').style.display = 'block';
+            document.getElementById('backBtn').style.display = 'none';
+        }
+
+        // Detay görünümüne geç
+        function showDetail() {
+            document.getElementById('detailCard').style.display = 'block';
+            document.getElementById('extractCard').style.display = 'none';
+            document.getElementById('listCard').style.display = 'none';
+            document.getElementById('backBtn').style.display = 'inline-block';
+        }
+
+        // Yeni ilan çek
+        async function extractJob() {
+            const url = document.getElementById('jobUrl').value;
+            const notes = document.getElementById('jobNotes').value;
+
+            if (!url) {
+                alert('URL giriniz');
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '🔍 İlan çekiliyor... (Bu biraz sürebilir)';
+
+            try {
+                const response = await fetch('/api/extract-job', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url, notes})
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.innerHTML = `✅ ${data.message}<br>
+                                          📍 Kaynak: ${data.source}<br>
+                                          📊 Karakter: ${data.length}`;
+
+                    // Formu temizle
+                    document.getElementById('jobUrl').value = '';
+                    document.getElementById('jobNotes').value = '';
+
+                    // Listeyi yenile
+                    loadJobs();
+
+                    // Çekilen ilanı hemen göster
+                    setTimeout(() => viewJob(data.job_id), 1000);
+                } else {
+                    resultDiv.innerHTML = `❌ Hata: ${data.error}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Hata: ${error}`;
+            }
+        }
+
+        // Kayıtlı ilanları listele
+        async function loadJobs() {
+            try {
+                const response = await fetch('/api/user-jobs');
+                const data = await response.json();
+
+                const jobList = document.getElementById('jobList');
+
+                if (data.success && data.jobs.length > 0) {
+                    jobList.innerHTML = data.jobs.map(job => `
+                        <div class="job-item" onclick="viewJob(${job.job_id})">
+                            <strong>ID: ${job.job_id}</strong> - ${new Date(job.created_at).toLocaleString()}
+                            ${job.notes ? `<br><small>📝 Not: ${job.notes}</small>` : ''}
+                            <div class="preview">📄 ${job.preview || 'Önizleme yok'}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    jobList.innerHTML = 'Henüz kayıtlı ilan yok. Yukarıdan yeni ilan çekin.';
+                }
+            } catch (error) {
+                document.getElementById('jobList').innerHTML = 'Hata oluştu';
+            }
+        }
+
+        // İlan detayını göster
+        async function viewJob(jobId) {
+            showDetail();
+
+            const detailContent = document.getElementById('jobDetailContent');
+            detailContent.innerHTML = '<div style="text-align: center">Yükleniyor...</div>';
+
+            try {
+                const response = await fetch(`/api/job/${jobId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const job = data.job;
+                    const date = new Date(job.created_at).toLocaleString('tr-TR');
+
+                    detailContent.innerHTML = `
+                        <h3>📄 İş İlanı Detayı (ID: ${job.job_id})</h3>
+                        <div class="stats">
+                            <p>📅 Tarih: ${date}</p>
+                            <p>🔗 URL: <a href="${job.job_url}" target="_blank">${job.job_url}</a></p>
+                            ${job.notes ? `<p>📝 Not: ${job.notes}</p>` : ''}
+                            <p>📊 Karakter Sayısı: ${job.job_text.length}</p>
+                        </div>
+                        <h4>📋 İş Tanımı:</h4>
+                        <div class="job-description">
+                            ${job.job_text.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                } else {
+                    detailContent.innerHTML = '<div style="color: red">İlan bulunamadı</div>';
+                }
+            } catch (error) {
+                detailContent.innerHTML = `<div style="color: red">Hata: ${error}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

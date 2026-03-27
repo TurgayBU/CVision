@@ -3,246 +3,589 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV ve Link Yükleme</title>
-
+    <title>CVision — Başvuru Asistanı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #0d0f14;
+            --surface: #13161e;
+            --surface2: #1b1f2b;
+            --border: rgba(255,255,255,0.07);
+            --accent: #4f8ef7;
+            --accent2: #a78bfa;
+            --success: #34d399;
+            --error: #f87171;
+            --text: #e8eaf0;
+            --muted: #5a6070;
+            --label: #9ba3b5;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
+        /* ── arka plan ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 70% 10%, rgba(79,142,247,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 10% 80%, rgba(167,139,250,0.09) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page {
+            position: relative;
+            z-index: 1;
+            max-width: 780px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 32px 20px 60px;
         }
 
-        .header {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+        /* ── topbar ── */
+        .topbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 48px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .user-info {
-            font-size: 18px;
-            color: #333;
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span { color: var(--accent); }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            color: var(--label);
+            font-weight: 500;
         }
 
         .logout-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 7px 14px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            transition: all .2s;
+        }
+        .logout-btn:hover { border-color: var(--error); color: var(--error); }
+
+        /* ── section title ── */
+        .section-head {
+            margin-bottom: 32px;
+        }
+        .section-head h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+        .section-head p {
+            font-size: 14px;
+            color: var(--label);
+            font-weight: 300;
         }
 
-        .logout-btn:hover {
-            background-color: #c82333;
+        /* ── card ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 16px;
+            transition: border-color .2s;
+        }
+        .card:focus-within { border-color: rgba(79,142,247,0.35); }
+
+        .card-label {
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 16px;
         }
 
-        .upload-section {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        /* ── file drop zone ── */
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .2s;
+            position: relative;
         }
-
-        .form-group {
-            margin-bottom: 20px;
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--accent);
+            background: rgba(79,142,247,0.05);
         }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        .form-group input[type="file"],
-        .form-group input[type="url"],
-        .form-group textarea {
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
+            height: 100%;
+        }
+        .drop-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--surface2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+        }
+        .drop-icon svg { width: 22px; height: 22px; stroke: var(--accent); }
+        .drop-title {
+            font-weight: 500;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        .drop-sub {
+            font-size: 13px;
+            color: var(--muted);
+        }
+        .file-chosen {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-top: 14px;
+            font-size: 13px;
+        }
+        .file-chosen.show { display: flex; }
+        .file-chosen svg { width: 16px; height: 16px; stroke: var(--success); flex-shrink: 0; }
+        .file-chosen span { color: var(--text); }
+
+        /* ── input fields ── */
+        .field {
+            margin-bottom: 14px;
+        }
+        .field:last-child { margin-bottom: 0; }
+
+        .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--label);
+            margin-bottom: 7px;
+        }
+        .field label .req { color: var(--accent); margin-left: 3px; }
+        .field label .opt {
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--muted);
+            margin-left: 6px;
         }
 
-        .form-group textarea {
-            height: 100px;
-            resize: vertical;
+        .field input,
+        .field textarea {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            padding: 11px 14px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .field input::placeholder,
+        .field textarea::placeholder { color: var(--muted); }
+        .field input:focus,
+        .field textarea:focus {
+            border-color: rgba(79,142,247,0.5);
+            box-shadow: 0 0 0 3px rgba(79,142,247,0.08);
+        }
+        .field textarea { height: 88px; resize: vertical; }
+
+        /* ── source tabs ── */
+        .source-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            background: var(--surface2);
+            padding: 5px;
+            border-radius: 10px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 9px;
+            background: transparent;
+            border: none;
+            border-radius: 7px;
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .tab-btn.active {
+            background: var(--surface);
+            color: var(--text);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── submit ── */
+        .submit-wrap {
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .submit-btn {
-            background-color: #007bff;
-            color: white;
+            background: var(--accent);
+            color: #fff;
             border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
+            padding: 13px 32px;
+            border-radius: 10px;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
+            transition: opacity .2s, transform .1s;
+            position: relative;
+            overflow: hidden;
+        }
+        .submit-btn:hover { opacity: 0.88; }
+        .submit-btn:active { transform: scale(0.98); }
+        .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .submit-hint {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
         }
 
-        .submit-btn:hover {
-            background-color: #0056b3;
-        }
-
-        .submit-btn:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-
-        .message {
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+        /* ── alert banner ── */
+        .alert {
             display: none;
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            animation: slideIn .25s ease;
+        }
+        .alert.show { display: flex; align-items: flex-start; gap: 10px; }
+        .alert svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+        .alert.success {
+            background: rgba(52,211,153,0.1);
+            border-color: rgba(52,211,153,0.25);
+            color: var(--success);
+        }
+        .alert.error {
+            background: rgba(248,113,113,0.1);
+            border-color: rgba(248,113,113,0.25);
+            color: var(--error);
         }
 
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
+        /* ── progress ── */
+        .progress-bar {
+            height: 3px;
+            background: var(--surface2);
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+            margin-bottom: 20px;
+        }
+        .progress-bar.show { display: block; }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            border-radius: 2px;
+            transition: width .4s ease;
         }
 
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="user-info">
-                Hoş geldiniz, <span id="username">{{ session.get('fullname', session.get('username', '')) }}</span>
-            </div>
-            <button class="logout-btn" onclick="logout()">Çıkış Yap</button>
-        </div>
+<div class="page">
 
-        <div class="upload-section">
-            <h2>CV ve Link Yükleme</h2>
-
-            <div id="message" class="message"></div>
-
-            <form id="uploadForm" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="cv">CV Dosyası (PDF, DOC, DOCX)</label>
-                    <input type="file" id="cv" name="cv" accept=".pdf,.doc,.docx" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="linkedin">Link of Job</label>
-                    <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/username" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="github">GitHub Profil Linki (Opsiyonel)</label>
-                    <input type="url" id="github" name="github" placeholder="https://github.com/username">
-                </div>
-
-                <div class="form-group">
-                    <label for="portfolio">Portfolio/Website Linki (Opsiyonel)</label>
-                    <input type="url" id="portfolio" name="portfolio" placeholder="https://example.com">
-                </div>
-
-                <div class="form-group">
-                    <label for="notes">Ek Notlar (Opsiyonel)</label>
-                    <textarea id="notes" name="notes" placeholder="Eklemek istediğiniz notlar..."></textarea>
-                </div>
-
-                <button type="submit" class="submit-btn" id="submitBtn">Yükle</button>
-            </form>
+    <!-- topbar -->
+    <div class="topbar">
+        <div class="logo">CV<span>ision</span></div>
+        <div class="user-pill">
+            <span class="user-name">👤 <span id="username">{{ session.get('fullname', session.get('username', '')) }}</span></span>
+            <button class="logout-btn" onclick="logout()">Çıkış</button>
         </div>
     </div>
 
-    <script>
-        // Oturum kontrolü
-        fetch('/api/check-session')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.logged_in) {
-                    window.location.href = '/';
-                }
-            });
+    <!-- başlık -->
+    <div class="section-head">
+        <h1>Başvuru Analizi</h1>
+        <p>CV'nizi yükleyin ve başvurmak istediğiniz iş ilanını ekleyin — yapay zeka geri kalanını halleder.</p>
+    </div>
 
-        // Çıkış işlemi
-        function logout() {
-            fetch('/api/logout')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = '/';
-                    }
-                });
+    <!-- alert -->
+    <div id="alert" class="alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="alertText"></span>
+    </div>
+
+    <!-- progress -->
+    <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+
+        <!-- CV yükleme -->
+        <div class="card">
+            <div class="card-label">01 — CV Dosyası</div>
+            <div class="drop-zone" id="dropZone">
+                <input type="file" id="cv" name="cv" accept=".pdf,.doc,.docx" required>
+                <div class="drop-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="12" y1="18" x2="12" y2="12"/>
+                        <polyline points="9 15 12 12 15 15"/>
+                    </svg>
+                </div>
+                <div class="drop-title">Dosyayı buraya sürükleyin</div>
+                <div class="drop-sub">veya tıklayarak seçin &nbsp;·&nbsp; PDF, DOC, DOCX</div>
+            </div>
+            <div class="file-chosen" id="fileChosen">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span id="fileName">—</span>
+            </div>
+        </div>
+
+        <!-- İş ilanı -->
+        <div class="card">
+            <div class="card-label">02 — İş İlanı</div>
+
+            <div class="source-tabs">
+                <button type="button" class="tab-btn active" onclick="switchTab('url', this)">🔗 Link</button>
+                <button type="button" class="tab-btn" onclick="switchTab('text', this)">📝 Metin</button>
+            </div>
+
+            <div class="tab-panel active" id="panel-url">
+                <div class="field">
+                    <label for="job_url">İş İlanı URL'si <span class="req">*</span></label>
+                    <input type="url" id="job_url" name="job_url"
+                           placeholder="https://linkedin.com/jobs/view/... veya kariyer.net/...">
+                </div>
+            </div>
+
+            <div class="tab-panel" id="panel-text">
+                <div class="field">
+                    <label for="job_text">İlan Metnini Yapıştırın <span class="req">*</span></label>
+                    <textarea id="job_text" name="job_text"
+                              placeholder="İş ilanının tamamını buraya yapıştırın…"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opsiyonel linkler -->
+        <div class="card">
+            <div class="card-label">03 — Profil Linkleri <span style="color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0">(opsiyonel)</span></div>
+
+            <div class="field">
+                <label for="github">GitHub <span class="opt">opsiyonel</span></label>
+                <input type="url" id="github" name="github" placeholder="https://github.com/kullanıcıadı">
+            </div>
+            <div class="field">
+                <label for="portfolio">Portfolio / Website <span class="opt">opsiyonel</span></label>
+                <input type="url" id="portfolio" name="portfolio" placeholder="https://portfolio.com">
+            </div>
+        </div>
+
+        <div class="submit-wrap">
+            <button type="submit" class="submit-btn" id="submitBtn">Analiz Et →</button>
+            <p class="submit-hint">CV ve iş ilanı birlikte analiz edilerek<br>uyumluluk raporu hazırlanır.</p>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // ── oturum kontrolü ──
+    fetch('/api/check-session')
+        .then(r => r.json())
+        .then(d => { if (!d.logged_in) location.href = '/'; });
+
+    function logout() {
+        fetch('/api/logout').then(r => r.json())
+            .then(d => { if (d.success) location.href = '/'; });
+    }
+
+    // ── dosya seçimi ──
+    const cvInput   = document.getElementById('cv');
+    const dropZone  = document.getElementById('dropZone');
+    const fileChosen = document.getElementById('fileChosen');
+    const fileName  = document.getElementById('fileName');
+
+    cvInput.addEventListener('change', () => {
+        if (cvInput.files[0]) {
+            fileName.textContent = cvInput.files[0].name;
+            fileChosen.classList.add('show');
+        }
+    });
+    dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        if (e.dataTransfer.files[0]) {
+            cvInput.files = e.dataTransfer.files;
+            fileName.textContent = e.dataTransfer.files[0].name;
+            fileChosen.classList.add('show');
+        }
+    });
+
+    // ── tab geçişi ──
+    let activeTab = 'url';
+    function switchTab(tab, btn) {
+        activeTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + tab).classList.add('active');
+    }
+
+    // ── alert ──
+    function showAlert(msg, type) {
+        const el = document.getElementById('alert');
+        el.className = 'alert show ' + type;
+        document.getElementById('alertText').textContent = msg;
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ── progress ──
+    function setProgress(pct) {
+        const bar = document.getElementById('progressBar');
+        const fill = document.getElementById('progressFill');
+        bar.classList.add('show');
+        fill.style.width = pct + '%';
+        if (pct >= 100) setTimeout(() => bar.classList.remove('show'), 600);
+    }
+
+    // ── form submit ──
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const btn = document.getElementById('submitBtn');
+
+        // İş ilanı kaynağı kontrolü
+        const jobUrl  = document.getElementById('job_url').value.trim();
+        const jobText = document.getElementById('job_text').value.trim();
+        const jobSource = activeTab === 'url' ? jobUrl : jobText;
+
+        if (!jobSource) {
+            showAlert(activeTab === 'url'
+                ? 'Lütfen bir iş ilanı URL\'si girin.'
+                : 'Lütfen iş ilanı metnini yapıştırın.', 'error');
+            return;
         }
 
-        // Form gönderme işlemi
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        btn.disabled = true;
+        btn.textContent = 'Analiz ediliyor…';
+        setProgress(15);
 
-            const formData = new FormData(this);
-            const messageDiv = document.getElementById('message');
-            const submitBtn = document.getElementById('submitBtn');
+        // 1) CV yükleme
+        const formData = new FormData(this);
+        // job_url alanını her zaman gönder (backend için)
+        if (activeTab === 'text') {
+            formData.set('job_url', '');
+        }
 
-            // Butonu devre dışı bırak ve metnini değiştir
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Yükleniyor...';
+        let cvTextId = null;
+        try {
+            setProgress(30);
+            const r1 = await fetch('/api/upload-cv-links', { method: 'POST', body: formData });
+            const d1 = await r1.json();
 
-            fetch('/api/upload-cv-links', {
+            if (!d1.success) {
+                showAlert(d1.message || 'CV yükleme başarısız.', 'error');
+                btn.disabled = false; btn.textContent = 'Analiz Et →';
+                return;
+            }
+            cvTextId = d1.cv_text_id;
+            setProgress(55);
+        } catch (err) {
+            showAlert('CV yükleme sırasında hata: ' + err, 'error');
+            btn.disabled = false; btn.textContent = 'Analiz Et →';
+            return;
+        }
+
+        // 2) İş ilanı analizi
+        try {
+            setProgress(70);
+            const r2 = await fetch('/api/analyze-job', {
                 method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                messageDiv.className = 'message ' + (data.success ? 'success' : 'error');
-                messageDiv.textContent = data.message;
-
-                if (data.success) {
-                    this.reset();
-
-                    // Yönlendirme varsa sayfayı yönlendir
-                    if (data.redirect) {
-                        messageDiv.textContent += ' Yönlendiriliyorsunuz...';
-                        setTimeout(() => {
-                            window.location.href = data.redirect;
-                        }, 2000);
-                    } else {
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Yükle';
-                    }
-                } else {
-                    // Hata durumunda butonu tekrar aktif et
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Yükle';
-                }
-            })
-            .catch(error => {
-                messageDiv.className = 'message error';
-                messageDiv.textContent = 'Bir hata oluştu: ' + error;
-
-                // Hata durumunda butonu tekrar aktif et
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Yükle';
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ source: jobSource })
             });
-        });
-    </script>
+            const d2 = await r2.json();
+
+            setProgress(100);
+
+            if (!d2.success) {
+                showAlert('İş ilanı analizi başarısız: ' + (d2.error || ''), 'error');
+                btn.disabled = false; btn.textContent = 'Analiz Et →';
+                return;
+            }
+
+            showAlert('CV ve iş ilanı başarıyla analiz edildi! Yönlendiriliyorsunuz…', 'success');
+
+            // cv_analysis sayfasına yönlendir
+            setTimeout(() => {
+                const params = new URLSearchParams({
+                    cv_id: cvTextId,
+                    job_id: d2.job_analysis_id
+                });
+                location.href = '/cv-analysis?' + params.toString();
+            }, 1800);
+
+        } catch (err) {
+            showAlert('İş ilanı analizi sırasında hata: ' + err, 'error');
+            btn.disabled = false; btn.textContent = 'Analiz Et →';
+        }
+    });
+</script>
 </body>
 </html>
