@@ -317,6 +317,46 @@ def analyze_cv():
         ai_cv.disconnect()
 
 
+@app.route('/api/job-analyses')
+def get_job_analyses():
+    if not session.get('user_id'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    user_id = session['user_id']
+
+    try:
+        # DB_CONFIG'in tanımlı olduğunu kontrol et
+        if 'DB_CONFIG' not in globals():
+            return jsonify({'success': False, 'error': 'Database configuration not found'}), 500
+
+        conn = mysql.connector.connect(**DB_CONFIG)  # ** kullanımı daha güvenli
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT job_analysis_id, job_title, company_name, department,
+                   employment_type, is_remote, work_type, completeness_score,
+                   analyzed_at, required_skills, preferred_skills, exp_min_years,
+                   exp_max_years, edu_min_level, edu_preferred_fields, languages,
+                   salary_min, salary_max, salary_currency, source_url,
+                   location_city, location_district, location_country
+            FROM job_analyses
+            WHERE user_id = %s
+            ORDER BY analyzed_at DESC
+        """, (user_id,))
+
+        jobs = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({'success': True, 'jobs': jobs})
+
+    except mysql.connector.Error as err:
+        print(f"MySQL Hatası: {err}")
+        return jsonify({'success': False, 'error': f'Database error: {str(err)}'}), 500
+    except Exception as e:
+        print(f"Genel hata: {e}")
+        return jsonify({'success': False, 'error': f'Server error: {str(e)}'}), 500
 # ─────────────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
