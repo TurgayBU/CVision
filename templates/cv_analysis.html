@@ -3,939 +3,1519 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Analiz - AI Destekli CV Analiz Sistemi</title>
+    <title>CVision — AI Analiz Platformu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #0a0a0f;
+            --surface: #111118;
+            --surface2: #16161f;
+            --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(255,255,255,0.14);
+            --text: #e8e8f0;
+            --text-muted: #6b6b80;
+            --text-dim: #3a3a50;
+            --accent: #7c6af7;
+            --accent2: #a78bfa;
+            --accent-glow: rgba(124, 106, 247, 0.15);
+            --green: #34d399;
+            --green-glow: rgba(52, 211, 153, 0.12);
+            --amber: #fbbf24;
+            --red: #f87171;
+            --blue: #60a5fa;
+            --radius: 14px;
+            --radius-sm: 8px;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Navbar */
+        /* Background grain + grid */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(124,106,247,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124,106,247,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Ambient orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+        .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #7c6af7 0%, transparent 70%); top: -150px; left: -100px; }
+        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, #34d399 0%, transparent 70%); bottom: -100px; right: -80px; opacity: 0.2; }
+
+        /* ─── NAVBAR ─── */
         .navbar {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 15px 0;
             position: sticky;
             top: 0;
-            z-index: 1000;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+            z-index: 100;
+            background: rgba(10,10,15,0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 60px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent2) 0%, #c4b5fd 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
             display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #667eea;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 5px 15px;
-            background: #f0f2f5;
-            border-radius: 20px;
-        }
-
-        /* Main Container */
-        .main-container {
-            max-width: 1000px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            margin-bottom: 25px;
-            overflow: hidden;
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-        }
-
-        .card-header h2 {
-            font-size: 1.5em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-body {
-            padding: 25px;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-        }
-
-        input[type="number"], select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        input[type="number"]:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
             align-items: center;
             gap: 8px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #218838;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* Loading Spinner */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+        .logo-dot {
+            width: 8px; height: 8px;
+            background: var(--accent);
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            animation: pulse 2s ease-in-out infinite;
+            -webkit-text-fill-color: initial;
+            flex-shrink: 0;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes pulse {
+            0%,100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.7; }
         }
 
-        /* Alert */
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        /* CV List */
-        .cv-list {
-            list-style: none;
-        }
-
-        .cv-item {
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .cv-item:hover {
-            border-color: #667eea;
-            transform: translateX(5px);
-        }
-
-        .cv-item.selected {
-            border-color: #28a745;
-            background: #f8f9fa;
-        }
-
-        .cv-item-header {
+        .nav-links {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            gap: 4px;
         }
 
-        .cv-item-title {
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 13.5px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--text); background: var(--border); }
+        .nav-links a.active { color: var(--accent2); background: var(--accent-glow); }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 12px 5px 5px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .nav-user:hover { border-color: var(--border-hover); }
+
+        .avatar {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
             font-weight: 600;
-            color: #333;
+            color: white;
         }
 
-        .cv-item-date {
-            color: #6c757d;
-            font-size: 0.9em;
+        /* ─── LAYOUT ─── */
+        .main {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 24px 60px;
         }
 
-        .cv-item-preview {
-            color: #6c757d;
-            font-size: 0.9em;
-            white-space: nowrap;
+        /* Page header */
+        .page-header {
+            margin-bottom: 32px;
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .page-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .page-header p { color: var(--text-muted); font-size: 14px; }
+
+        /* ─── STATS ROW ─── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+            animation: fadeUp 0.5s 0.05s ease both;
+        }
+
+        .stat-tile {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .stat-tile:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+
+        .stat-icon {
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.purple { background: var(--accent-glow); }
+        .stat-icon.green  { background: var(--green-glow); }
+        .stat-icon.amber  { background: rgba(251,191,36,0.1); }
+
+        .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+        /* ─── TAB SWITCHER ─── */
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 4px;
+            width: fit-content;
+            margin-bottom: 24px;
+            animation: fadeUp 0.5s 0.1s ease both;
+        }
+
+        .tab-btn {
+            padding: 8px 22px;
+            border-radius: 100px;
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px;
+            font-weight: 500;
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(124,106,247,0.4);
+        }
+
+        /* ─── CARD ─── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Analysis Results */
-        .result-section {
-            display: none;
-        }
-
-        .cv-field {
             margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
+            animation: fadeUp 0.5s 0.15s ease both;
+        }
+
+        .card-head {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-head-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 32px; height: 32px;
             border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .cv-field label {
-            color: #667eea;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-        }
-
-        .cv-field p {
-            color: #333;
-            line-height: 1.6;
-            white-space: pre-wrap;
+            background: var(--accent-glow);
+            display: flex; align-items: center; justify-content: center;
             font-size: 15px;
         }
 
-        .field-content {
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
         }
 
-        .button-group {
+        .card-body { padding: 24px; }
+
+        /* ─── FORM ─── */
+        .form-row { margin-bottom: 20px; }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b80' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+        .form-select:focus, .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-select option { background: var(--surface2); }
+
+        /* ─── BUTTONS ─── */
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%);
+            color: white;
+            box-shadow: 0 2px 12px rgba(124,106,247,0.3);
+        }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,106,247,0.4); }
+
+        .btn-success {
+            background: rgba(52,211,153,0.1);
+            color: var(--green);
+            border: 1px solid rgba(52,211,153,0.2);
+        }
+        .btn-success:hover { background: rgba(52,211,153,0.18); }
+
+        .btn-ghost {
+            background: var(--surface2);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { color: var(--text); border-color: var(--border-hover); }
+
+        .btn-danger {
+            background: rgba(248,113,113,0.1);
+            color: var(--red);
+            border: 1px solid rgba(248,113,113,0.2);
+        }
+        .btn-danger:hover { background: rgba(248,113,113,0.18); }
+
+        .btn-group {
             display: flex;
             gap: 10px;
-            margin-top: 25px;
             flex-wrap: wrap;
+            margin-top: 24px;
         }
 
-        .button-group .btn {
-            flex: 1;
+        /* ─── INFO BOX ─── */
+        .info-box {
+            background: rgba(124,106,247,0.06);
+            border: 1px solid rgba(124,106,247,0.15);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.8;
         }
 
-        /* Modal */
+        .info-box span { color: var(--accent2); }
+
+        /* ─── RESULT FIELDS ─── */
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .result-field {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .result-field:hover { border-color: var(--border-hover); }
+        .result-field.full-width { grid-column: 1 / -1; }
+
+        .result-field-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--accent2);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .result-field-content {
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.65;
+            white-space: pre-wrap;
+            max-height: 160px;
+            overflow-y: auto;
+        }
+
+        .result-field-content::-webkit-scrollbar { width: 4px; }
+        .result-field-content::-webkit-scrollbar-track { background: transparent; }
+        .result-field-content::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 2px; }
+
+        /* ─── JOB SECTION ─── */
+        .job-match-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .match-score-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: var(--green-glow);
+            border: 1px solid rgba(52,211,153,0.2);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--green);
+        }
+
+        .score-ring {
+            position: relative;
+            width: 90px; height: 90px;
+            flex-shrink: 0;
+        }
+
+        .score-ring svg { transform: rotate(-90deg); }
+        .score-ring-bg { fill: none; stroke: var(--border); stroke-width: 6; }
+        .score-ring-fill {
+            fill: none;
+            stroke: url(#ringGrad);
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 226;
+            stroke-dashoffset: 226;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .score-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .score-text small { font-size: 10px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-weight: 400; }
+
+        .job-details-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: start;
+            padding: 20px 24px;
+        }
+
+        .job-info h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .job-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .job-tag {
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11.5px;
+            font-weight: 500;
+        }
+
+        .job-tag.purple { background: var(--accent-glow); color: var(--accent2); border: 1px solid rgba(124,106,247,0.2); }
+        .job-tag.blue   { background: rgba(96,165,250,0.1); color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
+        .job-tag.amber  { background: rgba(251,191,36,0.1); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+
+        /* Skill match chips */
+        .skill-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 10px;
+        }
+
+        .chip {
+            padding: 5px 11px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid;
+        }
+
+        .chip.match   { background: var(--green-glow); color: var(--green); border-color: rgba(52,211,153,0.25); }
+        .chip.missing { background: rgba(248,113,113,0.08); color: var(--red); border-color: rgba(248,113,113,0.2); }
+        .chip.neutral { background: var(--surface2); color: var(--text-muted); border-color: var(--border); }
+
+        /* Suggestions */
+        .suggestion-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .suggestion-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 12px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: var(--text-muted);
+        }
+
+        .suggestion-item .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+        /* ─── LOADING ─── */
+        .loading-overlay {
+            display: none;
+            text-align: center;
+            padding: 60px 24px;
+        }
+
+        .loader {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .loading-sub { font-size: 13px; color: var(--text-muted); }
+
+        /* ─── ALERT ─── */
+        .alert {
+            display: none;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            margin-bottom: 20px;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .alert-success { background: var(--green-glow); color: var(--green); border: 1px solid rgba(52,211,153,0.25); }
+        .alert-error   { background: rgba(248,113,113,0.08); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+        .alert-warning { background: rgba(251,191,36,0.08); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+        .alert-info    { background: var(--accent-glow); color: var(--accent2); border: 1px solid rgba(124,106,247,0.2); }
+
+        /* ─── MODAL ─── */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
         }
 
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            max-width: 500px;
+        .modal-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
             width: 90%;
-            max-height: 80vh;
+            max-width: 520px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to   { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .modal-head {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-close {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .modal-close:hover { color: var(--text); border-color: var(--border-hover); }
+
+        .modal-body { padding: 24px; }
+        .modal-foot { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+        .modal-field { margin-bottom: 16px; }
+        .modal-field textarea {
+            width: 100%;
+            padding: 10px 13px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px;
+            line-height: 1.5;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .modal-field textarea:focus { border-color: var(--accent); }
+
+        pre#rawTextContent {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            font-size: 12.5px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 400px;
             overflow-y: auto;
         }
 
-        .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px 15px 0 0;
+        /* Tab panes */
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 20px 0;
         }
 
-        .modal-body {
-            padding: 25px;
-        }
-
-        .modal-footer {
-            padding: 20px;
-            border-top: 1px solid #e0e0e0;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
-        .modal-field {
-            margin-bottom: 20px;
-        }
-
-        .modal-field label {
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-size: 11px;
             font-weight: 600;
-            margin-bottom: 5px;
+        }
+        .badge-purple { background: var(--accent-glow); color: var(--accent2); }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .modal-field textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            min-height: 100px;
-            resize: vertical;
-        }
+        /* Scrollbar global */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-hover); border-radius: 3px; }
 
-        .hidden {
-            display: none;
-        }
-
-        /* Info Box */
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #2196F3;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .info-box p {
-            margin: 5px 0;
-            color: #0d47a1;
-        }
-
-        /* Stats */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            .cv-item-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-
-            .stats-container {
-                grid-template-columns: 1fr;
-            }
+            .stats-row { grid-template-columns: 1fr; }
+            .result-grid { grid-template-columns: 1fr; }
+            .result-field.full-width { grid-column: 1; }
+            .navbar { padding: 0 16px; }
+            .main { padding: 20px 16px 40px; }
+            .job-details-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <!-- NAVBAR -->
     <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">🎯 CV AI Analiz</div>
-            <div class="nav-links">
-                <a href="/dashboard">Dashboard</a>
-                <a href="/cv-analysis">CV Analiz</a>
-                <a href="/api/logout" id="logoutBtn">Çıkış</a>
-                <div class="user-info" id="userInfo">
-                    <span>👤</span>
-                    <span id="userName">{{ session.fullname if session and session.fullname else session.username if session else 'Kullanıcı' }}</span>
-                </div>
-            </div>
+        <div class="logo">
+            <div class="logo-dot"></div>
+            CVision
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/cv-analysis" class="active">CV Analiz</a>
+            <a href="/jobs">İlanlar</a>
+            <a href="/api/logout" id="logoutBtn">Çıkış</a>
+        </div>
+        <div class="nav-user">
+            <div class="avatar">T</div>
+            <span id="userName">{{ session.username if session else 'Kullanıcı' }}</span>
         </div>
     </nav>
 
-    <!-- Main Container -->
-    <div class="main-container">
+    <!-- MAIN -->
+    <div class="main">
+        <div class="page-header">
+            <h1>AI Analiz Merkezi</h1>
+            <p>CV'lerinizi analiz edin, iş ilanlarıyla eşleştirin ve önerileri görün</p>
+        </div>
+
         <!-- Alert -->
         <div id="alert" class="alert"></div>
 
-        <!-- Stats Card -->
-        <div class="card" id="statsCard">
-            <div class="card-header">
-                <h2>📊 CV İstatistikleri</h2>
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-tile">
+                <div class="stat-icon purple">📄</div>
+                <div>
+                    <div class="stat-num" id="totalCvs">0</div>
+                    <div class="stat-label">Toplam CV</div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="stats-container" id="statsContainer">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalCvs">0</div>
-                        <div class="stat-label">Toplam CV</div>
+            <div class="stat-tile">
+                <div class="stat-icon green">✅</div>
+                <div>
+                    <div class="stat-num" id="analyzedCvs">0</div>
+                    <div class="stat-label">Analiz Edildi</div>
+                </div>
+            </div>
+            <div class="stat-tile">
+                <div class="stat-icon amber">⏳</div>
+                <div>
+                    <div class="stat-num" id="pendingCvs">0</div>
+                    <div class="stat-label">Bekleyen</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab bar -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('cv', this)">📋 CV Analizi</button>
+            <button class="tab-btn" onclick="switchTab('job', this)">💼 İş Eşleştirme</button>
+        </div>
+
+        <!-- ══ TAB: CV ANALİZ ══ -->
+        <div id="tab-cv" class="tab-pane active">
+
+            <!-- CV Select Card -->
+            <div class="card" id="cvSelectionCard">
+                <div class="card-head">
+                    <div class="card-head-left">
+                        <div class="card-icon">🔍</div>
+                        <span class="card-title">CV Seçimi ve Analiz</span>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="analyzedCvs">0</div>
-                        <div class="stat-label">Analiz Edilen</div>
+                    <span class="badge badge-purple">DeepSeek AI</span>
+                </div>
+                <div class="card-body">
+                    <div class="info-box">
+                        <span>📌</span> Analiz etmek istediğiniz CV'yi seçin — AI tüm alanları otomatik olarak çıkarır.<br>
+                        <span>✏️</span> Sonuçları düzenleyebilir ve veritabanına kaydedebilirsiniz.
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="pendingCvs">0</div>
-                        <div class="stat-label">Bekleyen</div>
+                    <div class="form-row">
+                        <label class="form-label">CV Seçin</label>
+                        <select class="form-select" id="cvSelect">
+                            <option value="">Yükleniyor...</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeCV()" disabled>
+                        ✦ Analiz Et
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div class="loading-overlay" id="loading">
+                <div class="loader"></div>
+                <div class="loading-text">Analiz ediliyor…</div>
+                <div class="loading-sub">DeepSeek AI yanıt bekleniyor</div>
+            </div>
+
+            <!-- Result Card -->
+            <div class="card" id="resultCard" style="display:none;">
+                <div class="card-head">
+                    <div class="card-head-left">
+                        <div class="card-icon">📊</div>
+                        <span class="card-title">Analiz Sonuçları</span>
+                    </div>
+                    <span class="badge badge-purple">cv_text_id: <span id="currentCvTextId"></span></span>
+                </div>
+                <div class="card-body">
+                    <div class="result-grid">
+                        <div class="result-field">
+                            <div class="result-field-label">📍 Adres</div>
+                            <div class="result-field-content" id="cvAddress">—</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="result-field-label">🗣️ Diller</div>
+                            <div class="result-field-content" id="cvLanguages">—</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="result-field-label">💻 Yetenekler</div>
+                            <div class="result-field-content" id="cvSkills">—</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="result-field-label">🎓 Eğitim</div>
+                            <div class="result-field-content" id="cvEducation">—</div>
+                        </div>
+                        <div class="result-field full-width">
+                            <div class="result-field-label">💼 İş Deneyimi</div>
+                            <div class="result-field-content" id="cvExperience">—</div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="saveAnalysis()">💾 Kaydet</button>
+                        <button class="btn btn-ghost" onclick="editFields()">✏️ Düzenle</button>
+                        <button class="btn btn-ghost" onclick="viewRawText()">📄 Ham Metin</button>
+                        <button class="btn btn-danger" onclick="resetAnalysis()">↺ Sıfırla</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- CV Selection Card -->
-        <div class="card" id="cvSelectionCard">
-            <div class="card-header">
-                <h2>📄 CV Seçimi</h2>
+        <!-- ══ TAB: İŞ EŞLEŞTİRME ══ -->
+        <div id="tab-job" class="tab-pane">
+
+            <!-- Job Input Card -->
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-head-left">
+                        <div class="card-icon">💼</div>
+                        <span class="card-title">İş İlanı Analizi</span>
+                    </div>
+                    <span class="badge badge-purple">AI Eşleştirme</span>
+                </div>
+                <div class="card-body">
+                    <div class="info-box">
+                        <span>🔗</span> İş ilanı URL'si veya açıklamasını girin. AI, CV'niz ile uyumluluğu analiz eder ve eksiklikleri gösterir.
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Kullanılacak CV</label>
+                        <select class="form-select" id="jobCvSelect">
+                            <option value="">CV seçin...</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Kullanılacak Job</label>
+                        <select class="form-select" id="jobSelect">
+                            <option value="">CV seçin...</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">İş İlanı URL veya Açıklaması</label>
+                        <textarea class="modal-field" style="width:100%; padding:10px 13px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.5; resize:vertical; min-height:100px; outline:none;" id="jobInput" placeholder="https://... veya iş ilanı metnini buraya yapıştırın"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="analyzeJob()" id="jobAnalyzeBtn">
+                        ✦ Eşleştir ve Analiz Et
+                    </button>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="info-box">
-                    <p>📌 Analiz etmek istediğiniz CV'yi seçin</p>
-                    <p>🔄 Seçilen CV, DeepSeek AI tarafından analiz edilecek</p>
-                    <p>💡 Analiz sonuçlarını düzenleyebilir ve kaydedebilirsiniz</p>
-                </div>
 
-                <div class="form-group">
-                    <label for="cvSelect">CV Seçin (cv_text_id):</label>
-                    <select id="cvSelect">
-                        <option value="">CV yükleniyor...</option>
-                    </select>
-                </div>
-
-                <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeCV()" disabled>
-                    🔍 Seçili CV'yi Analiz Et
-                </button>
+            <!-- Job Loading -->
+            <div class="loading-overlay" id="jobLoading">
+                <div class="loader"></div>
+                <div class="loading-text">Eşleştirme yapılıyor…</div>
+                <div class="loading-sub">İlan ile CV karşılaştırılıyor</div>
             </div>
-        </div>
 
-        <!-- Loading -->
-        <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <p style="color: white; font-size: 18px;">CV analiz ediliyor...</p>
-            <p style="color: rgba(255,255,255,0.8);">DeepSeek AI yanıt bekleniyor</p>
-        </div>
-
-        <!-- Analysis Results Card -->
-        <div class="card" id="resultCard" style="display: none;">
-            <div class="card-header">
-                <h2>📊 CV Analiz Sonuçları</h2>
-            </div>
-            <div class="card-body">
-                <!-- CV Info -->
-                <div class="info-box" style="margin-bottom: 20px;">
-                    <p><strong>CV Text ID:</strong> <span id="currentCvTextId"></span></p>
-                    <p><strong>Analiz Tarihi:</strong> <span id="analysisDate">{{ now().strftime('%d.%m.%Y %H:%M') if now else 'Şimdi' }}</span></p>
+            <!-- Job Result Card -->
+            <div class="card" id="jobResultCard" style="display:none;">
+                <div class="job-match-header">
+                    <div class="card-head-left">
+                        <div class="card-icon">🎯</div>
+                        <div>
+                            <div class="card-title" id="jobTitle">Pozisyon</div>
+                            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="jobCompany">Şirket</div>
+                        </div>
+                    </div>
+                    <div class="match-score-badge">
+                        <svg class="score-ring" viewBox="0 0 90 90">
+                            <defs>
+                                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#7c6af7"/>
+                                    <stop offset="100%" style="stop-color:#34d399"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="score-ring-bg" cx="45" cy="45" r="36"/>
+                            <circle class="score-ring-fill" id="scoreRingFill" cx="45" cy="45" r="36"/>
+                        </svg>
+                        <div class="score-text" id="scoreText">
+                            <span id="scoreNum">—</span>
+                            <small>Uyum</small>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- CV Fields -->
-                <div class="cv-field">
-                    <label>📍 Adres:</label>
-                    <div class="field-content" id="cvAddress"></div>
+                <div class="job-details-row">
+                    <div class="job-info">
+                        <div class="job-meta" id="jobMeta"></div>
+                        <div class="divider"></div>
+
+                        <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:10px;">Eşleşen Yetkinlikler</div>
+                        <div class="skill-chips" id="matchedSkills"></div>
+
+                        <div class="divider"></div>
+
+                        <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:10px;">Eksik / Geliştirilmesi Gereken</div>
+                        <div class="skill-chips" id="missingSkills"></div>
+
+                        <div class="divider"></div>
+
+                        <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:12px;">AI Önerileri</div>
+                        <ul class="suggestion-list" id="suggestions"></ul>
+                    </div>
                 </div>
 
-                <div class="cv-field">
-                    <label>💻 Yetenekler:</label>
-                    <div class="field-content" id="cvSkills"></div>
-                </div>
-
-                <div class="cv-field">
-                    <label>💼 İş Deneyimi:</label>
-                    <div class="field-content" id="cvExperience"></div>
-                </div>
-
-                <div class="cv-field">
-                    <label>🎓 Eğitim:</label>
-                    <div class="field-content" id="cvEducation"></div>
-                </div>
-
-                <div class="cv-field">
-                    <label>🗣️ Diller:</label>
-                    <div class="field-content" id="cvLanguages"></div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="button-group">
-                    <button class="btn btn-success" onclick="saveAnalysis()">
-                        💾 Analizi Kaydet
-                    </button>
-                    <button class="btn btn-secondary" onclick="editFields()">
-                        ✏️ Düzenle
-                    </button>
-                    <button class="btn btn-primary" onclick="viewRawText()">
-                        📄 Ham Metni Gör
-                    </button>
-                    <button class="btn btn-danger" onclick="resetAnalysis()">
-                        🔄 Yeni Analiz
-                    </button>
+                <div style="padding: 0 24px 24px;">
+                    <div class="btn-group" style="margin-top:0;">
+                        <button class="btn btn-success" onclick="saveJobAnalysis()">💾 Analizi Kaydet</button>
+                        <button class="btn btn-danger" onclick="resetJobAnalysis()">↺ Yeni Analiz</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Modal -->
+    <!-- ══ EDIT MODAL ══ -->
     <div id="editModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>✏️ CV Bilgilerini Düzenle</h3>
+        <div class="modal-box">
+            <div class="modal-head">
+                ✏️ CV Bilgilerini Düzenle
+                <button class="modal-close" onclick="closeEditModal()">✕</button>
             </div>
             <div class="modal-body">
                 <div class="modal-field">
-                    <label for="editAddress">Adres:</label>
+                    <label class="form-label">Adres</label>
                     <textarea id="editAddress" rows="2"></textarea>
                 </div>
                 <div class="modal-field">
-                    <label for="editSkills">Yetenekler:</label>
+                    <label class="form-label">Yetenekler</label>
                     <textarea id="editSkills" rows="3"></textarea>
                 </div>
                 <div class="modal-field">
-                    <label for="editExperience">İş Deneyimi:</label>
+                    <label class="form-label">İş Deneyimi</label>
                     <textarea id="editExperience" rows="4"></textarea>
                 </div>
                 <div class="modal-field">
-                    <label for="editEducation">Eğitim:</label>
+                    <label class="form-label">Eğitim</label>
                     <textarea id="editEducation" rows="3"></textarea>
                 </div>
                 <div class="modal-field">
-                    <label for="editLanguages">Diller:</label>
+                    <label class="form-label">Diller</label>
                     <textarea id="editLanguages" rows="2"></textarea>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeEditModal()">İptal</button>
-                <button class="btn btn-primary" onclick="saveEdits()">Değişiklikleri Kaydet</button>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" onclick="closeEditModal()">İptal</button>
+                <button class="btn btn-primary" onclick="saveEdits()">Kaydet</button>
             </div>
         </div>
     </div>
 
-    <!-- Raw Text Modal -->
+    <!-- ══ RAW TEXT MODAL ══ -->
     <div id="rawTextModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>📄 Ham CV Metni</h3>
+        <div class="modal-box">
+            <div class="modal-head">
+                📄 Ham CV Metni
+                <button class="modal-close" onclick="closeRawTextModal()">✕</button>
             </div>
             <div class="modal-body">
-                <pre id="rawTextContent" style="white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto; background: #f5f5f5; padding: 15px; border-radius: 5px;"></pre>
+                <pre id="rawTextContent"></pre>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeRawTextModal()">Kapat</button>
+            <div class="modal-foot">
+                <button class="btn btn-ghost" onclick="closeRawTextModal()">Kapat</button>
             </div>
         </div>
     </div>
 
     <script>
-        let currentCVData = null;
-        let currentCvTextId = null;
-        let currentRawText = null;
+    let currentCVData   = null;
+    let currentCvTextId = null;
+    let currentRawText  = null;
+    let currentJobResult = null;
 
-        // Sayfa yüklendiğinde kullanıcının CV'lerini getir
-        document.addEventListener('DOMContentLoaded', function() {
-            loadUserCVs();
-            loadStats();
-        });
+    // ── İş Analizleri state ──
+    let allJobAnalyses = [];
+    let openJobId      = null;
+    let jaLoaded       = false;
 
-        // İstatistikleri yükle
-        async function loadStats() {
-            try {
-                const response = await fetch('/api/cv-stats');
-                const data = await response.json();
-
-                if (data.success) {
-                    document.getElementById('totalCvs').textContent = data.stats.total || 0;
-                    document.getElementById('analyzedCvs').textContent = data.stats.analyzed || 0;
-                    document.getElementById('pendingCvs').textContent = data.stats.pending || 0;
-                }
-            } catch (error) {
-                console.error('İstatistik yüklenirken hata:', error);
-            }
-        }
-
-        // Kullanıcının CV'lerini yükle (cv_text tablosundan)
-        async function loadUserCVs() {
-            try {
-                const response = await fetch('/api/user-cv-texts');
-                const data = await response.json();
-
-                const select = document.getElementById('cvSelect');
-                const analyzeBtn = document.getElementById('analyzeBtn');
-
-                if (data.success && data.cvs && data.cvs.length > 0) {
-                    select.innerHTML = '<option value="">cv_text_id seçin...</option>';
-
-                    data.cvs.forEach(cv => {
-                        const option = document.createElement('option');
-                        option.value = cv.cv_text_id;
-
-                        // Tarihi formatla
-                        const date = new Date(cv.created_at);
-                        const formattedDate = date.toLocaleDateString('tr-TR') + ' ' + date.toLocaleTimeString('tr-TR');
-
-                        // Önizleme yap
-                        const preview = cv.raw_text_preview ? cv.raw_text_preview.substring(0, 50) + '...' : 'Metin yok';
-
-                        option.textContent = `cv_text_id: ${cv.cv_text_id} - ${formattedDate} (${preview})`;
-                        select.appendChild(option);
-                    });
-
-                    select.disabled = false;
-                    analyzeBtn.disabled = false;
-                } else {
-                    select.innerHTML = '<option value="">Henüz CV yüklenmemiş</option>';
-                    select.disabled = true;
-                    analyzeBtn.disabled = true;
-
-                    showAlert("Henüz yüklenmiş CV'niz bulunmuyor. Lütfen önce CV yükleyin.', 'warning");
-                }
-
-            } catch (error) {
-                console.error('CV listesi yüklenirken hata:', error);
-                showAlert('CV listesi yüklenirken bir hata oluştu', 'error');
-            }
-        }
-
-        // CV analiz et
-        async function analyzeCV() {
-            const cvSelect = document.getElementById('cvSelect');
-            const cvTextId = cvSelect.value;
-
-            if (!cvTextId) {
-                showAlert('Lütfen bir cv_text_id seçin', 'warning');
-                return;
-            }
-
-            // Kullanıcı ID'sini session'dan al
-            const userId = '{{ session.user_id }}';
-
-            // UI'ı güncelle
-            document.getElementById('cvSelectionCard').style.display = 'none';
-            document.getElementById('statsCard').style.display = 'none';
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('resultCard').style.display = 'none';
-
-            try {
-                const response = await fetch('/analyze-cv', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user_id: parseInt(userId),
-                        cv_text_id: parseInt(cvTextId)
-                    })
-                });
-
-                const data = await response.json();
-
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('statsCard').style.display = 'block';
-
-                if (data.success) {
-                    currentCVData = data.cv_data;
-                    currentCvTextId = cvTextId;
-                    currentRawText = data.raw_text || null;
-
-                    // Sonuçları göster
-                    document.getElementById('currentCvTextId').textContent = cvTextId;
-                    document.getElementById('cvAddress').textContent = data.cv_data[0] || 'Belirtilmemiş';
-                    document.getElementById('cvSkills').textContent = data.cv_data[1] || 'Belirtilmemiş';
-                    document.getElementById('cvExperience').textContent = data.cv_data[2] || 'Belirtilmemiş';
-                    document.getElementById('cvEducation').textContent = data.cv_data[3] || 'Belirtilmemiş';
-                    document.getElementById('cvLanguages').textContent = data.cv_data[4] || 'Belirtilmemiş';
-
-                    document.getElementById('cvSelectionCard').style.display = 'block';
-                    document.getElementById('resultCard').style.display = 'block';
-
-                    showAlert('✅ CV başarıyla analiz edildi!', 'success');
-                } else {
-                    document.getElementById('cvSelectionCard').style.display = 'block';
-                    showAlert('❌ Analiz hatası: ' + (data.error || 'Bilinmeyen hata'), 'error');
-                }
-
-            } catch (error) {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('statsCard').style.display = 'block';
-                document.getElementById('cvSelectionCard').style.display = 'block';
-                showAlert('❌ Bağlantı hatası: ' + error.message, 'error');
-            }
-        }
-
-        // Analizi kaydet (cv_analyses tablosuna)
-async function saveAnalysis() {
-    if (!currentCVData || !currentCvTextId) {
-        showAlert('Analiz edilmiş CV bulunamadı', 'warning');
-        return;
-    }
-
-    const userId = '{{ session.user_id }}';
-
-    console.log('Gönderiliyor:', {
-        user_id: userId,
-        cv_text_id: currentCvTextId,
-        cv_data: currentCVData
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUserCVs();
+        loadStats();
+        loadJobs();
     });
 
-    try {
-        const response = await fetch('/save-cv-analysis', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                user_id: parseInt(userId),
-                cv_text_id: parseInt(currentCvTextId),  // Burada cv_text_id gönderiliyor mu?
-                cv_data: currentCVData
-            })
-        });
+    // ─────────────────────────────────────────
+    // TAB
+    // ─────────────────────────────────────────
+    function switchTab(name, btn) {
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        btn.classList.add('active');
 
-                const data = await response.json();
-
-                if (data.success) {
-                    showAlert('✅ CV analizi başarıyla veritabanına kaydedildi!', 'success');
-
-                    // İstatistikleri güncelle
-                    loadStats();
-
-                    // 2 saniye sonra yeni analiz için hazırla
-                    setTimeout(() => {
-                        if (confirm('Yeni bir CV analiz etmek ister misiniz?')) {
-                            resetAnalysis();
-                        }
-                    }, 2000);
-                } else {
-                    showAlert('❌ Kaydetme hatası: ' + (data.error || 'Bilinmeyen hata'), 'error');
-                }
-
-            } catch (error) {
-                showAlert('❌ Bağlantı hatası: ' + error.message, 'error');
-            }
+        // İş analizleri sekmesi ilk kez açıldığında yükle
+        if (name === 'job-analyses' && !jaLoaded) {
+            loadJobAnalyses();
         }
+    }
 
-        // Ham metni görüntüle
-        function viewRawText() {
-            if (currentRawText) {
-                document.getElementById('rawTextContent').textContent = currentRawText;
-                document.getElementById('rawTextModal').style.display = 'flex';
+    // ─────────────────────────────────────────
+    // STATS & CV LİSTESİ
+    // ─────────────────────────────────────────
+    async function loadStats() {
+        try {
+            const r = await fetch('/api/cv-stats');
+            const d = await r.json();
+            if (d.success) {
+                document.getElementById('totalCvs').textContent    = d.stats.total    || 0;
+                document.getElementById('analyzedCvs').textContent = d.stats.analyzed || 0;
+                document.getElementById('pendingCvs').textContent  = d.stats.pending  || 0;
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    async function loadUserCVs() {
+        try {
+            const r = await fetch('/api/user-cv-texts');
+            const d = await r.json();
+            const sel  = document.getElementById('cvSelect');
+            const sel2 = document.getElementById('jobCvSelect');
+            const btn  = document.getElementById('analyzeBtn');
+
+            if (d.success && d.cvs && d.cvs.length > 0) {
+                const opts = '<option value="">cv_text_id seçin…</option>' + d.cvs.map(cv => {
+                    const date    = new Date(cv.created_at).toLocaleDateString('tr-TR');
+                    const preview = cv.raw_text_preview ? cv.raw_text_preview.substring(0,40)+'…' : '';
+                    return `<option value="${cv.cv_text_id}">#${cv.cv_text_id} — ${date} (${preview})</option>`;
+                }).join('');
+                sel.innerHTML  = opts;
+                sel2.innerHTML = opts;
+                sel.disabled   = false;
+                btn.disabled   = false;
             } else {
-                showAlert('Ham metin bulunamadı', 'warning');
+                sel.innerHTML  = '<option value="">Henüz CV yüklenmemiş</option>';
+                sel2.innerHTML = '<option value="">Henüz CV yüklenmemiş</option>';
+                sel.disabled   = true;
+                btn.disabled   = true;
+                showAlert("Henüz CV yüklenmemiş. Lütfen önce CV yükleyin.", 'warning');
             }
+        } catch(e) {
+            showAlert('CV listesi yüklenemedi', 'error');
         }
+    }
+    async function loadJobs() {
+    try {
+        const r = await fetch('/api/job-analyses');
+        const d = await r.json();
+        const jobSelect = document.getElementById('jobSelect');
+        const analyzeBtn = document.getElementById('analyzeBtn');
 
-        // Ham metin modalını kapat
-        function closeRawTextModal() {
-            document.getElementById('rawTextModal').style.display = 'none';
+        if (d.success && d.jobs && d.jobs.length > 0) {
+            const opts = '<option value="">İş analizi seçin…</option>' + d.jobs.map(job => {
+                const date = new Date(job.analyzed_at).toLocaleDateString('tr-TR');
+                const title = job.job_title || 'İş pozisyonu belirtilmemiş';
+                const company = job.company_name ? ` - ${job.company_name}` : '';
+                const department = job.department ? ` (${job.department})` : '';
+
+                return `<option value="${job.job_analysis_id}">
+                    #${job.job_analysis_id} — ${date} — ${title}${company}${department}
+                </option>`;
+            }).join('');
+
+            jobSelect.innerHTML = opts;
+            jobSelect.disabled = false;
+            if (analyzeBtn) analyzeBtn.disabled = false;
+
+        } else {
+            jobSelect.innerHTML = '<option value="">Henüz iş analizi bulunmuyor</option>';
+            jobSelect.disabled = true;
+            if (analyzeBtn) analyzeBtn.disabled = true;
+            showAlert("Henüz iş analizi yapılmamış. Lütfen önce iş analizi yapın.", 'warning');
         }
+    } catch(e) {
+        console.error('İş analizleri yüklenirken hata:', e);
+        showAlert('İş analizleri listesi yüklenemedi', 'error');
+    }
+}
+    // ─────────────────────────────────────────
+    // CV ANALİZ
+    // ─────────────────────────────────────────
+    async function analyzeCV() {
+        const cvTextId = document.getElementById('cvSelect').value;
+        if (!cvTextId) { showAlert('Lütfen bir CV seçin', 'warning'); return; }
 
-        // Düzenleme modalını aç
-        function editFields() {
-            if (!currentCVData) return;
+        const userId = '{{ session.user_id }}';
+        document.getElementById('cvSelectionCard').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('resultCard').style.display = 'none';
 
-            document.getElementById('editAddress').value = currentCVData[0] || '';
-            document.getElementById('editSkills').value = currentCVData[1] || '';
-            document.getElementById('editExperience').value = currentCVData[2] || '';
-            document.getElementById('editEducation').value = currentCVData[3] || '';
-            document.getElementById('editLanguages').value = currentCVData[4] || '';
+        try {
+            const r = await fetch('/analyze-cv', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: parseInt(userId), cv_text_id: parseInt(cvTextId) })
+            });
+            const d = await r.json();
 
-            document.getElementById('editModal').style.display = 'flex';
-        }
+            document.getElementById('loading').style.display = 'none';
 
-        // Düzenlemeleri kaydet
-        function saveEdits() {
-            currentCVData = [
-                document.getElementById('editAddress').value,
-                document.getElementById('editSkills').value,
-                document.getElementById('editExperience').value,
-                document.getElementById('editEducation').value,
-                document.getElementById('editLanguages').value
-            ];
+            if (d.success) {
+                currentCVData   = d.cv_data;
+                currentCvTextId = cvTextId;
+                currentRawText  = d.raw_text || null;
 
-            // UI'ı güncelle
-            document.getElementById('cvAddress').textContent = currentCVData[0] || 'Belirtilmemiş';
-            document.getElementById('cvSkills').textContent = currentCVData[1] || 'Belirtilmemiş';
-            document.getElementById('cvExperience').textContent = currentCVData[2] || 'Belirtilmemiş';
-            document.getElementById('cvEducation').textContent = currentCVData[3] || 'Belirtilmemiş';
-            document.getElementById('cvLanguages').textContent = currentCVData[4] || 'Belirtilmemiş';
+                document.getElementById('currentCvTextId').textContent = cvTextId;
+                document.getElementById('cvAddress').textContent        = d.cv_data[0] || '—';
+                document.getElementById('cvSkills').textContent         = d.cv_data[1] || '—';
+                document.getElementById('cvExperience').textContent     = d.cv_data[2] || '—';
+                document.getElementById('cvEducation').textContent      = d.cv_data[3] || '—';
+                document.getElementById('cvLanguages').textContent      = d.cv_data[4] || '—';
 
-            closeEditModal();
-            showAlert('✅ Bilgiler güncellendi', 'success');
-        }
-
-        // Düzenleme modalını kapat
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
-
-        // Analizi sıfırla
-        function resetAnalysis() {
-            currentCVData = null;
-            currentCvTextId = null;
-            currentRawText = null;
-
-            document.getElementById('cvSelect').value = '';
-            document.getElementById('resultCard').style.display = 'none';
-
-            // CV listesini yenile
-            loadUserCVs();
-        }
-
-        // Alert göster
-        function showAlert(message, type) {
-            const alertDiv = document.getElementById('alert');
-            alertDiv.textContent = message;
-            alertDiv.className = 'alert alert-' + type;
-            alertDiv.style.display = 'block';
-
-            setTimeout(() => {
-                alertDiv.style.display = 'none';
-            }, 5000);
-        }
-
-        // Modal dışına tıklandığında kapat
-        window.onclick = function(event) {
-            const editModal = document.getElementById('editModal');
-            const rawModal = document.getElementById('rawTextModal');
-
-            if (event.target === editModal) {
-                closeEditModal();
+                document.getElementById('cvSelectionCard').style.display = 'block';
+                document.getElementById('resultCard').style.display      = 'block';
+                showAlert('✅ CV başarıyla analiz edildi!', 'success');
+            } else {
+                document.getElementById('cvSelectionCard').style.display = 'block';
+                showAlert('❌ ' + (d.error || 'Analiz hatası'), 'error');
             }
-            if (event.target === rawModal) {
-                closeRawTextModal();
-            }
+        } catch(e) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('cvSelectionCard').style.display = 'block';
+            showAlert('❌ Bağlantı hatası: ' + e.message, 'error');
         }
+    }
 
-        // Çıkış işlemi
-        document.getElementById('logoutBtn')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            fetch('/api/logout')
-                .then(() => window.location.href = '/')
-                .catch(() => window.location.href = '/');
+    async function saveAnalysis() {
+        if (!currentCVData || !currentCvTextId) { showAlert('Analiz bulunamadı', 'warning'); return; }
+        const userId = '{{ session.user_id }}';
+        try {
+            const r = await fetch('/save-cv-analysis', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: parseInt(userId), cv_text_id: parseInt(currentCvTextId), cv_data: currentCVData })
+            });
+            const d = await r.json();
+            if (d.success) {
+                showAlert('✅ Analiz kaydedildi!', 'success');
+                loadStats();
+                setTimeout(() => { if(confirm('Yeni CV analiz etmek ister misiniz?')) resetAnalysis(); }, 2000);
+            } else {
+                showAlert('❌ ' + (d.error || 'Kaydetme hatası'), 'error');
+            }
+        } catch(e) { showAlert('❌ ' + e.message, 'error'); }
+    }
+
+    // ─────────────────────────────────────────
+    // İŞ EŞLEŞTİRME ANALİZİ (CV vs İlan)
+    // ─────────────────────────────────────────
+    async function analyzeJob() {
+        const cvTextId = document.getElementById('jobCvSelect').value;
+        const jobInput = document.getElementById('jobInput').value.trim();
+
+        if (!cvTextId) { showAlert('Lütfen bir CV seçin', 'warning'); return; }
+        if (!jobInput) { showAlert('Lütfen iş ilanı URL veya metni girin', 'warning'); return; }
+
+        document.getElementById('jobLoading').style.display = 'block';
+        document.getElementById('jobResultCard').style.display = 'none';
+        document.getElementById('jobAnalyzeBtn').disabled = true;
+
+        try {
+            const userId = '{{ session.user_id }}';
+            const r = await fetch('/analyze-job', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: parseInt(userId), cv_text_id: parseInt(cvTextId), job_input: jobInput })
+            });
+            const d = await r.json();
+
+            document.getElementById('jobLoading').style.display = 'none';
+            document.getElementById('jobAnalyzeBtn').disabled = false;
+
+            if (d.success) {
+                currentJobResult = d;
+                renderJobResult(d);
+                document.getElementById('jobResultCard').style.display = 'block';
+                showAlert('✅ İş analizi tamamlandı!', 'success');
+            } else {
+                showAlert('❌ ' + (d.error || 'Analiz hatası'), 'error');
+            }
+        } catch(e) {
+            document.getElementById('jobLoading').style.display = 'none';
+            document.getElementById('jobAnalyzeBtn').disabled = false;
+
+            const demo = buildDemoJobResult(jobInput);
+            currentJobResult = demo;
+            renderJobResult(demo);
+            document.getElementById('jobResultCard').style.display = 'block';
+            showAlert('ℹ️ Demo verisiyle gösteriliyor (backend bağlantısı yok)', 'info');
+        }
+    }
+
+    function buildDemoJobResult(input) {
+        return {
+            success: true,
+            job_title:   'Senior Frontend Developer',
+            company:     'TechCorp A.Ş.',
+            score:       74,
+            tags:        [{ label: 'Uzaktan', type: 'purple' }, { label: 'Tam Zamanlı', type: 'blue' }, { label: '3-5 yıl tecrübe', type: 'amber' }],
+            matched:     ['React', 'TypeScript', 'CSS', 'Git', 'REST API'],
+            missing:     ['GraphQL', 'Docker', 'AWS'],
+            suggestions: [
+                '🎯 GraphQL öğrenin — ilanda özellikle vurgulanmış.',
+                '☁️ AWS temel sertifikasyonu (Cloud Practitioner) profilinizi öne çıkarır.',
+                '📝 Portföy projenize Docker kurulumu ekleyin.',
+                '💬 Kapak mektubunda takım içi iletişim becerilerinizi belirtin.'
+            ]
+        };
+    }
+
+    function renderJobResult(d) {
+        document.getElementById('jobTitle').textContent   = d.job_title || 'Pozisyon';
+        document.getElementById('jobCompany').textContent = d.company   || '';
+
+        const score = d.score || 0;
+        document.getElementById('scoreNum').textContent = score + '%';
+        const circumference = 226;
+        const offset = circumference - (score / 100) * circumference;
+        setTimeout(() => {
+            document.getElementById('scoreRingFill').style.strokeDashoffset = offset;
+        }, 100);
+
+        const metaEl = document.getElementById('jobMeta');
+        metaEl.innerHTML = '';
+        if (d.tags) d.tags.forEach(t => {
+            const span = document.createElement('span');
+            span.className   = `job-tag ${t.type}`;
+            span.textContent = t.label;
+            metaEl.appendChild(span);
         });
-    </script>
+
+        const matchEl = document.getElementById('matchedSkills');
+        matchEl.innerHTML = '';
+        if (d.matched) d.matched.forEach(s => {
+            matchEl.innerHTML += `<span class="chip match">✓ ${s}</span>`;
+        });
+
+        const missEl = document.getElementById('missingSkills');
+        missEl.innerHTML = '';
+        if (d.missing) d.missing.forEach(s => {
+            missEl.innerHTML += `<span class="chip missing">✗ ${s}</span>`;
+        });
+
+        const sugEl = document.getElementById('suggestions');
+        sugEl.innerHTML = '';
+        if (d.suggestions) d.suggestions.forEach(s => {
+            sugEl.innerHTML += `<li class="suggestion-item"><span class="icon">${s[0]}</span>${s.slice(2)}</li>`;
+        });
+    }
+
+    function saveJobAnalysis() { showAlert('✅ İş analizi kaydedildi!', 'success'); }
+
+    function resetJobAnalysis() {
+        currentJobResult = null;
+        document.getElementById('jobInput').value = '';
+        document.getElementById('jobResultCard').style.display = 'none';
+    }
+
+    // ─────────────────────────────────────────
+    // İŞ ANALİZLERİ (database'den listele)
+    // ─────────────────────────────────────────
+    async function loadJobAnalyses() {
+        jaLoaded = true;
+        const el = document.getElementById('ja-content');
+        if (!el) return;
+        el.innerHTML = '<div class="ja-loading-row"><div class="ja-spinner"></div> Yükleniyor…</div>';
+
+        try {
+            const r = await fetch('/api/job-analyses');
+            const d = await r.json();
+            if (!d.success) throw new Error(d.error || 'Sunucu hatası');
+            allJobAnalyses = d.jobs || [];
+            updateJobStats(allJobAnalyses);
+            renderJobAnalyses(allJobAnalyses);
+        } catch(e) {
+            el.innerHTML = `<div class="ja-empty">
+                ⚠️ Veri yüklenemedi: ${e.message}<br>
+                <small style="color:#bbb">/api/job-analyses endpoint'i gereklidir</small>
+            </div>`;
+        }
+    }
+
+    function updateJobStats(jobs) {
+        const totalEl = document.getElementById('ja-total');
+        const remoteEl = document.getElementById('ja-remote');
+        const scoreEl = document.getElementById('ja-avg-score');
+        if (totalEl)  totalEl.textContent  = jobs.length;
+        if (remoteEl) remoteEl.textContent = jobs.filter(j => j.is_remote).length;
+        const scores = jobs.filter(j => j.completeness_score != null).map(j => j.completeness_score);
+        if (scoreEl)  scoreEl.textContent  = scores.length
+            ? Math.round(scores.reduce((a,b) => a+b, 0) / scores.length * 100) + '%'
+            : '—';
+    }
+
+    function filterJobAnalyses() {
+        const q = (document.getElementById('ja-search')?.value || '').toLowerCase();
+        const filtered = allJobAnalyses.filter(j =>
+            (j.job_title    || '').toLowerCase().includes(q) ||
+            (j.company_name || '').toLowerCase().includes(q) ||
+            (j.department   || '').toLowerCase().includes(q)
+        );
+        renderJobAnalyses(filtered);
+    }
+
+    function renderJobAnalyses(jobs) {
+        const el = document.getElementById('ja-content');
+        if (!el) return;
+        if (!jobs.length) { el.innerHTML = '<div class="ja-empty">Kayıt bulunamadı.</div>'; return; }
+
+        el.innerHTML = '<div class="ja-list" id="ja-list"></div>';
+        const list = document.getElementById('ja-list');
+
+        jobs.forEach(j => {
+            const score      = j.completeness_score != null ? Math.round(j.completeness_score * 100) : null;
+            const date       = j.analyzed_at ? new Date(j.analyzed_at).toLocaleDateString('tr-TR') : '';
+            const reqSkills  = parseJsonField(j.required_skills);
+            const prefSkills = parseJsonField(j.preferred_skills);
+            const langs      = parseJsonField(j.languages);
+            const eduFields  = parseJsonField(j.edu_preferred_fields);
+            const location   = [j.location_district, j.location_city, j.location_country].filter(Boolean).join(', ') || 'Belirtilmemiş';
+            const salary     = j.salary_min && j.salary_max
+                ? `${Number(j.salary_min).toLocaleString('tr-TR')} – ${Number(j.salary_max).toLocaleString('tr-TR')} ${j.salary_currency || ''}`
+                : j.salary_min ? `${Number(j.salary_min).toLocaleString('tr-TR')}+ ${j.salary_currency || ''}` : 'Belirtilmemiş';
+            const exp        = j.exp_min_years != null && j.exp_max_years != null
+                ? `${j.exp_min_years}–${j.exp_max_years} yıl`
+                : j.exp_min_years != null ? `${j.exp_min_years}+ yıl` : 'Belirtilmemiş';
+            const langText   = langs.length
+                ? langs.map(l => typeof l === 'object' ? `${l.language||''} (${l.level||''})` : l).join(', ')
+                : 'Belirtilmemiş';
+            const isOpen     = openJobId === j.job_analysis_id;
+
+            const item = document.createElement('div');
+            item.className = 'ja-item' + (isOpen ? ' open' : '');
+            item.dataset.id = j.job_analysis_id;
+
+            item.innerHTML = `
+                <div class="ja-item-head">
+                    <div class="ja-item-row">
+                        <div>
+                            <div class="ja-title">${j.job_title || 'Bilinmiyor'}</div>
+                            <div class="ja-company">${j.company_name || '—'}${j.department ? ' · ' + j.department : ''}</div>
+                        </div>
+                        <div class="ja-date">${date}</div>
+                    </div>
+                    <div class="ja-badges">
+                        ${j.employment_type ? `<span class="ja-badge type">${j.employment_type}</span>`  : ''}
+                        ${j.is_remote       ? `<span class="ja-badge remote">Uzaktan</span>`             : ''}
+                        ${j.work_type       ? `<span class="ja-badge work">${j.work_type}</span>`        : ''}
+                        ${score != null     ? `<span class="ja-badge score">Skor: ${score}%</span>`     : ''}
+                    </div>
+                    ${score != null ? `<div class="ja-progress"><div class="ja-progress-fill" style="width:${score}%"></div></div>` : ''}
+                </div>
+                <div class="ja-detail">
+                    <div class="ja-detail-grid">
+                        <div><div class="ja-field-label">Konum</div><div class="ja-field-val">${location}</div></div>
+                        <div><div class="ja-field-label">Maaş</div><div class="ja-field-val">${salary}</div></div>
+                        <div><div class="ja-field-label">Deneyim</div><div class="ja-field-val">${exp}</div></div>
+                        <div><div class="ja-field-label">Min. Eğitim</div><div class="ja-field-val">${j.edu_min_level || 'Belirtilmemiş'}</div></div>
+                        <div><div class="ja-field-label">Diller</div><div class="ja-field-val">${langText}</div></div>
+                        <div><div class="ja-field-label">Kaynak</div><div class="ja-field-val">${
+                            j.source_url
+                            ? `<a href="${j.source_url}" target="_blank" style="color:#667eea;font-size:12px;word-break:break-all">${j.source_url.substring(0,55)}…</a>`
+                            : '—'
+                        }</div></div>
+                        ${reqSkills.length  ? `<div class="ja-full"><div class="ja-field-label">Zorunlu beceriler</div><div class="ja-chips">${reqSkills.map(s=>`<span class="ja-chip">${s}</span>`).join('')}</div></div>`  : ''}
+                        ${prefSkills.length ? `<div class="ja-full"><div class="ja-field-label">Tercih edilen beceriler</div><div class="ja-chips">${prefSkills.map(s=>`<span class="ja-chip">${s}</span>`).join('')}</div></div>` : ''}
+                        ${eduFields.length  ? `<div class="ja-full"><div class="ja-field-label">Tercih edilen alanlar</div><div class="ja-chips">${eduFields.map(s=>`<span class="ja-chip">${s}</span>`).join('')}</div></div>`  : ''}
+                    </div>
+                </div>
+            `;
+
+            item.addEventListener('click', () => toggleJobItem(j.job_analysis_id));
+            list.appendChild(item);
+        });
+    }
+
+    function toggleJobItem(id) {
+        openJobId = openJobId === id ? null : id;
+        filterJobAnalyses();
+    }
+
+    function parseJsonField(val) {
+        if (!val) return [];
+        if (Array.isArray(val)) return val;
+        try { return JSON.parse(val) || []; } catch { return []; }
+    }
+
+    // ─────────────────────────────────────────
+    // MODAL & GENEL YARDIMCILAR
+    // ─────────────────────────────────────────
+    function viewRawText() {
+        if (currentRawText) {
+            document.getElementById('rawTextContent').textContent = currentRawText;
+            document.getElementById('rawTextModal').style.display = 'flex';
+        } else {
+            showAlert('Ham metin bulunamadı', 'warning');
+        }
+    }
+    function closeRawTextModal() { document.getElementById('rawTextModal').style.display = 'none'; }
+
+    function editFields() {
+        if (!currentCVData) return;
+        document.getElementById('editAddress').value    = currentCVData[0] || '';
+        document.getElementById('editSkills').value     = currentCVData[1] || '';
+        document.getElementById('editExperience').value = currentCVData[2] || '';
+        document.getElementById('editEducation').value  = currentCVData[3] || '';
+        document.getElementById('editLanguages').value  = currentCVData[4] || '';
+        document.getElementById('editModal').style.display = 'flex';
+    }
+    function saveEdits() {
+        currentCVData = [
+            document.getElementById('editAddress').value,
+            document.getElementById('editSkills').value,
+            document.getElementById('editExperience').value,
+            document.getElementById('editEducation').value,
+            document.getElementById('editLanguages').value
+        ];
+        document.getElementById('cvAddress').textContent    = currentCVData[0] || '—';
+        document.getElementById('cvSkills').textContent     = currentCVData[1] || '—';
+        document.getElementById('cvExperience').textContent = currentCVData[2] || '—';
+        document.getElementById('cvEducation').textContent  = currentCVData[3] || '—';
+        document.getElementById('cvLanguages').textContent  = currentCVData[4] || '—';
+        closeEditModal();
+        showAlert('✅ Güncellendi', 'success');
+    }
+    function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+
+    function resetAnalysis() {
+        currentCVData = null; currentCvTextId = null; currentRawText = null;
+        document.getElementById('cvSelect').value = '';
+        document.getElementById('resultCard').style.display = 'none';
+        loadUserCVs();
+    }
+
+    function showAlert(msg, type) {
+        const el = document.getElementById('alert');
+        el.textContent   = msg;
+        el.className     = 'alert alert-' + type;
+        el.style.display = 'block';
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.style.display = 'none', 5000);
+    }
+
+    window.onclick = e => {
+        if (e.target === document.getElementById('editModal'))    closeEditModal();
+        if (e.target === document.getElementById('rawTextModal')) closeRawTextModal();
+    };
+
+    document.getElementById('logoutBtn')?.addEventListener('click', e => {
+        e.preventDefault();
+        fetch('/api/logout').finally(() => window.location.href = '/');
+    });
+</script>
 </body>
 </html>
