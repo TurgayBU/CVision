@@ -316,6 +316,11 @@ def analyze_cv():
     finally:
         ai_cv.disconnect()
 
+@app.route('/job-detail')
+def job_detail_page():
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('job_detail.html')
 
 # ─────────────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':

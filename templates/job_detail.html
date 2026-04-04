@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVision — İş İlanı Detayı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:       #0d0f14;
+            --surface:  #13161e;
+            --surface2: #1b1f2b;
+            --surface3: #222636;
+            --border:   rgba(255,255,255,0.07);
+            --accent:   #4f8ef7;
+            --accent2:  #a78bfa;
+            --success:  #34d399;
+            --warning:  #fbbf24;
+            --error:    #f87171;
+            --text:     #e8eaf0;
+            --muted:    #5a6070;
+            --label:    #9ba3b5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 70% 10%, rgba(79,142,247,0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 10% 80%, rgba(167,139,250,0.08) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 20px 80px;
+        }
+
+        /* ── topbar ── */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+            color: var(--text);
+        }
+        .logo span { color: var(--accent); }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--label);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all .2s;
+        }
+        .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            transition: all .2s;
+        }
+        .logout-btn:hover { border-color: var(--error); color: var(--error); }
+
+        /* ── skeleton / loading ── */
+        .skeleton-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 12px;
+        }
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ── alert ── */
+        .alert {
+            display: none;
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            border: 1px solid transparent;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert.show { display: flex; }
+        .alert.error {
+            background: rgba(248,113,113,0.10);
+            border-color: rgba(248,113,113,0.25);
+            color: var(--error);
+        }
+
+        /* ── hero header ── */
+        .job-hero {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .job-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(79,142,247,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .job-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .completeness-ring {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .ring-svg { width: 64px; height: 64px; }
+        .ring-bg  { fill: none; stroke: var(--surface2); stroke-width: 6; }
+        .ring-fill {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 163;
+            stroke-dashoffset: 163;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 1s ease;
+        }
+        .ring-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            fill: var(--text);
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+        .ring-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+        .badge-blue   { background: rgba(79,142,247,0.12);  border-color: rgba(79,142,247,0.25);  color: #82b4ff; }
+        .badge-purple { background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.25); color: #c4b0ff; }
+        .badge-green  { background: rgba(52,211,153,0.12);  border-color: rgba(52,211,153,0.25);  color: #6ee7b7; }
+        .badge-yellow { background: rgba(251,191,36,0.12);  border-color: rgba(251,191,36,0.25);  color: #fcd34d; }
+        .badge-gray   { background: rgba(255,255,255,0.05); border-color: var(--border);          color: var(--label); }
+
+        .hero-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .meta-item {
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+        .meta-item-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .meta-item-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        /* ── section card ── */
+        .section-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: border-color .2s;
+        }
+        .section-card:hover { border-color: rgba(79,142,247,0.2); }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 24px;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color .2s;
+        }
+        .section-header.open { border-bottom-color: var(--border); }
+
+        .section-icon {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .section-count {
+            font-size: 12px;
+            color: var(--muted);
+            background: var(--surface2);
+            padding: 3px 9px;
+            border-radius: 12px;
+        }
+
+        .chevron {
+            width: 18px; height: 18px;
+            stroke: var(--muted);
+            transition: transform .25s;
+        }
+        .section-header.open .chevron { transform: rotate(180deg); }
+
+        .section-body {
+            padding: 20px 24px;
+            display: none;
+        }
+        .section-body.open { display: block; }
+
+        /* ── skill chips ── */
+        .chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: transform .15s;
+        }
+        .chip:hover { transform: translateY(-1px); }
+        .chip-required {
+            background: rgba(79,142,247,0.12);
+            border-color: rgba(79,142,247,0.3);
+            color: #93c5fd;
+        }
+        .chip-preferred {
+            background: rgba(167,139,250,0.10);
+            border-color: rgba(167,139,250,0.2);
+            color: #c4b0ff;
+        }
+
+        /* ── lang table ── */
+        .lang-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .lang-row:last-child { border-bottom: none; }
+
+        .lang-name { font-weight: 500; flex: 1; }
+
+        .lang-level {
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .level-c1, .level-c2, .level-ana_dil {
+            background: rgba(52,211,153,0.12);
+            color: #6ee7b7;
+        }
+        .level-b1, .level-b2 {
+            background: rgba(251,191,36,0.12);
+            color: #fcd34d;
+        }
+        .level-a1, .level-a2 {
+            background: rgba(248,113,113,0.12);
+            color: #fca5a5;
+        }
+
+        .lang-required {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(79,142,247,0.10);
+            color: #82b4ff;
+        }
+
+        /* ── salary block ── */
+        .salary-block {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--surface2);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+        .salary-amount {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--success);
+        }
+        .salary-sep { color: var(--muted); font-size: 20px; }
+        .salary-currency {
+            font-size: 13px;
+            color: var(--muted);
+            background: var(--surface3);
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+        .salary-negotiable {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--warning);
+            background: rgba(251,191,36,0.10);
+            padding: 4px 10px;
+            border-radius: 10px;
+        }
+
+        /* ── benefits ── */
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .benefit-item:last-child { border-bottom: none; }
+        .benefit-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--accent2);
+            flex-shrink: 0;
+        }
+
+        /* ── missing fields ── */
+        .missing-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .missing-chip {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: rgba(248,113,113,0.08);
+            border: 1px solid rgba(248,113,113,0.2);
+            color: #fca5a5;
+        }
+
+        /* ── description text ── */
+        .desc-text {
+            font-size: 14px;
+            color: var(--label);
+            line-height: 1.7;
+        }
+
+        /* ── source link ── */
+        .source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent);
+            font-size: 13px;
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(79,142,247,0.25);
+            transition: all .2s;
+            word-break: break-all;
+        }
+        .source-link:hover { background: rgba(79,142,247,0.08); }
+
+        /* ── edu grid ── */
+        .edu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .edu-item {
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+        .edu-item-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+        .edu-item-value { font-size: 14px; font-weight: 500; }
+
+        /* ── exp block ── */
+        .exp-block {
+            background: var(--surface2);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+        }
+        .exp-years {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
+        /* ── section icon colors ── */
+        .icon-blue   { background: rgba(79,142,247,0.12); }
+        .icon-purple { background: rgba(167,139,250,0.12); }
+        .icon-green  { background: rgba(52,211,153,0.12); }
+        .icon-yellow { background: rgba(251,191,36,0.12); }
+        .icon-pink   { background: rgba(248,113,113,0.12); }
+        .icon-teal   { background: rgba(45,212,191,0.12); }
+        .icon-orange { background: rgba(251,146,60,0.12); }
+        .icon-gray   { background: rgba(255,255,255,0.05); }
+
+        /* ── responsive ── */
+        @media (max-width: 640px) {
+            .job-title { font-size: 20px; }
+            .hero-top  { flex-direction: column; }
+            .salary-block { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- topbar -->
+    <div class="topbar">
+        <a class="logo" href="/dashboard">CV<span>ision</span></a>
+        <div class="topbar-right">
+            <a class="back-btn" href="/dashboard">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                Dashboard'a Dön
+            </a>
+            <button class="logout-btn" onclick="logout()">Çıkış</button>
+        </div>
+    </div>
+
+    <!-- alert -->
+    <div id="alert" class="alert error">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="alertText"></span>
+    </div>
+
+    <!-- content -->
+    <div id="content"></div>
+
+</div>
+
+<script>
+    /* ── helpers ── */
+    function logout() {
+        fetch('/api/logout').then(() => location.href = '/');
+    }
+
+    function getParams() {
+        const p = new URLSearchParams(location.search);
+        return { jobId: p.get('job_id') };
+    }
+
+    function showAlert(msg) {
+        const el = document.getElementById('alert');
+        document.getElementById('alertText').textContent = msg;
+        el.classList.add('show');
+    }
+
+    /* ── label maps ── */
+    const empTypeMap = {
+        full_time: 'Tam Zamanlı', part_time: 'Yarı Zamanlı',
+        contract: 'Sözleşmeli', internship: 'Staj', freelance: 'Freelance'
+    };
+    const workTypeMap  = { onsite: 'Ofiste', hybrid: 'Hibrit', remote: 'Uzaktan' };
+    const eduLevelMap  = {
+        none: 'Şart Değil', primary: 'İlkokul', high_school: 'Lise',
+        associate: 'Ön Lisans', bachelor: 'Lisans', master: 'Yüksek Lisans', phd: 'Doktora'
+    };
+
+    function fmt(v, map) { return (v && map[v]) ? map[v] : (v || '—'); }
+    function null2dash(v) { return (v === null || v === undefined || v === '') ? '—' : v; }
+
+    /* ── ring helper ── */
+    function buildRing(score) {
+        const pct   = Math.round(score || 0);
+        const circ  = 163;
+        const offset = circ - (pct / 100) * circ;
+        const color  = pct >= 75 ? '#34d399' : pct >= 45 ? '#fbbf24' : '#f87171';
+        return `
+        <div class="completeness-ring">
+            <svg class="ring-svg" viewBox="0 0 56 56">
+                <circle class="ring-bg"   cx="28" cy="28" r="26"/>
+                <circle class="ring-fill" cx="28" cy="28" r="26"
+                    style="stroke:${color}; stroke-dashoffset:${offset}" id="ringFill"/>
+                <text class="ring-text" x="28" y="29">${pct}%</text>
+            </svg>
+            <span class="ring-label">Tamamlanma</span>
+        </div>`;
+    }
+
+    /* ── section toggle ── */
+    function initToggles() {
+        document.querySelectorAll('.section-header').forEach(h => {
+            h.addEventListener('click', () => {
+                h.classList.toggle('open');
+                h.nextElementSibling.classList.toggle('open');
+            });
+        });
+    }
+
+    /* ── render ── */
+    function render(j) {
+        const loc = j.full_analysis_json?.location || {};
+        const skills    = j.full_analysis_json?.skills    || {};
+        const exp       = j.full_analysis_json?.experience || {};
+        const edu       = j.full_analysis_json?.education  || {};
+        const salary    = j.full_analysis_json?.salary     || {};
+        const langs     = j.full_analysis_json?.languages  || j.languages || [];
+        const benefits  = j.full_analysis_json?.benefits   || j.benefits  || [];
+        const missing   = j.missing_fields || [];
+        const reqSkills = skills.required  || j.required_skills  || [];
+        const prefSkills= skills.preferred || j.preferred_skills || [];
+
+        /* ── badges ── */
+        const badges = [];
+        if (j.employment_type) badges.push(`<span class="badge badge-blue">${fmt(j.employment_type, empTypeMap)}</span>`);
+        if (j.work_type)       badges.push(`<span class="badge badge-purple">📍 ${fmt(j.work_type, workTypeMap)}</span>`);
+        if (loc.is_remote)     badges.push(`<span class="badge badge-green">🌐 Uzaktan</span>`);
+        if (j.location_city)   badges.push(`<span class="badge badge-gray">🏙 ${j.location_city}${j.location_country ? ', ' + j.location_country : ''}</span>`);
+        if (j.department)      badges.push(`<span class="badge badge-yellow">🏢 ${j.department}</span>`);
+
+        /* ── meta ── */
+        const metas = [
+            { label: 'Şirket',    value: null2dash(j.company_name) },
+            { label: 'Pozisyon',  value: null2dash(j.job_title) },
+            { label: 'Analiz',    value: j.analyzed_at ? new Date(j.analyzed_at).toLocaleDateString('tr-TR', {day:'2-digit',month:'long',year:'numeric'}) : '—' },
+        ];
+
+        /* ── salary ── */
+        let salaryHTML = '<p class="desc-text">Maaş bilgisi belirtilmemiş.</p>';
+        if (salary.min || salary.max) {
+            const cur = salary.currency || '';
+            const neg = salary.is_negotiable ? `<span class="salary-negotiable">Pazarlık Payı Var</span>` : '';
+            salaryHTML = `<div class="salary-block">
+                ${salary.min ? `<span class="salary-amount">${salary.min.toLocaleString('tr-TR')}</span>` : ''}
+                ${(salary.min && salary.max) ? `<span class="salary-sep">—</span>` : ''}
+                ${salary.max ? `<span class="salary-amount">${salary.max.toLocaleString('tr-TR')}</span>` : ''}
+                ${cur ? `<span class="salary-currency">${cur}</span>` : ''}
+                ${neg}
+            </div>`;
+        }
+
+        /* ── languages ── */
+        let langsHTML = '<p class="desc-text">Dil bilgisi belirtilmemiş.</p>';
+        if (langs.length) {
+            langsHTML = langs.map(l => {
+                const lvl  = (l.level || '').toLowerCase();
+                const req  = l.is_required ? `<span class="lang-required">Zorunlu</span>` : '';
+                return `<div class="lang-row">
+                    <span class="lang-name">${l.language || '—'}</span>
+                    <span class="lang-level level-${lvl}">${(l.level || '').toUpperCase()}</span>
+                    ${req}
+                </div>`;
+            }).join('');
+        }
+
+        /* ── benefits ── */
+        let benefitsHTML = '<p class="desc-text">Yan haklar belirtilmemiş.</p>';
+        if (benefits.length) {
+            benefitsHTML = benefits.map(b =>
+                `<div class="benefit-item"><div class="benefit-dot"></div>${b}</div>`
+            ).join('');
+        }
+
+        /* ── missing ── */
+        let missingHTML = '';
+        if (missing.length) {
+            const chips = missing.map(m => `<span class="missing-chip">⚠ ${m}</span>`).join('');
+            missingHTML = `
+            <div class="section-card">
+                <div class="section-header open">
+                    <div class="section-icon icon-pink">⚠️</div>
+                    <span class="section-title">Eksik Bilgiler</span>
+                    <span class="section-count">${missing.length}</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="section-body open">
+                    <div class="missing-list">${chips}</div>
+                </div>
+            </div>`;
+        }
+
+        /* ── experience ── */
+        let expHTML = '<p class="desc-text">Deneyim bilgisi belirtilmemiş.</p>';
+        if (exp.min_years || exp.max_years || exp.description || j.exp_min_years || j.exp_max_years) {
+            const minY = exp.min_years ?? j.exp_min_years;
+            const maxY = exp.max_years ?? j.exp_max_years;
+            const desc = exp.description ?? j.exp_description;
+            let yearsStr = '';
+            if (minY && maxY) yearsStr = `${minY} – ${maxY} Yıl`;
+            else if (minY)    yearsStr = `Min. ${minY} Yıl`;
+            else if (maxY)    yearsStr = `Maks. ${maxY} Yıl`;
+            expHTML = `
+            <div class="exp-block">
+                ${yearsStr ? `<div class="exp-years">${yearsStr}</div>` : ''}
+                ${desc ? `<p class="desc-text">${desc}</p>` : ''}
+            </div>`;
+        }
+
+        /* ── education ── */
+        const eduLevel  = edu.min_level ?? j.edu_min_level;
+        const eduFields = edu.preferred_fields ?? j.edu_preferred_fields ?? [];
+        const eduDesc   = edu.description ?? j.edu_description;
+        let eduHTML = `<div class="edu-grid">
+            <div class="edu-item">
+                <div class="edu-item-label">Minimum Seviye</div>
+                <div class="edu-item-value">${fmt(eduLevel, eduLevelMap)}</div>
+            </div>
+            ${eduFields.length ? `<div class="edu-item">
+                <div class="edu-item-label">Tercih Edilen Alanlar</div>
+                <div class="edu-item-value">${eduFields.join(', ')}</div>
+            </div>` : ''}
+        </div>
+        ${eduDesc ? `<p class="desc-text">${eduDesc}</p>` : ''}`;
+
+        /* ── source ── */
+        const sourceHTML = j.source_url
+            ? `<a class="source-link" href="${j.source_url}" target="_blank">
+                🔗 ${j.source_url}
+               </a>`
+            : '<p class="desc-text">Kaynak URL kaydedilmemiş.</p>';
+
+        /* ── full render ── */
+        document.getElementById('content').innerHTML = `
+
+            <!-- HERO -->
+            <div class="job-hero">
+                <div class="hero-top">
+                    <h1 class="job-title">${null2dash(j.job_title)}</h1>
+                    ${buildRing(j.completeness_score)}
+                </div>
+                <div class="hero-badges">${badges.join('') || '<span class="badge badge-gray">Bilgi yok</span>'}</div>
+                <div class="hero-meta">
+                    ${metas.map(m => `
+                        <div class="meta-item">
+                            <div class="meta-item-label">${m.label}</div>
+                            <div class="meta-item-value">${m.value}</div>
+                        </div>`).join('')}
+                </div>
+            </div>
+
+            ${missingHTML}
+
+            <!-- ZORUNLU BECERİLER -->
+            <div class="section-card">
+                <div class="section-header open">
+                    <div class="section-icon icon-blue">💻</div>
+                    <span class="section-title">Zorunlu Beceriler</span>
+                    <span class="section-count">${reqSkills.length}</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="section-body open">
+                    ${reqSkills.length
+                        ? `<div class="chip-grid">${reqSkills.map(s => `<span class="chip chip-required">${s}</span>`).join('')}</div>`
+                        : '<p class="desc-text">Belirtilmemiş.</p>'}
+                </div>
+            </div>
+
+            <!-- TERCİH EDİLEN BECERİLER -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon icon-purple">✨</div>
+                    <span class="section-title">Tercih Edilen Beceriler</span>
+                    <span class="section-count">${prefSkills.length}</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="section-body">
+                    ${prefSkills.length
+                        ? `<div class="chip-grid">${prefSkills.map(s => `<span class="chip chip-preferred">${s}</span>`).join('')}</div>`
+                        : '<p class="desc-text">Belirtilmemiş.</p>'}
+                </div>
+            </div>
+
+            <!-- DENEYİM -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon icon-green">📅</div>
+                    <span class="section-title">Deneyim</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="section-body">${expHTML}</div>
+            </div>
+
+            <!-- EĞİTİM -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon icon-yellow">🎓</div>
+                    <span class="section-title">Eğitim</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="section-body">${eduHTML}</div>
+            </div>
+
+            <!-- DİLLER -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon icon-teal">🌍</div>
+                    <span class="section-title">Dil Gereksinimleri</span>
+                    <span class="section-count">${langs.length}</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="section-body">${langsHTML}</div>
+            </div>
+
+            <!-- MAAŞ -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon icon-green">💰</div>
+                    <span class="section-title">Maaş Bilgisi</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="section-body">${salaryHTML}</div>
+            </div>
+
+            <!-- YAN HAKLAR -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon icon-orange">🎁</div>
+                    <span class="section-title">Yan Haklar</span>
+                    <span class="section-count">${benefits.length}</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="section-body">${benefitsHTML}</div>
+            </div>
+
+            <!-- KAYNAK -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-icon icon-gray">🔗</div>
+                    <span class="section-title">İlan Kaynağı</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="section-body">${sourceHTML}</div>
+            </div>
+        `;
+
+        initToggles();
+
+        /* ring animation */
+        requestAnimationFrame(() => {
+            const ring = document.getElementById('ringFill');
+            if (ring) {
+                const pct    = Math.round(j.completeness_score || 0);
+                const circ   = 163;
+                const offset = circ - (pct / 100) * circ;
+                ring.style.strokeDashoffset = offset;
+            }
+        });
+    }
+
+    /* ── fetch & init ── */
+    async function init() {
+        const { jobId } = getParams();
+
+        if (!jobId) {
+            showAlert('URL\'de job_id parametresi bulunamadı. Örnek: /job-detail?job_id=5');
+            return;
+        }
+
+        /* skeleton */
+        document.getElementById('content').innerHTML = `
+            <div class="skeleton-wrap">
+                <div class="skeleton" style="height:180px"></div>
+                <div class="skeleton" style="height:80px"></div>
+                <div class="skeleton" style="height:80px"></div>
+                <div class="skeleton" style="height:80px"></div>
+            </div>`;
+
+        try {
+            const resp = await fetch(`/api/job-detail/${jobId}`);
+            if (resp.status === 401) { location.href = '/'; return; }
+            const data = await resp.json();
+            if (!data.success) { showAlert(data.error || 'İlan yüklenemedi.'); return; }
+            render(data.job);
+        } catch (e) {
+            showAlert('Sunucuya bağlanılamadı: ' + e.message);
+        }
+    }
+
+    init();
+</script>
+</body>
+</html></title>
+</head>
+<body>
+
+</body>
+</html>

@@ -574,11 +574,7 @@
 
             // cv_analysis sayfasına yönlendir
             setTimeout(() => {
-                const params = new URLSearchParams({
-                    cv_id: cvTextId,
-                    job_id: d2.job_analysis_id
-                });
-                location.href = '/cv-analysis?' + params.toString();
+                location.href = '/job-detail?job_id=' + d2.job_analysis_id;
             }, 1800);
 
         } catch (err) {
