@@ -1214,48 +1214,72 @@
     // İŞ EŞLEŞTİRME ANALİZİ (CV vs İlan)
     // ─────────────────────────────────────────
     async function analyzeJob() {
-        const cvTextId = document.getElementById('jobCvSelect').value;
-        const jobInput = document.getElementById('jobInput').value.trim();
+    const cvTextId = document.getElementById('jobCvSelect').value;
+    const jobInput = document.getElementById('jobInput').value.trim();
 
-        if (!cvTextId) { showAlert('Lütfen bir CV seçin', 'warning'); return; }
-        if (!jobInput) { showAlert('Lütfen iş ilanı URL veya metni girin', 'warning'); return; }
-
-        document.getElementById('jobLoading').style.display = 'block';
-        document.getElementById('jobResultCard').style.display = 'none';
-        document.getElementById('jobAnalyzeBtn').disabled = true;
-
-        try {
-            const userId = '{{ session.user_id }}';
-            const r = await fetch('/analyze-job', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: parseInt(userId), cv_text_id: parseInt(cvTextId), job_input: jobInput })
-            });
-            const d = await r.json();
-
-            document.getElementById('jobLoading').style.display = 'none';
-            document.getElementById('jobAnalyzeBtn').disabled = false;
-
-            if (d.success) {
-                currentJobResult = d;
-                renderJobResult(d);
-                document.getElementById('jobResultCard').style.display = 'block';
-                showAlert('✅ İş analizi tamamlandı!', 'success');
-            } else {
-                showAlert('❌ ' + (d.error || 'Analiz hatası'), 'error');
-            }
-        } catch(e) {
-            document.getElementById('jobLoading').style.display = 'none';
-            document.getElementById('jobAnalyzeBtn').disabled = false;
-
-            const demo = buildDemoJobResult(jobInput);
-            currentJobResult = demo;
-            renderJobResult(demo);
-            document.getElementById('jobResultCard').style.display = 'block';
-            showAlert('ℹ️ Demo verisiyle gösteriliyor (backend bağlantısı yok)', 'info');
-        }
+    if (!cvTextId) {
+        showAlert('Lütfen bir CV seçin', 'warning');
+        return;
+    }
+    if (!jobInput) {
+        showAlert('Lütfen iş ilanı URL veya metni girin', 'warning');
+        return;
     }
 
+    document.getElementById('jobLoading').style.display = 'block';
+    document.getElementById('jobResultCard').style.display = 'none';
+    document.getElementById('jobAnalyzeBtn').disabled = true;
+
+    try {
+        const userId = parseInt('{{ session.user_id }}');
+
+        // 1. CV'nin analiz edilip edilmediğini kontrol et
+        const checkResp = await fetch(
+            `/api/cv-analysis-check?user_id=${userId}&cv_text_id=${parseInt(cvTextId)}`
+        );
+        const checkData = await checkResp.json();
+
+        if (!checkData.success) {
+            document.getElementById('jobLoading').style.display = 'none';
+            document.getElementById('jobAnalyzeBtn').disabled = false;
+            showAlert(
+                '❌ CV analiz sonuçları bulunamadı!\n\n' +
+                'Lütfen önce CV Analizi sekmesine gidin ve CV\'yi analiz edin.',
+                'error'
+            );
+            return;
+        }
+
+        // 2. CV analiz edilmişse, job matching yap
+        const r = await fetch('/analyze-job', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: userId,
+                cv_text_id: parseInt(cvTextId),
+                job_input: jobInput
+            })
+        });
+
+        const d = await r.json();
+
+        document.getElementById('jobLoading').style.display = 'none';
+        document.getElementById('jobAnalyzeBtn').disabled = false;
+
+        if (d.success) {
+            currentJobResult = d;
+            renderJobResult(d);
+            document.getElementById('jobResultCard').style.display = 'block';
+            showAlert('✅ İş analizi tamamlandı!', 'success');
+        } else {
+            showAlert('❌ ' + (d.error || 'Analiz hatası'), 'error');
+        }
+    } catch(e) {
+        document.getElementById('jobLoading').style.display = 'none';
+        document.getElementById('jobAnalyzeBtn').disabled = false;
+        showAlert('❌ Bağlantı hatası: ' + e.message, 'error');
+    }
+}
     function buildDemoJobResult(input) {
         return {
             success: true,

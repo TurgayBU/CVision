@@ -1,906 +1,415 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CVision — İş İlanı Detayı</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <title>CVision — Analiz Raporu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg:       #0d0f14;
-            --surface:  #13161e;
-            --surface2: #1b1f2b;
-            --surface3: #222636;
-            --border:   rgba(255,255,255,0.07);
-            --accent:   #4f8ef7;
-            --accent2:  #a78bfa;
-            --success:  #34d399;
-            --warning:  #fbbf24;
-            --error:    #f87171;
-            --text:     #e8eaf0;
-            --muted:    #5a6070;
-            --label:    #9ba3b5;
+            --bg: #080b12; --surface: #0f1420; --surface2: #161c2e; --surface3: #1d2540;
+            --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+            --accent: #4f8ef7; --accent2: #a78bfa; --green: #34d399;
+            --amber: #fbbf24; --red: #f87171; --text: #dde2f0;
+            --muted: #5a6480; --label: #8892aa; --radius: 16px; --radius-sm: 10px;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
         body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
+            content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
             background:
-                radial-gradient(ellipse 60% 40% at 70% 10%, rgba(79,142,247,0.10) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 50% at 10% 80%, rgba(167,139,250,0.08) 0%, transparent 60%);
-            pointer-events: none;
-            z-index: 0;
+                radial-gradient(ellipse 70% 50% at 80% -10%, rgba(79,142,247,0.10) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 60% at -10% 90%, rgba(167,139,250,0.08) 0%, transparent 55%);
         }
 
-        .page {
-            position: relative;
-            z-index: 1;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 32px 20px 80px;
+        /* navbar */
+        .navbar {
+            position:sticky; top:0; z-index:100;
+            background:rgba(8,11,18,0.85); backdrop-filter:blur(24px);
+            border-bottom:1px solid var(--border);
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 32px; height:58px;
         }
+        .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:19px; }
+        .logo span { color:var(--accent); }
+        .btn-sm {
+            padding:7px 16px; border-radius:8px; border:1px solid var(--border);
+            background:var(--surface2); color:var(--label); font-family:'DM Sans',sans-serif;
+            font-size:13px; font-weight:500; cursor:pointer; text-decoration:none;
+            display:inline-flex; align-items:center; gap:6px; transition:all .2s;
+        }
+        .btn-sm:hover { border-color:var(--border2); color:var(--text); }
 
-        /* ── topbar ── */
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
+        /* layout */
+        .page { position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:36px 24px 80px; }
 
-        .logo {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 22px;
-            letter-spacing: -0.5px;
-            text-decoration: none;
-            color: var(--text);
-        }
-        .logo span { color: var(--accent); }
+        /* hero */
+        .hero { display:grid; grid-template-columns:1fr auto; gap:24px; align-items:start; margin-bottom:32px; animation:fadeUp .5s ease both; }
+        .hero-eyebrow { font-size:11px; font-weight:600; letter-spacing:1.4px; text-transform:uppercase; color:var(--accent); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+        .hero-eyebrow::before { content:''; width:20px; height:2px; background:var(--accent); }
+        .hero h1 { font-family:'Syne',sans-serif; font-size:30px; font-weight:800; letter-spacing:-1px; line-height:1.15; margin-bottom:6px; }
+        .hero-meta { color:var(--label); font-size:14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:4px; }
+        .hero-tags { display:flex; flex-wrap:wrap; gap:7px; margin-top:14px; }
+        .tag { padding:5px 12px; border-radius:100px; font-size:12px; font-weight:500; border:1px solid; }
+        .tag.blue   { background:rgba(79,142,247,.1);  border-color:rgba(79,142,247,.25);  color:var(--accent); }
+        .tag.purple { background:rgba(167,139,250,.1); border-color:rgba(167,139,250,.25); color:var(--accent2); }
+        .tag.green  { background:rgba(52,211,153,.1);  border-color:rgba(52,211,153,.25);  color:var(--green); }
+        .tag.amber  { background:rgba(251,191,36,.1);  border-color:rgba(251,191,36,.25);  color:var(--amber); }
 
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        /* score ring */
+        .score-block { display:flex; flex-direction:column; align-items:center; gap:8px; }
+        .ring-wrap { position:relative; width:110px; height:110px; }
+        .ring-wrap svg { transform:rotate(-90deg); }
+        .ring-bg   { fill:none; stroke:var(--surface3); stroke-width:7; }
+        .ring-fill { fill:none; stroke:url(#grad); stroke-width:7; stroke-linecap:round; stroke-dasharray:283; stroke-dashoffset:283; transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1); }
+        .ring-label { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .ring-pct { font-family:'Syne',sans-serif; font-size:24px; font-weight:800; line-height:1; }
+        .ring-sub { font-size:10px; color:var(--muted); font-weight:500; margin-top:2px; }
+        .score-label { font-size:11px; font-weight:600; padding:4px 12px; border-radius:100px; border:1px solid; }
 
-        .back-btn {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--label);
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all .2s;
-        }
-        .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+        /* grids */
+        .cols      { display:grid; grid-template-columns:1fr 1fr;     gap:16px; margin-bottom:16px; }
+        .cols3     { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:0; }
+        .cols-wide { display:grid; grid-template-columns:2fr 1fr;     gap:16px; margin-bottom:16px; }
 
-        .logout-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--muted);
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            transition: all .2s;
-        }
-        .logout-btn:hover { border-color: var(--error); color: var(--error); }
+        /* panel */
+        .panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; animation:fadeUp .5s ease both; }
+        .panel:nth-child(1){animation-delay:.05s} .panel:nth-child(2){animation-delay:.10s}
+        .panel:nth-child(3){animation-delay:.15s} .panel:nth-child(4){animation-delay:.20s}
+        .panel-hd { padding:15px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+        .panel-title { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px; }
+        .panel-icon  { width:26px; height:26px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; }
+        .i-blue   { background:rgba(79,142,247,.15); } .i-green  { background:rgba(52,211,153,.12); }
+        .i-purple { background:rgba(167,139,250,.12); } .i-amber  { background:rgba(251,191,36,.10); }
+        .panel-body { padding:18px 20px; }
 
-        /* ── skeleton / loading ── */
-        .skeleton-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .skeleton {
-            background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.4s infinite;
-            border-radius: 12px;
-        }
-        @keyframes shimmer {
-            0%   { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
+        /* info field */
+        .info-field { margin-bottom:14px; }
+        .info-field:last-child { margin-bottom:0; }
+        .info-label { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
+        .info-val   { font-size:13.5px; color:var(--text); line-height:1.65; white-space:pre-wrap; }
+        .info-val.scroll { max-height:160px; overflow-y:auto; }
+        .info-val.scroll::-webkit-scrollbar { width:3px; }
+        .info-val.scroll::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
 
-        /* ── alert ── */
-        .alert {
-            display: none;
-            padding: 16px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 24px;
-            border: 1px solid transparent;
-            align-items: center;
-            gap: 10px;
-        }
-        .alert.show { display: flex; }
-        .alert.error {
-            background: rgba(248,113,113,0.10);
-            border-color: rgba(248,113,113,0.25);
-            color: var(--error);
-        }
+        /* chips */
+        .chips { display:flex; flex-wrap:wrap; gap:6px; }
+        .chip { padding:5px 11px; border-radius:100px; font-size:12px; font-weight:500; border:1px solid; }
+        .chip.neutral { background:var(--surface2); border-color:var(--border); color:var(--label); }
+        .chip.green   { background:rgba(52,211,153,.08); border-color:rgba(52,211,153,.2); color:var(--green); }
+        .chip.amber   { background:rgba(251,191,36,.08); border-color:rgba(251,191,36,.2); color:var(--amber); }
+        .empty { font-size:13px; color:var(--muted); font-style:italic; }
 
-        /* ── hero header ── */
-        .job-hero {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        .job-hero::before {
-            content: '';
-            position: absolute;
-            top: -60px; right: -60px;
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(79,142,247,0.12) 0%, transparent 70%);
-            pointer-events: none;
-        }
+        /* source link */
+        .src-link { display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-size:12.5px; text-decoration:none; font-weight:500; }
+        .src-link:hover { opacity:.75; }
 
-        .hero-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 16px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+        /* loading / error */
+        .loading-state { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; gap:16px; text-align:center; }
+        .spinner { width:44px; height:44px; border:3px solid var(--surface3); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+        .error-state { text-align:center; padding:80px 24px; }
+        .error-state .err-icon { font-size:48px; margin-bottom:16px; }
+        .error-state h2 { font-family:'Syne',sans-serif; font-size:22px; margin-bottom:8px; }
+        .error-state p  { color:var(--muted); font-size:14px; }
 
-        .job-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
-        }
+        /* cv-missing notice */
+        .cv-notice { padding:14px 16px; background:rgba(251,191,36,.06); border:1px solid rgba(251,191,36,.18); border-radius:var(--radius-sm); font-size:13px; color:var(--amber); line-height:1.6; }
 
-        .completeness-ring {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            flex-shrink: 0;
-        }
+        @keyframes spin    { to { transform:rotate(360deg); } }
+        @keyframes fadeUp  { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 
-        .ring-svg { width: 64px; height: 64px; }
-        .ring-bg  { fill: none; stroke: var(--surface2); stroke-width: 6; }
-        .ring-fill {
-            fill: none;
-            stroke: var(--accent);
-            stroke-width: 6;
-            stroke-linecap: round;
-            stroke-dasharray: 163;
-            stroke-dashoffset: 163;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-            transition: stroke-dashoffset 1s ease;
-        }
-        .ring-text {
-            font-family: 'Syne', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            fill: var(--text);
-            text-anchor: middle;
-            dominant-baseline: middle;
-        }
-        .ring-label {
-            font-size: 11px;
-            color: var(--muted);
-            text-align: center;
-        }
-
-        .hero-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            border: 1px solid transparent;
-        }
-        .badge-blue   { background: rgba(79,142,247,0.12);  border-color: rgba(79,142,247,0.25);  color: #82b4ff; }
-        .badge-purple { background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.25); color: #c4b0ff; }
-        .badge-green  { background: rgba(52,211,153,0.12);  border-color: rgba(52,211,153,0.25);  color: #6ee7b7; }
-        .badge-yellow { background: rgba(251,191,36,0.12);  border-color: rgba(251,191,36,0.25);  color: #fcd34d; }
-        .badge-gray   { background: rgba(255,255,255,0.05); border-color: var(--border);          color: var(--label); }
-
-        .hero-meta {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px;
-        }
-
-        .meta-item {
-            background: var(--surface2);
-            border-radius: 10px;
-            padding: 12px 14px;
-        }
-        .meta-item-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 4px;
-        }
-        .meta-item-value {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text);
-        }
-
-        /* ── section card ── */
-        .section-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            margin-bottom: 16px;
-            overflow: hidden;
-            transition: border-color .2s;
-        }
-        .section-card:hover { border-color: rgba(79,142,247,0.2); }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 18px 24px;
-            cursor: pointer;
-            user-select: none;
-            border-bottom: 1px solid transparent;
-            transition: border-color .2s;
-        }
-        .section-header.open { border-bottom-color: var(--border); }
-
-        .section-icon {
-            width: 34px; height: 34px;
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        .section-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            flex: 1;
-        }
-
-        .section-count {
-            font-size: 12px;
-            color: var(--muted);
-            background: var(--surface2);
-            padding: 3px 9px;
-            border-radius: 12px;
-        }
-
-        .chevron {
-            width: 18px; height: 18px;
-            stroke: var(--muted);
-            transition: transform .25s;
-        }
-        .section-header.open .chevron { transform: rotate(180deg); }
-
-        .section-body {
-            padding: 20px 24px;
-            display: none;
-        }
-        .section-body.open { display: block; }
-
-        /* ── skill chips ── */
-        .chip-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .chip {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            border: 1px solid transparent;
-            transition: transform .15s;
-        }
-        .chip:hover { transform: translateY(-1px); }
-        .chip-required {
-            background: rgba(79,142,247,0.12);
-            border-color: rgba(79,142,247,0.3);
-            color: #93c5fd;
-        }
-        .chip-preferred {
-            background: rgba(167,139,250,0.10);
-            border-color: rgba(167,139,250,0.2);
-            color: #c4b0ff;
-        }
-
-        /* ── lang table ── */
-        .lang-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .lang-row:last-child { border-bottom: none; }
-
-        .lang-name { font-weight: 500; flex: 1; }
-
-        .lang-level {
-            font-size: 12px;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .level-c1, .level-c2, .level-ana_dil {
-            background: rgba(52,211,153,0.12);
-            color: #6ee7b7;
-        }
-        .level-b1, .level-b2 {
-            background: rgba(251,191,36,0.12);
-            color: #fcd34d;
-        }
-        .level-a1, .level-a2 {
-            background: rgba(248,113,113,0.12);
-            color: #fca5a5;
-        }
-
-        .lang-required {
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: rgba(79,142,247,0.10);
-            color: #82b4ff;
-        }
-
-        /* ── salary block ── */
-        .salary-block {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: var(--surface2);
-            border-radius: 12px;
-            padding: 16px 20px;
-        }
-        .salary-amount {
-            font-family: 'Syne', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--success);
-        }
-        .salary-sep { color: var(--muted); font-size: 20px; }
-        .salary-currency {
-            font-size: 13px;
-            color: var(--muted);
-            background: var(--surface3);
-            padding: 4px 10px;
-            border-radius: 8px;
-        }
-        .salary-negotiable {
-            margin-left: auto;
-            font-size: 12px;
-            color: var(--warning);
-            background: rgba(251,191,36,0.10);
-            padding: 4px 10px;
-            border-radius: 10px;
-        }
-
-        /* ── benefits ── */
-        .benefit-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 9px 0;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
-        .benefit-item:last-child { border-bottom: none; }
-        .benefit-dot {
-            width: 7px; height: 7px;
-            border-radius: 50%;
-            background: var(--accent2);
-            flex-shrink: 0;
-        }
-
-        /* ── missing fields ── */
-        .missing-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .missing-chip {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            background: rgba(248,113,113,0.08);
-            border: 1px solid rgba(248,113,113,0.2);
-            color: #fca5a5;
-        }
-
-        /* ── description text ── */
-        .desc-text {
-            font-size: 14px;
-            color: var(--label);
-            line-height: 1.7;
-        }
-
-        /* ── source link ── */
-        .source-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--accent);
-            font-size: 13px;
-            text-decoration: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            border: 1px solid rgba(79,142,247,0.25);
-            transition: all .2s;
-            word-break: break-all;
-        }
-        .source-link:hover { background: rgba(79,142,247,0.08); }
-
-        /* ── edu grid ── */
-        .edu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-        .edu-item {
-            background: var(--surface2);
-            border-radius: 10px;
-            padding: 12px 14px;
-        }
-        .edu-item-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
-        .edu-item-value { font-size: 14px; font-weight: 500; }
-
-        /* ── exp block ── */
-        .exp-block {
-            background: var(--surface2);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 12px;
-        }
-        .exp-years {
-            font-family: 'Syne', sans-serif;
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 4px;
-        }
-
-        /* ── section icon colors ── */
-        .icon-blue   { background: rgba(79,142,247,0.12); }
-        .icon-purple { background: rgba(167,139,250,0.12); }
-        .icon-green  { background: rgba(52,211,153,0.12); }
-        .icon-yellow { background: rgba(251,191,36,0.12); }
-        .icon-pink   { background: rgba(248,113,113,0.12); }
-        .icon-teal   { background: rgba(45,212,191,0.12); }
-        .icon-orange { background: rgba(251,146,60,0.12); }
-        .icon-gray   { background: rgba(255,255,255,0.05); }
-
-        /* ── responsive ── */
-        @media (max-width: 640px) {
-            .job-title { font-size: 20px; }
-            .hero-top  { flex-direction: column; }
-            .salary-block { flex-wrap: wrap; }
+        @media(max-width:768px){
+            .hero { grid-template-columns:1fr; }
+            .cols, .cols-wide { grid-template-columns:1fr; }
+            .cols3 { grid-template-columns:1fr 1fr; }
+            .navbar { padding:0 16px; }
+            .page   { padding:24px 16px 60px; }
         }
     </style>
 </head>
 <body>
+
+<nav class="navbar">
+    <div class="logo">CV<span>ision</span></div>
+    <a href="/dashboard" class="btn-sm">← Yeni Analiz</a>
+</nav>
+
 <div class="page">
 
-    <!-- topbar -->
-    <div class="topbar">
-        <a class="logo" href="/dashboard">CV<span>ision</span></a>
-        <div class="topbar-right">
-            <a class="back-btn" href="/dashboard">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-                Dashboard'a Dön
-            </a>
-            <button class="logout-btn" onclick="logout()">Çıkış</button>
+    <!-- Loading -->
+    <div class="loading-state" id="loadingState">
+        <div class="spinner"></div>
+        <div>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:600;margin-bottom:6px;">Rapor yükleniyor…</div>
+            <div style="font-size:13px;color:var(--muted)">Analiz sonuçları getiriliyor</div>
         </div>
     </div>
 
-    <!-- alert -->
-    <div id="alert" class="alert error">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span id="alertText"></span>
+    <!-- Error -->
+    <div class="error-state" id="errorState" style="display:none;">
+        <div class="err-icon">⚠️</div>
+        <h2>Veri bulunamadı</h2>
+        <p id="errorMsg">Bu analize ait bilgiler yüklenemedi.</p>
+        <br><br>
+        <a href="/dashboard" class="btn-sm">← Geri Dön</a>
     </div>
 
-    <!-- content -->
-    <div id="content"></div>
+    <!-- Content -->
+    <div id="content" style="display:none;">
 
+        <!-- HERO -->
+        <div class="hero">
+            <div>
+                <div class="hero-eyebrow">Analiz Raporu</div>
+                <h1 id="heroTitle">—</h1>
+                <div class="hero-meta">
+                    <span id="heroCompany"></span>
+                    <span id="heroLocation" style="color:var(--muted)"></span>
+                </div>
+                <div class="hero-tags" id="heroTags"></div>
+            </div>
+            <div class="score-block" id="scoreBlock" style="display:none;">
+                <div class="ring-wrap">
+                    <svg viewBox="0 0 100 100" width="110" height="110">
+                        <defs>
+                            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%"   style="stop-color:#4f8ef7"/>
+                                <stop offset="100%" style="stop-color:#34d399"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="ring-bg"   cx="50" cy="50" r="45"/>
+                        <circle class="ring-fill" id="ringFill" cx="50" cy="50" r="45"/>
+                    </svg>
+                    <div class="ring-label">
+                        <span class="ring-pct" id="ringPct">—</span>
+                        <span class="ring-sub">Tamamlık</span>
+                    </div>
+                </div>
+                <span class="score-label" id="scoreLbl"></span>
+            </div>
+        </div>
+
+        <!-- ROW 1: İş detayları + CV özeti -->
+        <div class="cols-wide">
+            <div class="panel">
+                <div class="panel-hd">
+                    <div class="panel-title"><div class="panel-icon i-blue">💼</div>İş İlanı Detayları</div>
+                    <a id="srcLink" href="#" target="_blank" class="src-link" style="display:none;">Kaynağa Git ↗</a>
+                </div>
+                <div class="panel-body">
+                    <div class="cols3">
+                        <div class="info-field"><div class="info-label">Pozisyon</div><div class="info-val" id="jTitle">—</div></div>
+                        <div class="info-field"><div class="info-label">Şirket</div><div class="info-val" id="jCompany">—</div></div>
+                        <div class="info-field"><div class="info-label">Departman</div><div class="info-val" id="jDept">—</div></div>
+                        <div class="info-field"><div class="info-label">Konum</div><div class="info-val" id="jLocation">—</div></div>
+                        <div class="info-field"><div class="info-label">Çalışma Tipi</div><div class="info-val" id="jWorkType">—</div></div>
+                        <div class="info-field"><div class="info-label">İstihdam</div><div class="info-val" id="jEmpType">—</div></div>
+                        <div class="info-field"><div class="info-label">Deneyim</div><div class="info-val" id="jExp">—</div></div>
+                        <div class="info-field"><div class="info-label">Min. Eğitim</div><div class="info-val" id="jEdu">—</div></div>
+                        <div class="info-field"><div class="info-label">Maaş</div><div class="info-val" id="jSalary">—</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-hd">
+                    <div class="panel-title"><div class="panel-icon i-purple">👤</div>CV Özeti</div>
+                </div>
+                <div class="panel-body" id="cvPanel">
+                    <div class="cv-notice" id="cvNotice" style="display:none;">
+                        CV analizi bulunamadı.<br>
+                        <a href="/cv-analysis" style="color:var(--amber);font-weight:600;">CV Analiz →</a>
+                    </div>
+                    <div id="cvContent">
+                        <div class="info-field"><div class="info-label">📍 Konum</div><div class="info-val" id="cvAddress">—</div></div>
+                        <div class="info-field"><div class="info-label">🗣️ Diller</div><div class="info-val" id="cvLanguages">—</div></div>
+                        <div class="info-field"><div class="info-label">🎓 Eğitim</div><div class="info-val" id="cvEducation">—</div></div>
+                        <div class="info-field"><div class="info-label">💼 Deneyim</div><div class="info-val scroll" id="cvExperience">—</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2: Beceriler -->
+        <div class="cols">
+            <div class="panel">
+                <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-blue">⚡</div>Zorunlu Beceriler</div></div>
+                <div class="panel-body"><div class="chips" id="reqSkills"></div></div>
+            </div>
+            <div class="panel">
+                <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-purple">✨</div>Tercih Edilen Beceriler</div></div>
+                <div class="panel-body"><div class="chips" id="prefSkills"></div></div>
+            </div>
+        </div>
+
+        <!-- ROW 3: CV Becerileri + Benefits/Missing -->
+        <div class="cols">
+            <div class="panel">
+                <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-green">💡</div>CV Becerileri</div></div>
+                <div class="panel-body"><div class="chips" id="cvSkills"></div></div>
+            </div>
+            <div class="panel" id="extraPanel">
+                <div class="panel-hd"><div class="panel-title" id="extraTitle"><div class="panel-icon i-green">🎁</div>Yan Haklar</div></div>
+                <div class="panel-body"><div class="chips" id="extraChips"></div></div>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <script>
-    /* ── helpers ── */
-    function logout() {
-        fetch('/api/logout').then(() => location.href = '/');
+// ── helpers ──────────────────────────────────────────────────────────────────
+const pJ = v => { if(!v) return []; if(Array.isArray(v)) return v; try{return JSON.parse(v)||[];}catch{return[];} };
+const sf = (v,fb='—') => (v===null||v===undefined||v==='') ? fb : String(v);
+const st = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=sf(v); };
+
+function chips(containerId, items, cls='neutral') {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (!items || !items.length) { el.innerHTML='<span class="empty">Bilgi yok</span>'; return; }
+    el.innerHTML = items.map(s => {
+        const label = typeof s==='object' ? (s.skill||s.language||JSON.stringify(s)) : s;
+        return `<span class="chip ${cls}">${label}</span>`;
+    }).join('');
+}
+
+function scoreSetup(rawScore) {
+    if (rawScore===null||rawScore===undefined) return;
+    const pct = Math.round(parseFloat(rawScore)*100);
+    const color = pct>=75?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    document.getElementById('scoreBlock').style.display='flex';
+    const rp = document.getElementById('ringPct');
+    rp.textContent = pct+'%'; rp.style.color = color;
+    setTimeout(() => { document.getElementById('ringFill').style.strokeDashoffset = 283-(pct/100)*283; }, 200);
+    const lbl = document.getElementById('scoreLbl');
+    const bgMap = {'var(--green)':'rgba(52,211,153,.1)','var(--amber)':'rgba(251,191,36,.1)','var(--red)':'rgba(248,113,113,.1)'};
+    lbl.textContent = pct>=75?'🔥 Yüksek Tamamlık':pct>=50?'✅ Orta Tamamlık':'⚠️ Düşük Tamamlık';
+    lbl.style.cssText = `color:${color};border-color:${color};background:${bgMap[color]||'transparent'}`;
+}
+
+// ── params ───────────────────────────────────────────────────────────────────
+const p        = new URLSearchParams(location.search);
+const jobId    = p.get('job_id');
+const cvTextId = p.get('cv_text_id');
+
+// ── main ─────────────────────────────────────────────────────────────────────
+async function loadAll() {
+    if (!jobId) { showErr('URL\'de job_id parametresi eksik.'); return; }
+
+    try {
+        // 1. İş detayı — job_routes.py /api/job-detail/<id>
+        const jr = await fetch(`/api/job-detail/${jobId}`);
+        if (!jr.ok) throw new Error(`HTTP ${jr.status}`);
+        const jd = await jr.json();
+        if (!jd.success) { showErr(jd.error||'İş analizi bulunamadı.'); return; }
+        renderJob(jd.job);
+
+        // 2. CV analizi — /api/cv-analysis?cv_text_id=X  (app.py'e eklenecek)
+        if (cvTextId) {
+            try {
+                const cr = await fetch(`/api/cv-analysis?cv_text_id=${cvTextId}`);
+                if (cr.ok) {
+                    const cd = await cr.json();
+                    if (cd.success && cd.cv) { renderCV(cd.cv); }
+                    else showCVNotice();
+                } else showCVNotice();
+            } catch { showCVNotice(); }
+        } else showCVNotice();
+
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('content').style.display      = 'block';
+    } catch(e) {
+        showErr('Bağlantı hatası: '+e.message);
+    }
+}
+
+function showErr(msg) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display   = 'block';
+    document.getElementById('errorMsg').textContent = msg;
+}
+
+function showCVNotice() {
+    document.getElementById('cvContent').style.display = 'none';
+    document.getElementById('cvNotice').style.display  = 'block';
+}
+
+// ── render job ───────────────────────────────────────────────────────────────
+function renderJob(job) {
+    const empMap  = {full_time:'Tam Zamanlı',part_time:'Yarı Zamanlı',contract:'Sözleşmeli',internship:'Staj',freelance:'Freelance'};
+    const workMap = {remote:'Uzaktan',onsite:'Ofis',hybrid:'Hibrit'};
+
+    document.getElementById('heroTitle').textContent = sf(job.job_title,'Pozisyon Belirtilmemiş');
+    document.getElementById('heroCompany').textContent = sf(job.company_name,'');
+
+    const locParts = [job.location_district,job.location_city,job.location_country].filter(Boolean);
+    if (locParts.length) document.getElementById('heroLocation').textContent = '· '+locParts.join(', ');
+
+    // tags
+    const tEl = document.getElementById('heroTags');
+    [ {v:empMap[job.employment_type]||job.employment_type, c:'blue'},
+      {v:job.is_remote?'Uzaktan':null, c:'green'},
+      {v:workMap[job.work_type]||job.work_type, c:'purple'},
+      {v:job.department, c:'amber'}
+    ].forEach(t => { if(t.v) tEl.innerHTML+=`<span class="tag ${t.c}">${t.v}</span>`; });
+
+    scoreSetup(job.completeness_score);
+
+    if (job.source_url) {
+        const sl = document.getElementById('srcLink');
+        sl.href=job.source_url; sl.style.display='inline-flex';
     }
 
-    function getParams() {
-        const p = new URLSearchParams(location.search);
-        return { jobId: p.get('job_id') };
+    st('jTitle',   job.job_title);
+    st('jCompany', job.company_name);
+    st('jDept',    job.department);
+    st('jLocation', locParts.length?locParts.join(', '):null);
+    st('jWorkType', workMap[job.work_type]||job.work_type);
+    st('jEmpType',  empMap[job.employment_type]||job.employment_type);
+
+    const expP = [];
+    if (job.exp_min_years!=null) expP.push(job.exp_min_years+(job.exp_max_years?'–'+job.exp_max_years:'+')+' yıl');
+    if (job.exp_description) expP.push(job.exp_description);
+    st('jExp', expP.join(' · ')||null);
+    st('jEdu', job.edu_min_level);
+
+    if (job.salary_min||job.salary_max) {
+        const sp=[job.salary_min,job.salary_max].filter(Boolean).map(n=>Number(n).toLocaleString('tr-TR'));
+        st('jSalary', sp.join(' – ')+' '+(job.salary_currency||''));
+    } else st('jSalary', null);
+
+    chips('reqSkills',  pJ(job.required_skills).map(s=>typeof s==='object'?(s.skill||s):s),  'neutral');
+    chips('prefSkills', pJ(job.preferred_skills).map(s=>typeof s==='object'?(s.skill||s):s), 'neutral');
+
+    // extra panel: benefits veya missing_fields
+    const benefits = pJ(job.benefits);
+    const missing  = pJ(job.missing_fields);
+    if (benefits.length) {
+        chips('extraChips', benefits, 'green');
+    } else if (missing.length) {
+        document.getElementById('extraTitle').innerHTML =
+            '<div class="panel-icon i-amber">⚠️</div>İlanda Belirtilmemiş';
+        chips('extraChips', missing, 'amber');
+    } else {
+        document.getElementById('extraPanel').style.display='none';
     }
+}
 
-    function showAlert(msg) {
-        const el = document.getElementById('alert');
-        document.getElementById('alertText').textContent = msg;
-        el.classList.add('show');
-    }
+// ── render CV ────────────────────────────────────────────────────────────────
+function renderCV(cv) {
+    st('cvAddress',    cv.cv_address);
+    st('cvLanguages',  cv.cv_languages);
+    st('cvEducation',  cv.cv_education);
+    st('cvExperience', cv.cv_experience);
 
-    /* ── label maps ── */
-    const empTypeMap = {
-        full_time: 'Tam Zamanlı', part_time: 'Yarı Zamanlı',
-        contract: 'Sözleşmeli', internship: 'Staj', freelance: 'Freelance'
-    };
-    const workTypeMap  = { onsite: 'Ofiste', hybrid: 'Hibrit', remote: 'Uzaktan' };
-    const eduLevelMap  = {
-        none: 'Şart Değil', primary: 'İlkokul', high_school: 'Lise',
-        associate: 'Ön Lisans', bachelor: 'Lisans', master: 'Yüksek Lisans', phd: 'Doktora'
-    };
+    let skills=[];
+    if(cv.cv_skills){ try{skills=JSON.parse(cv.cv_skills);}catch{skills=cv.cv_skills.split(',').map(s=>s.trim()).filter(Boolean);} }
+    if(Array.isArray(skills)&&skills.length) chips('cvSkills',skills,'neutral');
+    else if(cv.cv_skills) document.getElementById('cvSkills').innerHTML=`<span class="info-val">${cv.cv_skills}</span>`;
+    else document.getElementById('cvSkills').innerHTML='<span class="empty">Beceri bilgisi yok</span>';
+}
 
-    function fmt(v, map) { return (v && map[v]) ? map[v] : (v || '—'); }
-    function null2dash(v) { return (v === null || v === undefined || v === '') ? '—' : v; }
-
-    /* ── ring helper ── */
-    function buildRing(score) {
-        const pct   = Math.round(score || 0);
-        const circ  = 163;
-        const offset = circ - (pct / 100) * circ;
-        const color  = pct >= 75 ? '#34d399' : pct >= 45 ? '#fbbf24' : '#f87171';
-        return `
-        <div class="completeness-ring">
-            <svg class="ring-svg" viewBox="0 0 56 56">
-                <circle class="ring-bg"   cx="28" cy="28" r="26"/>
-                <circle class="ring-fill" cx="28" cy="28" r="26"
-                    style="stroke:${color}; stroke-dashoffset:${offset}" id="ringFill"/>
-                <text class="ring-text" x="28" y="29">${pct}%</text>
-            </svg>
-            <span class="ring-label">Tamamlanma</span>
-        </div>`;
-    }
-
-    /* ── section toggle ── */
-    function initToggles() {
-        document.querySelectorAll('.section-header').forEach(h => {
-            h.addEventListener('click', () => {
-                h.classList.toggle('open');
-                h.nextElementSibling.classList.toggle('open');
-            });
-        });
-    }
-
-    /* ── render ── */
-    function render(j) {
-        const loc = j.full_analysis_json?.location || {};
-        const skills    = j.full_analysis_json?.skills    || {};
-        const exp       = j.full_analysis_json?.experience || {};
-        const edu       = j.full_analysis_json?.education  || {};
-        const salary    = j.full_analysis_json?.salary     || {};
-        const langs     = j.full_analysis_json?.languages  || j.languages || [];
-        const benefits  = j.full_analysis_json?.benefits   || j.benefits  || [];
-        const missing   = j.missing_fields || [];
-        const reqSkills = skills.required  || j.required_skills  || [];
-        const prefSkills= skills.preferred || j.preferred_skills || [];
-
-        /* ── badges ── */
-        const badges = [];
-        if (j.employment_type) badges.push(`<span class="badge badge-blue">${fmt(j.employment_type, empTypeMap)}</span>`);
-        if (j.work_type)       badges.push(`<span class="badge badge-purple">📍 ${fmt(j.work_type, workTypeMap)}</span>`);
-        if (loc.is_remote)     badges.push(`<span class="badge badge-green">🌐 Uzaktan</span>`);
-        if (j.location_city)   badges.push(`<span class="badge badge-gray">🏙 ${j.location_city}${j.location_country ? ', ' + j.location_country : ''}</span>`);
-        if (j.department)      badges.push(`<span class="badge badge-yellow">🏢 ${j.department}</span>`);
-
-        /* ── meta ── */
-        const metas = [
-            { label: 'Şirket',    value: null2dash(j.company_name) },
-            { label: 'Pozisyon',  value: null2dash(j.job_title) },
-            { label: 'Analiz',    value: j.analyzed_at ? new Date(j.analyzed_at).toLocaleDateString('tr-TR', {day:'2-digit',month:'long',year:'numeric'}) : '—' },
-        ];
-
-        /* ── salary ── */
-        let salaryHTML = '<p class="desc-text">Maaş bilgisi belirtilmemiş.</p>';
-        if (salary.min || salary.max) {
-            const cur = salary.currency || '';
-            const neg = salary.is_negotiable ? `<span class="salary-negotiable">Pazarlık Payı Var</span>` : '';
-            salaryHTML = `<div class="salary-block">
-                ${salary.min ? `<span class="salary-amount">${salary.min.toLocaleString('tr-TR')}</span>` : ''}
-                ${(salary.min && salary.max) ? `<span class="salary-sep">—</span>` : ''}
-                ${salary.max ? `<span class="salary-amount">${salary.max.toLocaleString('tr-TR')}</span>` : ''}
-                ${cur ? `<span class="salary-currency">${cur}</span>` : ''}
-                ${neg}
-            </div>`;
-        }
-
-        /* ── languages ── */
-        let langsHTML = '<p class="desc-text">Dil bilgisi belirtilmemiş.</p>';
-        if (langs.length) {
-            langsHTML = langs.map(l => {
-                const lvl  = (l.level || '').toLowerCase();
-                const req  = l.is_required ? `<span class="lang-required">Zorunlu</span>` : '';
-                return `<div class="lang-row">
-                    <span class="lang-name">${l.language || '—'}</span>
-                    <span class="lang-level level-${lvl}">${(l.level || '').toUpperCase()}</span>
-                    ${req}
-                </div>`;
-            }).join('');
-        }
-
-        /* ── benefits ── */
-        let benefitsHTML = '<p class="desc-text">Yan haklar belirtilmemiş.</p>';
-        if (benefits.length) {
-            benefitsHTML = benefits.map(b =>
-                `<div class="benefit-item"><div class="benefit-dot"></div>${b}</div>`
-            ).join('');
-        }
-
-        /* ── missing ── */
-        let missingHTML = '';
-        if (missing.length) {
-            const chips = missing.map(m => `<span class="missing-chip">⚠ ${m}</span>`).join('');
-            missingHTML = `
-            <div class="section-card">
-                <div class="section-header open">
-                    <div class="section-icon icon-pink">⚠️</div>
-                    <span class="section-title">Eksik Bilgiler</span>
-                    <span class="section-count">${missing.length}</span>
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="section-body open">
-                    <div class="missing-list">${chips}</div>
-                </div>
-            </div>`;
-        }
-
-        /* ── experience ── */
-        let expHTML = '<p class="desc-text">Deneyim bilgisi belirtilmemiş.</p>';
-        if (exp.min_years || exp.max_years || exp.description || j.exp_min_years || j.exp_max_years) {
-            const minY = exp.min_years ?? j.exp_min_years;
-            const maxY = exp.max_years ?? j.exp_max_years;
-            const desc = exp.description ?? j.exp_description;
-            let yearsStr = '';
-            if (minY && maxY) yearsStr = `${minY} – ${maxY} Yıl`;
-            else if (minY)    yearsStr = `Min. ${minY} Yıl`;
-            else if (maxY)    yearsStr = `Maks. ${maxY} Yıl`;
-            expHTML = `
-            <div class="exp-block">
-                ${yearsStr ? `<div class="exp-years">${yearsStr}</div>` : ''}
-                ${desc ? `<p class="desc-text">${desc}</p>` : ''}
-            </div>`;
-        }
-
-        /* ── education ── */
-        const eduLevel  = edu.min_level ?? j.edu_min_level;
-        const eduFields = edu.preferred_fields ?? j.edu_preferred_fields ?? [];
-        const eduDesc   = edu.description ?? j.edu_description;
-        let eduHTML = `<div class="edu-grid">
-            <div class="edu-item">
-                <div class="edu-item-label">Minimum Seviye</div>
-                <div class="edu-item-value">${fmt(eduLevel, eduLevelMap)}</div>
-            </div>
-            ${eduFields.length ? `<div class="edu-item">
-                <div class="edu-item-label">Tercih Edilen Alanlar</div>
-                <div class="edu-item-value">${eduFields.join(', ')}</div>
-            </div>` : ''}
-        </div>
-        ${eduDesc ? `<p class="desc-text">${eduDesc}</p>` : ''}`;
-
-        /* ── source ── */
-        const sourceHTML = j.source_url
-            ? `<a class="source-link" href="${j.source_url}" target="_blank">
-                🔗 ${j.source_url}
-               </a>`
-            : '<p class="desc-text">Kaynak URL kaydedilmemiş.</p>';
-
-        /* ── full render ── */
-        document.getElementById('content').innerHTML = `
-
-            <!-- HERO -->
-            <div class="job-hero">
-                <div class="hero-top">
-                    <h1 class="job-title">${null2dash(j.job_title)}</h1>
-                    ${buildRing(j.completeness_score)}
-                </div>
-                <div class="hero-badges">${badges.join('') || '<span class="badge badge-gray">Bilgi yok</span>'}</div>
-                <div class="hero-meta">
-                    ${metas.map(m => `
-                        <div class="meta-item">
-                            <div class="meta-item-label">${m.label}</div>
-                            <div class="meta-item-value">${m.value}</div>
-                        </div>`).join('')}
-                </div>
-            </div>
-
-            ${missingHTML}
-
-            <!-- ZORUNLU BECERİLER -->
-            <div class="section-card">
-                <div class="section-header open">
-                    <div class="section-icon icon-blue">💻</div>
-                    <span class="section-title">Zorunlu Beceriler</span>
-                    <span class="section-count">${reqSkills.length}</span>
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="section-body open">
-                    ${reqSkills.length
-                        ? `<div class="chip-grid">${reqSkills.map(s => `<span class="chip chip-required">${s}</span>`).join('')}</div>`
-                        : '<p class="desc-text">Belirtilmemiş.</p>'}
-                </div>
-            </div>
-
-            <!-- TERCİH EDİLEN BECERİLER -->
-            <div class="section-card">
-                <div class="section-header">
-                    <div class="section-icon icon-purple">✨</div>
-                    <span class="section-title">Tercih Edilen Beceriler</span>
-                    <span class="section-count">${prefSkills.length}</span>
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="section-body">
-                    ${prefSkills.length
-                        ? `<div class="chip-grid">${prefSkills.map(s => `<span class="chip chip-preferred">${s}</span>`).join('')}</div>`
-                        : '<p class="desc-text">Belirtilmemiş.</p>'}
-                </div>
-            </div>
-
-            <!-- DENEYİM -->
-            <div class="section-card">
-                <div class="section-header">
-                    <div class="section-icon icon-green">📅</div>
-                    <span class="section-title">Deneyim</span>
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="section-body">${expHTML}</div>
-            </div>
-
-            <!-- EĞİTİM -->
-            <div class="section-card">
-                <div class="section-header">
-                    <div class="section-icon icon-yellow">🎓</div>
-                    <span class="section-title">Eğitim</span>
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="section-body">${eduHTML}</div>
-            </div>
-
-            <!-- DİLLER -->
-            <div class="section-card">
-                <div class="section-header">
-                    <div class="section-icon icon-teal">🌍</div>
-                    <span class="section-title">Dil Gereksinimleri</span>
-                    <span class="section-count">${langs.length}</span>
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="section-body">${langsHTML}</div>
-            </div>
-
-            <!-- MAAŞ -->
-            <div class="section-card">
-                <div class="section-header">
-                    <div class="section-icon icon-green">💰</div>
-                    <span class="section-title">Maaş Bilgisi</span>
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="section-body">${salaryHTML}</div>
-            </div>
-
-            <!-- YAN HAKLAR -->
-            <div class="section-card">
-                <div class="section-header">
-                    <div class="section-icon icon-orange">🎁</div>
-                    <span class="section-title">Yan Haklar</span>
-                    <span class="section-count">${benefits.length}</span>
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="section-body">${benefitsHTML}</div>
-            </div>
-
-            <!-- KAYNAK -->
-            <div class="section-card">
-                <div class="section-header">
-                    <div class="section-icon icon-gray">🔗</div>
-                    <span class="section-title">İlan Kaynağı</span>
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="section-body">${sourceHTML}</div>
-            </div>
-        `;
-
-        initToggles();
-
-        /* ring animation */
-        requestAnimationFrame(() => {
-            const ring = document.getElementById('ringFill');
-            if (ring) {
-                const pct    = Math.round(j.completeness_score || 0);
-                const circ   = 163;
-                const offset = circ - (pct / 100) * circ;
-                ring.style.strokeDashoffset = offset;
-            }
-        });
-    }
-
-    /* ── fetch & init ── */
-    async function init() {
-        const { jobId } = getParams();
-
-        if (!jobId) {
-            showAlert('URL\'de job_id parametresi bulunamadı. Örnek: /job-detail?job_id=5');
-            return;
-        }
-
-        /* skeleton */
-        document.getElementById('content').innerHTML = `
-            <div class="skeleton-wrap">
-                <div class="skeleton" style="height:180px"></div>
-                <div class="skeleton" style="height:80px"></div>
-                <div class="skeleton" style="height:80px"></div>
-                <div class="skeleton" style="height:80px"></div>
-            </div>`;
-
-        try {
-            const resp = await fetch(`/api/job-detail/${jobId}`);
-            if (resp.status === 401) { location.href = '/'; return; }
-            const data = await resp.json();
-            if (!data.success) { showAlert(data.error || 'İlan yüklenemedi.'); return; }
-            render(data.job);
-        } catch (e) {
-            showAlert('Sunucuya bağlanılamadı: ' + e.message);
-        }
-    }
-
-    init();
+loadAll();
 </script>
-</body>
-</html></title>
-</head>
-<body>
-
 </body>
 </html>

@@ -30,7 +30,6 @@
             overflow-x: hidden;
         }
 
-        /* ── arka plan ── */
         body::before {
             content: '';
             position: fixed;
@@ -50,7 +49,6 @@
             padding: 32px 20px 60px;
         }
 
-        /* ── topbar ── */
         .topbar {
             display: flex;
             justify-content: space-between;
@@ -60,26 +58,11 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .logo {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 22px;
-            letter-spacing: -0.5px;
-        }
-
+        .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
         .logo span { color: var(--accent); }
 
-        .user-pill {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-name {
-            font-size: 14px;
-            color: var(--label);
-            font-weight: 500;
-        }
+        .user-pill { display: flex; align-items: center; gap: 12px; }
+        .user-name { font-size: 14px; color: var(--label); font-weight: 500; }
 
         .logout-btn {
             background: transparent;
@@ -94,10 +77,7 @@
         }
         .logout-btn:hover { border-color: var(--error); color: var(--error); }
 
-        /* ── section title ── */
-        .section-head {
-            margin-bottom: 32px;
-        }
+        .section-head { margin-bottom: 32px; }
         .section-head h1 {
             font-family: 'Syne', sans-serif;
             font-size: 28px;
@@ -105,13 +85,8 @@
             letter-spacing: -0.5px;
             margin-bottom: 6px;
         }
-        .section-head p {
-            font-size: 14px;
-            color: var(--label);
-            font-weight: 300;
-        }
+        .section-head p { font-size: 14px; color: var(--label); font-weight: 300; }
 
-        /* ── card ── */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -132,7 +107,6 @@
             margin-bottom: 16px;
         }
 
-        /* ── file drop zone ── */
         .drop-zone {
             border: 2px dashed var(--border);
             border-radius: 12px;
@@ -155,25 +129,16 @@
             height: 100%;
         }
         .drop-icon {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             border-radius: 12px;
             background: var(--surface2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             margin: 0 auto 14px;
         }
         .drop-icon svg { width: 22px; height: 22px; stroke: var(--accent); }
-        .drop-title {
-            font-weight: 500;
-            font-size: 15px;
-            margin-bottom: 4px;
-        }
-        .drop-sub {
-            font-size: 13px;
-            color: var(--muted);
-        }
+        .drop-title { font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+        .drop-sub { font-size: 13px; color: var(--muted); }
+
         .file-chosen {
             display: none;
             align-items: center;
@@ -186,31 +151,14 @@
         }
         .file-chosen.show { display: flex; }
         .file-chosen svg { width: 16px; height: 16px; stroke: var(--success); flex-shrink: 0; }
-        .file-chosen span { color: var(--text); }
 
-        /* ── input fields ── */
-        .field {
-            margin-bottom: 14px;
-        }
+        .field { margin-bottom: 14px; }
         .field:last-child { margin-bottom: 0; }
-
-        .field label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--label);
-            margin-bottom: 7px;
-        }
+        .field label { display: block; font-size: 13px; font-weight: 500; color: var(--label); margin-bottom: 7px; }
         .field label .req { color: var(--accent); margin-left: 3px; }
-        .field label .opt {
-            font-size: 11px;
-            font-weight: 400;
-            color: var(--muted);
-            margin-left: 6px;
-        }
+        .field label .opt { font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 6px; }
 
-        .field input,
-        .field textarea {
+        .field input, .field textarea {
             width: 100%;
             background: var(--surface2);
             border: 1px solid var(--border);
@@ -222,16 +170,13 @@
             outline: none;
             transition: border-color .2s, box-shadow .2s;
         }
-        .field input::placeholder,
-        .field textarea::placeholder { color: var(--muted); }
-        .field input:focus,
-        .field textarea:focus {
+        .field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+        .field input:focus, .field textarea:focus {
             border-color: rgba(79,142,247,0.5);
             box-shadow: 0 0 0 3px rgba(79,142,247,0.08);
         }
         .field textarea { height: 88px; resize: vertical; }
 
-        /* ── source tabs ── */
         .source-tabs {
             display: flex;
             gap: 6px;
@@ -261,14 +206,12 @@
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
 
-        /* ── submit ── */
         .submit-wrap {
             margin-top: 24px;
             display: flex;
             align-items: center;
             gap: 16px;
         }
-
         .submit-btn {
             background: var(--accent);
             color: #fff;
@@ -280,20 +223,51 @@
             font-weight: 600;
             cursor: pointer;
             transition: opacity .2s, transform .1s;
-            position: relative;
-            overflow: hidden;
         }
         .submit-btn:hover { opacity: 0.88; }
         .submit-btn:active { transform: scale(0.98); }
         .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .submit-hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
 
-        .submit-hint {
-            font-size: 12px;
-            color: var(--muted);
-            line-height: 1.5;
+        /* ── Steps indicator ── */
+        .steps {
+            display: flex;
+            gap: 0;
+            margin-bottom: 28px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            padding: 0;
         }
+        .step {
+            flex: 1;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--muted);
+            border-right: 1px solid var(--border);
+            transition: all .3s;
+        }
+        .step:last-child { border-right: none; }
+        .step-num {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: all .3s;
+        }
+        .step.active { color: var(--text); background: rgba(79,142,247,0.06); }
+        .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .step.done { color: var(--success); }
+        .step.done .step-num { background: rgba(52,211,153,0.15); border-color: var(--success); color: var(--success); }
 
-        /* ── alert banner ── */
         .alert {
             display: none;
             padding: 14px 18px;
@@ -306,26 +280,11 @@
         }
         .alert.show { display: flex; align-items: flex-start; gap: 10px; }
         .alert svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
-        .alert.success {
-            background: rgba(52,211,153,0.1);
-            border-color: rgba(52,211,153,0.25);
-            color: var(--success);
-        }
-        .alert.error {
-            background: rgba(248,113,113,0.1);
-            border-color: rgba(248,113,113,0.25);
-            color: var(--error);
-        }
+        .alert.success { background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.25); color: var(--success); }
+        .alert.error   { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: var(--error); }
+        .alert.info    { background: rgba(79,142,247,0.1);  border-color: rgba(79,142,247,0.25);  color: var(--accent); }
 
-        /* ── progress ── */
-        .progress-bar {
-            height: 3px;
-            background: var(--surface2);
-            border-radius: 2px;
-            overflow: hidden;
-            display: none;
-            margin-bottom: 20px;
-        }
+        .progress-bar { height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; display: none; margin-bottom: 20px; }
         .progress-bar.show { display: block; }
         .progress-fill {
             height: 100%;
@@ -357,6 +316,26 @@
     <div class="section-head">
         <h1>Başvuru Analizi</h1>
         <p>CV'nizi yükleyin ve başvurmak istediğiniz iş ilanını ekleyin — yapay zeka geri kalanını halleder.</p>
+    </div>
+
+    <!-- steps -->
+    <div class="steps">
+        <div class="step active" id="step1">
+            <div class="step-num" id="stepNum1">1</div>
+            <span>CV Yükleniyor</span>
+        </div>
+        <div class="step" id="step2">
+            <div class="step-num" id="stepNum2">2</div>
+            <span>CV Analiz</span>
+        </div>
+        <div class="step" id="step3">
+            <div class="step-num" id="stepNum3">3</div>
+            <span>İlan Analiz</span>
+        </div>
+        <div class="step" id="step4">
+            <div class="step-num" id="stepNum4">4</div>
+            <span>Rapor Hazır</span>
+        </div>
     </div>
 
     <!-- alert -->
@@ -423,7 +402,6 @@
         <!-- Opsiyonel linkler -->
         <div class="card">
             <div class="card-label">03 — Profil Linkleri <span style="color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0">(opsiyonel)</span></div>
-
             <div class="field">
                 <label for="github">GitHub <span class="opt">opsiyonel</span></label>
                 <input type="url" id="github" name="github" placeholder="https://github.com/kullanıcıadı">
@@ -443,7 +421,7 @@
 </div>
 
 <script>
-    // ── oturum kontrolü ──
+    // oturum kontrolü
     fetch('/api/check-session')
         .then(r => r.json())
         .then(d => { if (!d.logged_in) location.href = '/'; });
@@ -453,11 +431,11 @@
             .then(d => { if (d.success) location.href = '/'; });
     }
 
-    // ── dosya seçimi ──
-    const cvInput   = document.getElementById('cv');
-    const dropZone  = document.getElementById('dropZone');
+    // dosya seçimi
+    const cvInput    = document.getElementById('cv');
+    const dropZone   = document.getElementById('dropZone');
     const fileChosen = document.getElementById('fileChosen');
-    const fileName  = document.getElementById('fileName');
+    const fileName   = document.getElementById('fileName');
 
     cvInput.addEventListener('change', () => {
         if (cvInput.files[0]) {
@@ -477,17 +455,17 @@
         }
     });
 
-    // ── tab geçişi ──
+    // tab geçişi
     let activeTab = 'url';
     function switchTab(tab, btn) {
         activeTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.source-tabs .tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('panel-' + tab).classList.add('active');
     }
 
-    // ── alert ──
+    // alert
     function showAlert(msg, type) {
         const el = document.getElementById('alert');
         el.className = 'alert show ' + type;
@@ -495,22 +473,30 @@
         el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    // ── progress ──
+    // progress
     function setProgress(pct) {
-        const bar = document.getElementById('progressBar');
-        const fill = document.getElementById('progressFill');
-        bar.classList.add('show');
-        fill.style.width = pct + '%';
-        if (pct >= 100) setTimeout(() => bar.classList.remove('show'), 600);
+        document.getElementById('progressBar').classList.add('show');
+        document.getElementById('progressFill').style.width = pct + '%';
+        if (pct >= 100) setTimeout(() => document.getElementById('progressBar').classList.remove('show'), 700);
     }
 
-    // ── form submit ──
+    // steps
+    function setStep(n) {
+        for (let i = 1; i <= 4; i++) {
+            const s = document.getElementById('step' + i);
+            s.classList.remove('active', 'done');
+            if (i < n)  s.classList.add('done'),   document.getElementById('stepNum' + i).textContent = '✓';
+            if (i === n) s.classList.add('active');
+        }
+    }
+
+    // ── FORM SUBMIT ──────────────────────────────────────────────────────────
     document.getElementById('uploadForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const btn = document.getElementById('submitBtn');
 
-        // İş ilanı kaynağı kontrolü
+        // İş ilanı kaynağı
         const jobUrl  = document.getElementById('job_url').value.trim();
         const jobText = document.getElementById('job_text').value.trim();
         const jobSource = activeTab === 'url' ? jobUrl : jobText;
@@ -523,65 +509,86 @@
         }
 
         btn.disabled = true;
-        btn.textContent = 'Analiz ediliyor…';
-        setProgress(15);
+        btn.textContent = 'İşleniyor…';
 
-        // 1) CV yükleme
-        const formData = new FormData(this);
-        // job_url alanını her zaman gönder (backend için)
-        if (activeTab === 'text') {
-            formData.set('job_url', '');
-        }
-
-        let cvTextId = null;
         try {
-            setProgress(30);
+            // ── ADIM 1: CV Yükle ─────────────────────────────────────────
+            setStep(1);
+            setProgress(10);
+            showAlert('CV yükleniyor…', 'info');
+
+            const formData = new FormData(this);
+            if (activeTab === 'text') formData.set('job_url', '');
+
             const r1 = await fetch('/api/upload-cv-links', { method: 'POST', body: formData });
             const d1 = await r1.json();
 
             if (!d1.success) {
                 showAlert(d1.message || 'CV yükleme başarısız.', 'error');
-                btn.disabled = false; btn.textContent = 'Analiz Et →';
-                return;
+                btn.disabled = false; btn.textContent = 'Analiz Et →'; return;
             }
-            cvTextId = d1.cv_text_id;
-            setProgress(55);
-        } catch (err) {
-            showAlert('CV yükleme sırasında hata: ' + err, 'error');
-            btn.disabled = false; btn.textContent = 'Analiz Et →';
-            return;
-        }
 
-        // 2) İş ilanı analizi
-        try {
-            setProgress(70);
-            const r2 = await fetch('/api/analyze-job', {
+            const cvTextId = d1.cv_text_id;
+
+            const userId = d1.user_id || "{{ session.get('user_id', 0) }}";
+            setProgress(25);
+
+            // ── ADIM 2: CV'yi AI ile Analiz Et ───────────────────────────
+            setStep(2);
+            showAlert('CV analiz ediliyor…', 'info');
+            setProgress(40);
+
+            const r2 = await fetch('/analyze-cv', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, cv_text_id: cvTextId })
+            });
+            const d2 = await r2.json();
+
+            if (!d2.success) {
+                // CV analizi başarısız olsa bile devam et (kritik değil)
+                console.warn('CV analizi başarısız:', d2.error);
+            }
+            setProgress(60);
+
+            // ── ADIM 3: İş İlanını Analiz Et → DB'ye Kaydet ─────────────
+            // job_routes.py'deki /api/analyze-job endpoint'ini kullan
+            setStep(3);
+            showAlert('İş ilanı analiz ediliyor…', 'info');
+
+            const r3 = await fetch('/api/analyze-job', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ source: jobSource })
             });
-            const d2 = await r2.json();
+            const d3 = await r3.json();
 
-            setProgress(100);
-
-            if (!d2.success) {
-                showAlert('İş ilanı analizi başarısız: ' + (d2.error || ''), 'error');
-                btn.disabled = false; btn.textContent = 'Analiz Et →';
-                return;
+            if (!d3.success) {
+                showAlert('İş ilanı analizi başarısız: ' + (d3.error || ''), 'error');
+                btn.disabled = false; btn.textContent = 'Analiz Et →'; return;
             }
 
-            showAlert('CV ve iş ilanı başarıyla analiz edildi! Yönlendiriliyorsunuz…', 'success');
+            const jobAnalysisId = d3.job_analysis_id;
+            setProgress(90);
 
-            // cv_analysis sayfasına yönlendir
+            // ── ADIM 4: Yönlendir ─────────────────────────────────────────
+            setStep(4);
+            setProgress(100);
+            showAlert('✅ Analiz tamamlandı! Raporunuz hazırlanıyor…', 'success');
+
+            // job_detail sayfasına cv_text_id'yi de ilet — orada CV verisini çekmek için
             setTimeout(() => {
-                location.href = '/job-detail?job_id=' + d2.job_analysis_id;
-            }, 1800);
+                location.href = `/job-detail?job_id=${jobAnalysisId}&cv_text_id=${cvTextId}`;
+            }, 1500);
 
         } catch (err) {
-            showAlert('İş ilanı analizi sırasında hata: ' + err, 'error');
-            btn.disabled = false; btn.textContent = 'Analiz Et →';
+            console.error('Hata:', err);
+            showAlert('Beklenmeyen bir hata: ' + err.message, 'error');
+            btn.disabled = false;
+            btn.textContent = 'Analiz Et →';
         }
     });
 </script>
+
 </body>
 </html>
