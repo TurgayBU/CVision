@@ -5,7 +5,7 @@ DÜZELTME ÖZET:
 3. CV ve Job match sonuçları birlikte gösteriliyor
 4. Session cleanup yapılıyor
 """
-
+import app
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_cors import CORS
 import hashlib
@@ -19,6 +19,8 @@ from werkzeug.utils import secure_filename
 import json
 from cv_ai_extract import AICVResponseGroq as AICVResponse
 from extract_cv import CVProcessor
+from interview_routes import interview_bp
+
 
 # ── Flask uygulaması oluştur ──────────────────────────────────────────────────
 app = Flask(__name__)
@@ -26,6 +28,7 @@ app.secret_key = config.SECRET_KEY
 app.permanent_session_lifetime = timedelta(days=config.SESSION_LIFETIME_DAYS)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = config.MAX_CONTENT_LENGTH
+app.register_blueprint(interview_bp)
 CORS(app)
 
 from job_routes import job_bp
@@ -659,6 +662,12 @@ def get_cv_analysis():
         cursor.close()
         conn.close()
 
+@app.route('/interview')
+def interview_page():
+    """Mülakat simülatörü sayfası"""
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('interview.html')
 
 # ─────────────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':

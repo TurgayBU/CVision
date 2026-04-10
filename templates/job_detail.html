@@ -32,6 +32,10 @@
         }
         .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:19px; }
         .logo span { color:var(--accent); }
+
+        /* navbar sağ grup */
+        .nav-right { display:flex; align-items:center; gap:10px; }
+
         .btn-sm {
             padding:7px 16px; border-radius:8px; border:1px solid var(--border);
             background:var(--surface2); color:var(--label); font-family:'DM Sans',sans-serif;
@@ -39,6 +43,19 @@
             display:inline-flex; align-items:center; gap:6px; transition:all .2s;
         }
         .btn-sm:hover { border-color:var(--border2); color:var(--text); }
+
+        /* Mülakat butonu — vurgu rengi */
+        .btn-interview {
+            padding:7px 18px; border-radius:8px;
+            background: linear-gradient(135deg, #a78bfa 0%, #7c6af7 100%);
+            border: none;
+            color: #fff; font-family:'DM Sans',sans-serif;
+            font-size:13px; font-weight:600; cursor:pointer; text-decoration:none;
+            display:none; align-items:center; gap:7px; transition:all .2s;
+            box-shadow: 0 2px 12px rgba(124,106,247,0.35);
+        }
+        .btn-interview:hover { opacity:.88; transform:translateY(-1px); box-shadow: 0 4px 18px rgba(124,106,247,0.45); }
+        .btn-interview.visible { display:inline-flex; }
 
         /* layout */
         .page { position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:36px 24px 80px; }
@@ -104,6 +121,39 @@
         .src-link { display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-size:12.5px; text-decoration:none; font-weight:500; }
         .src-link:hover { opacity:.75; }
 
+        /* Mülakat CTA banner — sayfanın altında */
+        .interview-cta {
+            margin-top: 32px;
+            padding: 24px 28px;
+            background: linear-gradient(135deg, rgba(124,106,247,0.12) 0%, rgba(167,139,250,0.06) 100%);
+            border: 1px solid rgba(124,106,247,0.25);
+            border-radius: var(--radius);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            animation: fadeUp .5s .3s ease both;
+        }
+        .interview-cta.visible { display:flex; }
+        .interview-cta-text h3 {
+            font-family:'Syne',sans-serif; font-size:16px; font-weight:700;
+            margin-bottom:4px; color:var(--accent2);
+        }
+        .interview-cta-text p { font-size:13px; color:var(--label); line-height:1.5; }
+        .btn-cta-interview {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #a78bfa 0%, #7c6af7 100%);
+            border: none; border-radius: 10px;
+            color: white; font-family:'Syne',sans-serif;
+            font-size:15px; font-weight:700;
+            cursor:pointer; text-decoration:none;
+            display:inline-flex; align-items:center; gap:8px;
+            white-space:nowrap;
+            box-shadow: 0 4px 20px rgba(124,106,247,0.4);
+            transition: all .2s;
+        }
+        .btn-cta-interview:hover { opacity:.88; transform:translateY(-2px); box-shadow: 0 8px 28px rgba(124,106,247,0.5); }
+
         /* loading / error */
         .loading-state { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; gap:16px; text-align:center; }
         .spinner { width:44px; height:44px; border:3px solid var(--surface3); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
@@ -124,6 +174,7 @@
             .cols3 { grid-template-columns:1fr 1fr; }
             .navbar { padding:0 16px; }
             .page   { padding:24px 16px 60px; }
+            .interview-cta { flex-direction:column; align-items:flex-start; }
         }
     </style>
 </head>
@@ -131,7 +182,13 @@
 
 <nav class="navbar">
     <div class="logo">CV<span>ision</span></div>
-    <a href="/dashboard" class="btn-sm">← Yeni Analiz</a>
+    <!-- Sağ grup: mülakat butonu + geri butonu -->
+    <div class="nav-right">
+        <a id="navInterviewBtn" href="#" class="btn-interview">
+            🎙️ Mülakat Başlat
+        </a>
+        <a href="/dashboard" class="btn-sm">← Yeni Analiz</a>
+    </div>
 </nav>
 
 <div class="page">
@@ -254,6 +311,17 @@
             </div>
         </div>
 
+        <!-- ── MÜLAkat CTA BANNER ── -->
+        <div class="interview-cta" id="interviewCta">
+            <div class="interview-cta-text">
+                <h3>🎙️ Mülakat Simülatörü</h3>
+                <p>Bu iş ilanına özel AI mülakat soruları alın, cevaplarınız anında değerlendirilsin.</p>
+            </div>
+            <a id="ctaInterviewBtn" href="#" class="btn-cta-interview">
+                Mülakatı Başlat →
+            </a>
+        </div>
+
     </div>
 </div>
 
@@ -292,6 +360,21 @@ const p        = new URLSearchParams(location.search);
 const jobId    = p.get('job_id');
 const cvTextId = p.get('cv_text_id');
 
+// ── Mülakat linkini oluştur ve yerleştir ──────────────────────────────────────
+function setupInterviewLinks(jobAnalysisId) {
+    // Navbar butonu
+    const navBtn = document.getElementById('navInterviewBtn');
+    let interviewUrl = `/interview?job_id=${jobAnalysisId}`;
+    if (cvTextId) interviewUrl += `&cv_text_id=${cvTextId}`;
+
+    navBtn.href = interviewUrl;
+    navBtn.classList.add('visible');
+
+    // CTA banner
+    document.getElementById('ctaInterviewBtn').href = interviewUrl;
+    document.getElementById('interviewCta').classList.add('visible');
+}
+
 // ── main ─────────────────────────────────────────────────────────────────────
 async function loadAll() {
     if (!jobId) { showErr('URL\'de job_id parametresi eksik.'); return; }
@@ -304,7 +387,7 @@ async function loadAll() {
         if (!jd.success) { showErr(jd.error||'İş analizi bulunamadı.'); return; }
         renderJob(jd.job);
 
-        // 2. CV analizi — /api/cv-analysis?cv_text_id=X  (app.py'e eklenecek)
+        // 2. CV analizi — /api/cv-analysis?cv_text_id=X
         if (cvTextId) {
             try {
                 const cr = await fetch(`/api/cv-analysis?cv_text_id=${cvTextId}`);
@@ -393,6 +476,9 @@ function renderJob(job) {
     } else {
         document.getElementById('extraPanel').style.display='none';
     }
+
+    // ── Mülakat butonlarını aktif et ──────────────────────────────────────────
+    setupInterviewLinks(job.job_analysis_id);
 }
 
 // ── render CV ────────────────────────────────────────────────────────────────

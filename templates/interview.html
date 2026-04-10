@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVision — Mülakat Simülatörü</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300;1,500&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    --ink: #0e0e12;
+    --paper: #f5f2eb;
+    --paper2: #edeae0;
+    --paper3: #e3dfd3;
+    --accent: #c84b31;
+    --accent2: #2a6496;
+    --gold: #b8860b;
+    --green: #2d6a4f;
+    --border: rgba(14,14,18,0.12);
+    --border2: rgba(14,14,18,0.22);
+    --muted: #7a7570;
+    --radius: 12px;
+    --shadow: 0 2px 16px rgba(14,14,18,0.10);
+    --shadow-lg: 0 8px 40px rgba(14,14,18,0.18);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+}
+
+body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230e0e12' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events:none; z-index:0;
+}
+
+/* ── NAVBAR ── */
+.navbar {
+    position:sticky; top:0; z-index:200;
+    background: rgba(245,242,235,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border2);
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 36px; height:56px;
+}
+.logo {
+    font-family:'Fraunces',serif; font-size:20px; font-weight:700;
+    letter-spacing:-0.5px; color:var(--ink);
+}
+.logo em { color:var(--accent); font-style:normal; }
+.nav-right { display:flex; align-items:center; gap:12px; }
+.nav-btn {
+    padding:7px 16px; border-radius:8px;
+    border:1px solid var(--border2);
+    background:transparent; color:var(--muted);
+    font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+    cursor:pointer; text-decoration:none;
+    transition:all .2s;
+}
+.nav-btn:hover { background:var(--paper2); color:var(--ink); }
+
+/* ── PAGE ── */
+.page { position:relative; z-index:1; max-width:860px; margin:0 auto; padding:40px 24px 80px; }
+
+/* ── SETUP SCREEN ── */
+.setup-screen { animation: fadeUp .4s ease both; }
+
+.screen-title {
+    font-family:'Fraunces',serif;
+    font-size:36px; font-weight:700;
+    letter-spacing:-1px; line-height:1.1;
+    margin-bottom:8px;
+}
+.screen-title em { color:var(--accent); font-style:italic; }
+.screen-sub { color:var(--muted); font-size:15px; margin-bottom:36px; }
+
+.setup-card {
+    background:white;
+    border:1px solid var(--border2);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    margin-bottom:16px;
+}
+.setup-card-head {
+    background:var(--paper2);
+    border-bottom:1px solid var(--border);
+    padding:16px 22px;
+    display:flex; align-items:center; gap:10px;
+    font-family:'Fraunces',serif; font-size:14px; font-weight:500;
+}
+.setup-card-body { padding:22px; }
+
+.field { margin-bottom:18px; }
+.field:last-child { margin-bottom:0; }
+.field label {
+    display:block; font-size:11px; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:7px;
+}
+.field select, .field input {
+    width:100%;
+    padding:11px 14px;
+    background:var(--paper);
+    border:1px solid var(--border2);
+    border-radius:8px;
+    color:var(--ink);
+    font-family:'DM Sans',sans-serif; font-size:14px;
+    outline:none;
+    transition:border-color .2s, box-shadow .2s;
+    -webkit-appearance:none;
+}
+.field select {
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a7570' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 14px center;
+    padding-right:36px;
+}
+.field select:focus, .field input:focus {
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(200,75,49,.1);
+}
+.field select option { background:white; }
+
+.q-count-row {
+    display:flex; gap:8px; flex-wrap:wrap;
+}
+.q-count-btn {
+    padding:8px 18px;
+    border:1px solid var(--border2);
+    border-radius:100px;
+    background:transparent;
+    font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+    color:var(--muted); cursor:pointer;
+    transition:all .2s;
+}
+.q-count-btn.active {
+    background:var(--accent);
+    border-color:var(--accent);
+    color:white;
+}
+
+.start-btn {
+    width:100%;
+    padding:14px;
+    background:var(--ink);
+    color:var(--paper);
+    border:none; border-radius:var(--radius);
+    font-family:'Fraunces',serif; font-size:17px; font-weight:500;
+    cursor:pointer; letter-spacing:-.2px;
+    transition:all .25s;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin-top:24px;
+}
+.start-btn:hover:not(:disabled) { background:#222; transform:translateY(-1px); box-shadow:var(--shadow-lg); }
+.start-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+/* ── INTERVIEW SCREEN ── */
+.interview-screen { display:none; }
+
+/* Progress */
+.progress-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:28px;
+    animation:fadeUp .4s ease both;
+}
+.progress-label { font-size:13px; color:var(--muted); font-weight:500; }
+.progress-count { font-family:'DM Mono',monospace; font-size:13px; font-weight:500; }
+.progress-track {
+    height:4px; background:var(--paper3);
+    border-radius:2px; overflow:hidden;
+    margin:10px 0;
+}
+.progress-fill {
+    height:100%; background:var(--accent);
+    border-radius:2px;
+    transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+
+/* Category pill */
+.category-pill {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:5px 13px;
+    border-radius:100px;
+    font-size:11px; font-weight:600;
+    letter-spacing:.06em; text-transform:uppercase;
+    border:1px solid;
+    margin-bottom:16px;
+}
+.cat-technical   { background:rgba(42,100,150,.08); border-color:rgba(42,100,150,.25); color:var(--accent2); }
+.cat-behavioral  { background:rgba(45,106,79,.08);  border-color:rgba(45,106,79,.25);  color:var(--green); }
+.cat-situational { background:rgba(184,134,11,.08); border-color:rgba(184,134,11,.25); color:var(--gold); }
+.cat-cv_based    { background:rgba(200,75,49,.08);  border-color:rgba(200,75,49,.25);  color:var(--accent); }
+
+/* Question card */
+.question-card {
+    background:white;
+    border:1px solid var(--border2);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:28px;
+    margin-bottom:20px;
+    animation:slideIn .35s ease both;
+}
+@keyframes slideIn {
+    from { opacity:0; transform:translateX(20px); }
+    to   { opacity:1; transform:translateX(0); }
+}
+
+.difficulty-row {
+    display:flex; align-items:center; gap:6px;
+    margin-bottom:14px;
+}
+.diff-dot {
+    width:8px; height:8px; border-radius:50%;
+}
+.diff-easy   .diff-dot { background:var(--green); }
+.diff-medium .diff-dot { background:var(--gold); }
+.diff-hard   .diff-dot { background:var(--accent); }
+.diff-label { font-size:12px; font-weight:500; color:var(--muted); }
+
+.question-text {
+    font-family:'Fraunces',serif;
+    font-size:20px; font-weight:500;
+    line-height:1.45; letter-spacing:-.2px;
+    color:var(--ink);
+}
+
+/* Answer area */
+.answer-card {
+    background:white;
+    border:1px solid var(--border2);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    margin-bottom:16px;
+}
+.answer-head {
+    background:var(--paper2);
+    border-bottom:1px solid var(--border);
+    padding:12px 20px;
+    font-size:12px; font-weight:600;
+    letter-spacing:.06em; text-transform:uppercase;
+    color:var(--muted);
+    display:flex; align-items:center; justify-content:space-between;
+}
+.char-count { font-family:'DM Mono',monospace; font-size:12px; }
+.answer-textarea {
+    width:100%; min-height:180px;
+    padding:18px 20px;
+    background:white;
+    border:none; outline:none;
+    font-family:'DM Sans',sans-serif; font-size:14.5px;
+    line-height:1.7; color:var(--ink);
+    resize:vertical;
+}
+.answer-textarea::placeholder { color:#bbb; }
+.answer-footer {
+    padding:12px 20px;
+    border-top:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px;
+}
+
+.btn-submit {
+    padding:11px 28px;
+    background:var(--accent);
+    color:white; border:none;
+    border-radius:8px;
+    font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600;
+    cursor:pointer; transition:all .2s;
+    display:flex; align-items:center; gap:8px;
+}
+.btn-submit:hover:not(:disabled) { background:#b03a22; transform:translateY(-1px); }
+.btn-submit:disabled { opacity:.4; cursor:not-allowed; }
+
+.btn-skip {
+    padding:11px 20px;
+    background:transparent; color:var(--muted);
+    border:1px solid var(--border2);
+    border-radius:8px;
+    font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
+    cursor:pointer; transition:all .2s;
+}
+.btn-skip:hover { background:var(--paper2); color:var(--ink); }
+
+/* Evaluation result */
+.eval-card {
+    background:white;
+    border:1px solid var(--border2);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    margin-bottom:20px;
+    animation:fadeUp .4s ease both;
+    display:none;
+}
+.eval-head {
+    padding:16px 22px;
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+}
+.eval-grade {
+    font-family:'Fraunces',serif;
+    font-size:28px; font-weight:700;
+    width:52px; height:52px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    border:2px solid;
+}
+.grade-A { color:var(--green);  border-color:var(--green);  background:rgba(45,106,79,.08); }
+.grade-B { color:var(--accent2);border-color:var(--accent2);background:rgba(42,100,150,.08); }
+.grade-C { color:var(--gold);   border-color:var(--gold);   background:rgba(184,134,11,.08); }
+.grade-D { color:#c06030;       border-color:#c06030;       background:rgba(192,96,48,.08); }
+.grade-F { color:var(--accent); border-color:var(--accent); background:rgba(200,75,49,.08); }
+
+.eval-score-bar { flex:1; margin:0 20px; }
+.eval-score-label { font-size:12px; color:var(--muted); margin-bottom:6px; }
+.score-bar-track { height:8px; background:var(--paper3); border-radius:4px; overflow:hidden; }
+.score-bar-fill  { height:100%; border-radius:4px; transition:width .8s cubic-bezier(.4,0,.2,1); }
+
+.eval-body { padding:18px 22px; }
+.eval-section { margin-bottom:16px; }
+.eval-section:last-child { margin-bottom:0; }
+.eval-section-title {
+    font-size:11px; font-weight:600;
+    letter-spacing:.07em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:8px;
+}
+.eval-list { list-style:none; display:flex; flex-direction:column; gap:5px; }
+.eval-list li {
+    font-size:13.5px; line-height:1.55;
+    padding:8px 12px;
+    border-radius:6px;
+    display:flex; gap:8px;
+}
+.eval-list.strengths li    { background:rgba(45,106,79,.07);  color:#1d4a35; }
+.eval-list.improvements li { background:rgba(200,75,49,.07);  color:#7a2a1a; }
+.eval-feedback {
+    font-size:14px; line-height:1.7; color:var(--ink);
+    padding:14px;
+    background:var(--paper2);
+    border-radius:8px;
+    border-left:3px solid var(--accent2);
+}
+.eval-hint {
+    font-size:13px; line-height:1.65; color:var(--muted);
+    padding:12px 14px;
+    background:rgba(184,134,11,.06);
+    border-radius:8px;
+    border-left:3px solid var(--gold);
+    margin-top:10px;
+}
+
+.btn-next {
+    width:100%;
+    padding:13px;
+    background:var(--ink); color:var(--paper);
+    border:none; border-radius:8px;
+    font-family:'Fraunces',serif; font-size:16px; font-weight:500;
+    cursor:pointer; transition:all .2s;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:16px;
+}
+.btn-next:hover { background:#222; }
+
+/* ── REPORT SCREEN ── */
+.report-screen { display:none; }
+
+.report-hero {
+    text-align:center;
+    padding:48px 24px 36px;
+    animation:fadeUp .5s ease both;
+}
+.report-hero-title {
+    font-family:'Fraunces',serif;
+    font-size:13px; font-weight:500;
+    letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:16px;
+}
+.big-grade {
+    width:100px; height:100px;
+    border-radius:50%;
+    border:3px solid;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 20px;
+}
+.big-grade span {
+    font-family:'Fraunces',serif; font-size:44px; font-weight:700;
+}
+.report-score {
+    font-family:'Fraunces',serif;
+    font-size:52px; font-weight:700;
+    letter-spacing:-2px; line-height:1;
+    margin-bottom:8px;
+}
+.report-rec {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 20px;
+    border-radius:100px;
+    font-size:13px; font-weight:600;
+    border:1px solid;
+    margin-top:12px;
+}
+
+.report-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-bottom:16px;
+}
+.report-card {
+    background:white;
+    border:1px solid var(--border2);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    animation:fadeUp .5s ease both;
+}
+.report-card-head {
+    padding:14px 20px;
+    border-bottom:1px solid var(--border);
+    background:var(--paper2);
+    font-family:'Fraunces',serif; font-size:13px; font-weight:500;
+    display:flex; align-items:center; gap:8px;
+}
+.report-card-body { padding:18px 20px; }
+
+.cat-score-row {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px; gap:12px;
+}
+.cat-score-row:last-child { margin-bottom:0; }
+.cat-score-label { font-size:13px; font-weight:500; min-width:110px; }
+.cat-score-bar { flex:1; height:6px; background:var(--paper3); border-radius:3px; overflow:hidden; }
+.cat-score-fill { height:100%; border-radius:3px; }
+.cat-score-num { font-family:'DM Mono',monospace; font-size:12px; font-weight:500; min-width:32px; text-align:right; }
+
+.report-list { list-style:none; display:flex; flex-direction:column; gap:6px; }
+.report-list li {
+    font-size:13.5px; line-height:1.55;
+    padding:9px 13px;
+    border-radius:6px;
+    display:flex; gap:8px;
+}
+
+.summary-text {
+    font-size:14px; line-height:1.75; color:var(--ink);
+    padding:16px;
+    background:var(--paper2);
+    border-radius:8px;
+    border-left:3px solid var(--accent2);
+    grid-column:1/-1;
+}
+
+.q-review-item {
+    background:white;
+    border:1px solid var(--border2);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    margin-bottom:12px;
+    animation:fadeUp .5s ease both;
+}
+.q-review-head {
+    padding:14px 20px;
+    border-bottom:1px solid var(--border);
+    background:var(--paper2);
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    cursor:pointer;
+}
+.q-review-question {
+    font-family:'Fraunces',serif; font-size:14px; font-weight:500;
+    line-height:1.4;
+}
+.q-review-body {
+    padding:16px 20px;
+    display:none;
+}
+.q-review-body.open { display:block; }
+.answer-label { font-size:11px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
+.answer-text { font-size:13.5px; line-height:1.65; color:var(--ink); white-space:pre-wrap; }
+
+.report-actions {
+    display:flex; gap:12px; justify-content:center;
+    padding:32px 0;
+}
+.btn-primary {
+    padding:13px 32px;
+    background:var(--ink); color:var(--paper);
+    border:none; border-radius:var(--radius);
+    font-family:'Fraunces',serif; font-size:15px; font-weight:500;
+    cursor:pointer; transition:all .2s;
+    text-decoration:none;
+    display:inline-flex; align-items:center; gap:8px;
+}
+.btn-primary:hover { background:#222; }
+.btn-secondary {
+    padding:13px 28px;
+    background:white; color:var(--ink);
+    border:1px solid var(--border2);
+    border-radius:var(--radius);
+    font-family:'Fraunces',serif; font-size:15px; font-weight:500;
+    cursor:pointer; transition:all .2s;
+    text-decoration:none;
+    display:inline-flex; align-items:center; gap:8px;
+}
+.btn-secondary:hover { background:var(--paper2); }
+
+/* ── LOADING ── */
+.loading-overlay {
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(245,242,235,.85);
+    backdrop-filter:blur(8px);
+    z-index:500;
+    flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:20px;
+}
+.loading-overlay.show { display:flex; }
+.loading-spinner {
+    width:48px; height:48px;
+    border:3px solid var(--paper3);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+}
+.loading-text { font-family:'Fraunces',serif; font-size:18px; font-weight:500; }
+.loading-sub { font-size:13px; color:var(--muted); }
+
+/* ── ALERT ── */
+.alert {
+    display:none;
+    padding:12px 16px;
+    border-radius:8px;
+    font-size:13.5px;
+    margin-bottom:20px;
+    border:1px solid;
+    animation:fadeUp .3s ease;
+}
+.alert.show { display:block; }
+.alert-error   { background:rgba(200,75,49,.08);  border-color:rgba(200,75,49,.3);  color:var(--accent); }
+.alert-success { background:rgba(45,106,79,.08);  border-color:rgba(45,106,79,.3);  color:var(--green); }
+.alert-info    { background:rgba(42,100,150,.08); border-color:rgba(42,100,150,.3); color:var(--accent2); }
+
+/* ── UTILITIES ── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+@keyframes spin   { to { transform:rotate(360deg); } }
+
+.divider { height:1px; background:var(--border); margin:20px 0; }
+
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+@media(max-width:640px) {
+    .report-grid { grid-template-columns:1fr; }
+    .navbar { padding:0 16px; }
+    .page   { padding:24px 16px 60px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="logo">CV<em>ision</em> <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);font-weight:300;margin-left:6px;">/ mülakat</span></div>
+    <div class="nav-right">
+        <a href="/cv-analysis" class="nav-btn">← Analize Dön</a>
+        <a href="/dashboard" class="nav-btn">Dashboard</a>
+    </div>
+</nav>
+
+<div class="page">
+<div id="alertBox" class="alert"></div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">Hazırlanıyor…</div>
+    <div class="loading-sub" id="loadingSub">Yapay zeka sorularınızı oluşturuyor</div>
+</div>
+
+<!-- ═══════════════════════════════ SETUP SCREEN ═══════════════════════════════ -->
+<div class="setup-screen" id="setupScreen">
+    <h1 class="screen-title">AI <em>Mülakat</em><br>Simülatörü</h1>
+    <p class="screen-sub">İş ilanınız ve CV'niz üzerinden kişiselleştirilmiş mülakat soruları alın, cevaplarınız yapay zeka tarafından değerlendirilsin.</p>
+
+    <div class="setup-card">
+        <div class="setup-card-head">⚙️ &nbsp;Mülakat Ayarları</div>
+        <div class="setup-card-body">
+            <div class="field">
+                <label>İş İlanı Seçin</label>
+                <select id="jobSelect">
+                    <option value="">Yükleniyor…</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>CV Seçin <span style="color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0">(opsiyonel, kişiselleştirmeyi artırır)</span></label>
+                <select id="cvSelect">
+                    <option value="">CV seçin…</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Soru Sayısı</label>
+                <div class="q-count-row" id="qCountRow">
+                    <button class="q-count-btn" data-count="5" onclick="setQCount(this)">5</button>
+                    <button class="q-count-btn active" data-count="8" onclick="setQCount(this)">8</button>
+                    <button class="q-count-btn" data-count="10" onclick="setQCount(this)">10</button>
+                    <button class="q-count-btn" data-count="15" onclick="setQCount(this)">15</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="start-btn" id="startBtn" onclick="startInterview()">
+        <span>Mülakatı Başlat</span> <span>→</span>
+    </button>
+</div>
+
+<!-- ═══════════════════════════════ INTERVIEW SCREEN ═══════════════════════════ -->
+<div class="interview-screen" id="interviewScreen">
+
+    <!-- Progress -->
+    <div class="progress-header" id="progressHeader">
+        <div>
+            <div class="progress-label">Soru İlerlemesi</div>
+            <div class="progress-track" style="width:280px;">
+                <div class="progress-fill" id="progressFill" style="width:0%"></div>
+            </div>
+        </div>
+        <div class="progress-count" id="progressCount">1 / ?</div>
+    </div>
+
+    <!-- Question -->
+    <div class="question-card" id="questionCard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <span class="category-pill" id="categoryPill"></span>
+            <div class="difficulty-row" id="diffRow">
+                <div class="diff-dot"></div>
+                <span class="diff-label" id="diffLabel"></span>
+            </div>
+        </div>
+        <div class="question-text" id="questionText"></div>
+    </div>
+
+    <!-- Answer -->
+    <div class="answer-card" id="answerCard">
+        <div class="answer-head">
+            <span>Cevabınız</span>
+            <span class="char-count" id="charCount">0 karakter</span>
+        </div>
+        <textarea class="answer-textarea" id="answerTextarea"
+                  placeholder="Cevabınızı buraya yazın. Ayrıntılı ve düşünceli cevaplar daha yüksek puan alır…"
+                  oninput="updateCharCount()"></textarea>
+        <div class="answer-footer">
+            <button class="btn-skip" onclick="skipQuestion()">Soruyu Geç →</button>
+            <button class="btn-submit" id="submitAnswerBtn" onclick="submitAnswer()">
+                <span>Cevabı Gönder</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Evaluation result -->
+    <div class="eval-card" id="evalCard">
+        <div class="eval-head">
+            <div class="eval-grade" id="evalGrade"></div>
+            <div class="eval-score-bar">
+                <div class="eval-score-label" id="evalScoreLabel"></div>
+                <div class="score-bar-track">
+                    <div class="score-bar-fill" id="evalFill" style="width:0%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="eval-body">
+            <div class="eval-section">
+                <div class="eval-section-title">✅ Güçlü Yönler</div>
+                <ul class="eval-list strengths" id="evalStrengths"></ul>
+            </div>
+            <div class="eval-section">
+                <div class="eval-section-title">⚡ Geliştirilmesi Gerekenler</div>
+                <ul class="eval-list improvements" id="evalImprovements"></ul>
+            </div>
+            <div class="eval-section">
+                <div class="eval-section-title">💬 Geri Bildirim</div>
+                <div class="eval-feedback" id="evalFeedback"></div>
+                <div class="eval-hint" id="evalHint"></div>
+            </div>
+        </div>
+        <div style="padding:0 22px 22px;">
+            <button class="btn-next" id="nextBtn" onclick="nextQuestion()">
+                <span id="nextBtnText">Sonraki Soru →</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════ REPORT SCREEN ═══════════════════════════════ -->
+<div class="report-screen" id="reportScreen">
+
+    <div class="report-hero">
+        <div class="report-hero-title">Mülakat Tamamlandı</div>
+        <div class="big-grade" id="bigGrade"><span id="bigGradeText"></span></div>
+        <div class="report-score" id="reportScore"></div>
+        <div style="color:var(--muted);font-size:14px;">Genel Puan</div>
+        <div class="report-rec" id="reportRec"></div>
+    </div>
+
+    <div class="report-grid" id="reportGrid">
+        <!-- Kategori puanları -->
+        <div class="report-card">
+            <div class="report-card-head">📊 Kategori Puanları</div>
+            <div class="report-card-body" id="catScores"></div>
+        </div>
+        <!-- Güçlü yönler -->
+        <div class="report-card">
+            <div class="report-card-head">🏆 En Güçlü Yönler</div>
+            <div class="report-card-body">
+                <ul class="report-list" id="reportStrengths"></ul>
+            </div>
+        </div>
+        <!-- Kritik eksikler -->
+        <div class="report-card">
+            <div class="report-card-head">⚠️ Kritik Eksikler</div>
+            <div class="report-card-body">
+                <ul class="report-list" id="reportGaps"></ul>
+            </div>
+        </div>
+        <!-- Gelişim planı -->
+        <div class="report-card">
+            <div class="report-card-head">🗺️ Gelişim Planı</div>
+            <div class="report-card-body">
+                <ul class="report-list" id="reportPlan"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Özet -->
+    <div class="report-card" style="margin-bottom:24px;">
+        <div class="report-card-head">📝 Mülakat Özeti</div>
+        <div class="report-card-body">
+            <div class="summary-text" id="reportSummary"></div>
+        </div>
+    </div>
+
+    <!-- Soru gözden geçirme -->
+    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:500;margin-bottom:16px;">Soru Soru İnceleme</div>
+    <div id="qReviewList"></div>
+
+    <div class="report-actions">
+        <a href="/dashboard" class="btn-primary">← Dashboard</a>
+        <button class="btn-secondary" onclick="location.reload()">🔄 Yeni Mülakat</button>
+    </div>
+</div>
+
+</div><!-- /page -->
+
+<script>
+// ─────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────
+let sessionId     = null;
+let questions     = [];
+let currentIndex  = 0;
+let selectedQCount = 8;
+let finalReport   = null;
+
+const catLabels = {
+    technical:   '⚙️ Teknik',
+    behavioral:  '🧠 Davranışsal',
+    situational: '💡 Senaryo',
+    cv_based:    '📄 CV Bazlı'
+};
+const catClass = { technical:'cat-technical', behavioral:'cat-behavioral', situational:'cat-situational', cv_based:'cat-cv_based' };
+const recLabels = {
+    strong_yes: ['🌟 Kesinlikle İşe Alın', 'var(--green)', 'rgba(45,106,79,.1)', 'rgba(45,106,79,.3)'],
+    yes:        ['✅ İşe Alınabilir',        'var(--accent2)','rgba(42,100,150,.1)','rgba(42,100,150,.3)'],
+    maybe:      ['🤔 Değerlendirin',         'var(--gold)','rgba(184,134,11,.1)','rgba(184,134,11,.3)'],
+    no:         ['❌ Tavsiye Edilmez',        'var(--accent)','rgba(200,75,49,.1)','rgba(200,75,49,.3)'],
+    strong_no:  ['🚫 Kesinlikle Hayır',      '#666','rgba(0,0,0,.06)','rgba(0,0,0,.2)'],
+};
+
+// ─────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    loadJobs();
+    loadCVs();
+
+    // URL'den parametreler var mı?
+    const p = new URLSearchParams(location.search);
+    if (p.get('job_id')) {
+        // Belirli bir iş için gelindi, oto-seç
+        document.getElementById('jobSelect').dataset.autoselect = p.get('job_id');
+    }
+    if (p.get('cv_text_id')) {
+        document.getElementById('cvSelect').dataset.autoselect = p.get('cv_text_id');
+    }
+});
+
+async function loadJobs() {
+    try {
+        const r = await fetch('/api/job-analyses');
+        const d = await r.json();
+        const sel = document.getElementById('jobSelect');
+        if (d.success && d.jobs?.length) {
+            sel.innerHTML = '<option value="">İş ilanı seçin…</option>' +
+                d.jobs.map(j => `<option value="${j.job_analysis_id}">${j.job_title || 'Pozisyon'} — ${j.company_name || ''}</option>`).join('');
+            // Auto-select
+            const auto = sel.dataset.autoselect;
+            if (auto) sel.value = auto;
+        } else {
+            sel.innerHTML = '<option value="">Henüz iş ilanı analizi yok</option>';
+        }
+    } catch(e) { console.error(e); }
+}
+
+async function loadCVs() {
+    try {
+        const r = await fetch('/api/user-cv-texts');
+        const d = await r.json();
+        const sel = document.getElementById('cvSelect');
+        if (d.success && d.cvs?.length) {
+            sel.innerHTML = '<option value="">CV seçin (opsiyonel)…</option>' +
+                d.cvs.map(cv => {
+                    const date = new Date(cv.created_at).toLocaleDateString('tr-TR');
+                    return `<option value="${cv.cv_text_id}">#${cv.cv_text_id} — ${date}</option>`;
+                }).join('');
+            const auto = sel.dataset.autoselect;
+            if (auto) sel.value = auto;
+        }
+    } catch(e) { console.error(e); }
+}
+
+function setQCount(btn) {
+    document.querySelectorAll('.q-count-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedQCount = parseInt(btn.dataset.count);
+}
+
+// ─────────────────────────────────────────────────────
+// MÜLAKAT BAŞLAT
+// ─────────────────────────────────────────────────────
+async function startInterview() {
+    const jobId    = document.getElementById('jobSelect').value;
+    const cvTextId = document.getElementById('cvSelect').value;
+
+    if (!jobId) { showAlert('Lütfen bir iş ilanı seçin.', 'error'); return; }
+
+    showLoading('Sorular hazırlanıyor…', 'Yapay zeka CV ve iş ilanını analiz ediyor');
+
+    try {
+        const r = await fetch('/api/interview/start', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({
+                job_analysis_id: parseInt(jobId),
+                cv_text_id: cvTextId ? parseInt(cvTextId) : null,
+                question_count: selectedQCount
+            })
+        });
+        const d = await r.json();
+        hideLoading();
+
+        if (!d.success) { showAlert(d.error || 'Başlatma hatası', 'error'); return; }
+
+        sessionId  = d.session_id;
+        questions  = d.questions;
+        currentIndex = 0;
+
+        document.getElementById('setupScreen').style.display    = 'none';
+        document.getElementById('interviewScreen').style.display = 'block';
+        renderQuestion();
+    } catch(e) {
+        hideLoading();
+        showAlert('Bağlantı hatası: ' + e.message, 'error');
+    }
+}
+
+// ─────────────────────────────────────────────────────
+// SORU RENDER
+// ─────────────────────────────────────────────────────
+function renderQuestion() {
+    const q = questions[currentIndex];
+    const total = questions.length;
+
+    // Progress
+    const pct = ((currentIndex) / total) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressCount').textContent = `${currentIndex + 1} / ${total}`;
+
+    // Category pill
+    const pill = document.getElementById('categoryPill');
+    pill.textContent = catLabels[q.category] || q.category;
+    pill.className = 'category-pill ' + (catClass[q.category] || '');
+
+    // Difficulty
+    const diffRow = document.getElementById('diffRow');
+    diffRow.className = 'difficulty-row diff-' + q.difficulty;
+    document.getElementById('diffLabel').textContent =
+        {easy:'Kolay', medium:'Orta', hard:'Zor'}[q.difficulty] || q.difficulty;
+
+    // Question text
+    document.getElementById('questionText').textContent = q.question_text;
+
+    // Reset answer area
+    document.getElementById('answerTextarea').value = '';
+    document.getElementById('charCount').textContent = '0 karakter';
+    document.getElementById('answerCard').style.display = 'block';
+    document.getElementById('evalCard').style.display   = 'none';
+    document.getElementById('submitAnswerBtn').disabled = false;
+
+    // Scroll top
+    window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function updateCharCount() {
+    const len = document.getElementById('answerTextarea').value.length;
+    document.getElementById('charCount').textContent = len + ' karakter';
+}
+
+// ─────────────────────────────────────────────────────
+// CEVAP GÖNDER
+// ─────────────────────────────────────────────────────
+async function submitAnswer() {
+    const answer = document.getElementById('answerTextarea').value.trim();
+    if (answer.length < 10) {
+        showAlert('Lütfen daha uzun bir cevap yazın (en az 10 karakter).', 'error');
+        return;
+    }
+
+    document.getElementById('submitAnswerBtn').disabled = true;
+    showLoading('Cevabınız değerlendiriliyor…', 'Yapay zeka analiz yapıyor');
+
+    try {
+        const r = await fetch('/api/interview/answer', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({
+                question_id: questions[currentIndex].question_id,
+                answer
+            })
+        });
+        const d = await r.json();
+        hideLoading();
+
+        if (!d.success) { showAlert(d.error || 'Değerlendirme hatası', 'error'); document.getElementById('submitAnswerBtn').disabled=false; return; }
+
+        renderEvaluation(d.evaluation);
+    } catch(e) {
+        hideLoading();
+        showAlert('Bağlantı hatası: ' + e.message, 'error');
+        document.getElementById('submitAnswerBtn').disabled = false;
+    }
+}
+
+function renderEvaluation(ev) {
+    document.getElementById('answerCard').style.display = 'none';
+    const card = document.getElementById('evalCard');
+    card.style.display = 'block';
+
+    // Grade
+    const gradeEl = document.getElementById('evalGrade');
+    gradeEl.textContent  = ev.grade;
+    gradeEl.className    = 'eval-grade grade-' + ev.grade;
+
+    // Score bar
+    const score = ev.score || 0;
+    const scoreColor = score >= 70 ? 'var(--green)' : score >= 45 ? 'var(--gold)' : 'var(--accent)';
+    document.getElementById('evalScoreLabel').textContent = `Puan: ${score}/100`;
+    const fill = document.getElementById('evalFill');
+    fill.style.background = scoreColor;
+    setTimeout(() => { fill.style.width = score + '%'; }, 100);
+
+    // Strengths
+    const sl = document.getElementById('evalStrengths');
+    sl.innerHTML = (ev.strengths||[]).map(s=>`<li>✅ ${s}</li>`).join('') || '<li>—</li>';
+
+    // Improvements
+    const il = document.getElementById('evalImprovements');
+    il.innerHTML = (ev.improvements||[]).map(s=>`<li>⚡ ${s}</li>`).join('') || '<li>—</li>';
+
+    // Feedback & hint
+    document.getElementById('evalFeedback').textContent = ev.feedback || '';
+    const hintEl = document.getElementById('evalHint');
+    if (ev.model_answer_hint) {
+        hintEl.textContent = '💡 ' + ev.model_answer_hint;
+        hintEl.style.display = 'block';
+    } else {
+        hintEl.style.display = 'none';
+    }
+
+    // Next button text
+    const isLast = currentIndex === questions.length - 1;
+    document.getElementById('nextBtnText').textContent = isLast ? 'Raporu Görüntüle →' : 'Sonraki Soru →';
+
+    window.scrollTo({top: document.getElementById('evalCard').offsetTop - 80, behavior:'smooth'});
+}
+
+// ─────────────────────────────────────────────────────
+// SONRAKI / SORU GEÇME
+// ─────────────────────────────────────────────────────
+async function nextQuestion() {
+    currentIndex++;
+    if (currentIndex >= questions.length) {
+        await generateReport();
+    } else {
+        renderQuestion();
+    }
+}
+
+async function skipQuestion() {
+    if (!confirm('Bu soruyu geçmek istediğinize emin misiniz? Puanınızı etkileyebilir.')) return;
+    currentIndex++;
+    if (currentIndex >= questions.length) {
+        await generateReport();
+    } else {
+        renderQuestion();
+    }
+}
+
+// ─────────────────────────────────────────────────────
+// RAPOR
+// ─────────────────────────────────────────────────────
+async function generateReport() {
+    showLoading('Rapor hazırlanıyor…', 'Tüm cevaplar analiz ediliyor');
+    try {
+        const r = await fetch('/api/interview/finalize', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ session_id: sessionId })
+        });
+        const d = await r.json();
+        hideLoading();
+
+        if (!d.success) { showAlert(d.error || 'Rapor oluşturma hatası', 'error'); return; }
+
+        finalReport = d.report;
+        renderReport(d.report);
+
+        // Soru detaylarını da çek
+        fetchSessionQuestions();
+
+    } catch(e) {
+        hideLoading();
+        showAlert('Bağlantı hatası: ' + e.message, 'error');
+    }
+}
+
+function renderReport(r) {
+    document.getElementById('interviewScreen').style.display = 'none';
+    document.getElementById('reportScreen').style.display    = 'block';
+
+    // Grade & score
+    const grade = r.overall_grade || 'C';
+    const score = r.overall_score || 0;
+    const gradeColor = {A:'var(--green)',B:'var(--accent2)',C:'var(--gold)',D:'#c06030',F:'var(--accent)'}[grade] || 'var(--muted)';
+
+    const bg = document.getElementById('bigGrade');
+    bg.style.borderColor = gradeColor;
+    bg.style.background  = gradeColor.replace(')',',0.1)').replace('var(--','rgba(').replace('green','45,106,79').replace('accent2','42,100,150').replace('gold','184,134,11').replace('accent','200,75,49');
+    document.getElementById('bigGradeText').textContent = grade;
+    document.getElementById('bigGradeText').style.color = gradeColor;
+    document.getElementById('reportScore').textContent  = Math.round(score) + '/100';
+    document.getElementById('reportScore').style.color  = gradeColor;
+
+    // Recommendation
+    const rec = r.hiring_recommendation || 'maybe';
+    const [label, color, bg2, border] = recLabels[rec] || recLabels['maybe'];
+    const recEl = document.getElementById('reportRec');
+    recEl.textContent = label;
+    recEl.style.cssText = `color:${color};border-color:${border};background:${bg2}`;
+
+    // Category scores
+    const catEl = document.getElementById('catScores');
+    const cats = r.category_scores || {};
+    catEl.innerHTML = Object.entries(cats).map(([cat, val]) => {
+        if (val === null || val === undefined) return '';
+        const c = Math.round(val);
+        const barColor = c>=70?'var(--green)':c>=45?'var(--gold)':'var(--accent)';
+        return `<div class="cat-score-row">
+            <span class="cat-score-label">${catLabels[cat]||cat}</span>
+            <div class="cat-score-bar"><div class="cat-score-fill" style="width:${c}%;background:${barColor}"></div></div>
+            <span class="cat-score-num">${c}</span>
+        </div>`;
+    }).join('');
+
+    // Strengths, gaps, plan
+    document.getElementById('reportStrengths').innerHTML =
+        (r.top_strengths||[]).map(s=>`<li style="background:rgba(45,106,79,.07);color:#1d4a35">🏆 ${s}</li>`).join('') || '<li>—</li>';
+    document.getElementById('reportGaps').innerHTML =
+        (r.critical_gaps||[]).map(s=>`<li style="background:rgba(200,75,49,.07);color:#7a2a1a">⚠️ ${s}</li>`).join('') || '<li>—</li>';
+    document.getElementById('reportPlan').innerHTML =
+        (r.development_plan||[]).map(s=>`<li style="background:rgba(42,100,150,.07);color:#1d3d5e">🗺️ ${s}</li>`).join('') || '<li>—</li>';
+
+    // Summary
+    document.getElementById('reportSummary').textContent = r.interview_summary || '';
+
+    window.scrollTo({top:0, behavior:'smooth'});
+}
+
+async function fetchSessionQuestions() {
+    try {
+        const r = await fetch(`/api/interview/session/${sessionId}`);
+        const d = await r.json();
+        if (!d.success) return;
+        renderQReview(d.questions);
+    } catch(e) { console.error(e); }
+}
+
+function renderQReview(qs) {
+    const el = document.getElementById('qReviewList');
+    el.innerHTML = qs.filter(q => q.user_answer).map((q, i) => {
+        const score = q.score != null ? Math.round(q.score) : '—';
+        const grade = q.grade || '—';
+        const gradeColor = {A:'var(--green)',B:'var(--accent2)',C:'var(--gold)',D:'#c06030',F:'var(--accent)'}[grade] || 'var(--muted)';
+        return `
+        <div class="q-review-item">
+            <div class="q-review-head" onclick="toggleReview(${i})">
+                <div>
+                    <span class="category-pill ${catClass[q.category]||''}" style="margin-bottom:6px;display:inline-flex">${catLabels[q.category]||q.category}</span>
+                    <div class="q-review-question">${q.question_text}</div>
+                </div>
+                <div style="text-align:center;flex-shrink:0">
+                    <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:${gradeColor}">${grade}</div>
+                    <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${score}/100</div>
+                </div>
+            </div>
+            <div class="q-review-body" id="review-${i}">
+                <div class="answer-label" style="margin-bottom:6px">Cevabınız</div>
+                <div class="answer-text">${q.user_answer||'—'}</div>
+                ${q.feedback ? `<div class="eval-feedback" style="margin-top:12px">${q.feedback}</div>` : ''}
+                ${q.model_answer_hint ? `<div class="eval-hint" style="margin-top:8px">💡 ${q.model_answer_hint}</div>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function toggleReview(i) {
+    const el = document.getElementById('review-' + i);
+    el.classList.toggle('open');
+}
+
+// ─────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────
+function showLoading(text, sub) {
+    document.getElementById('loadingText').textContent = text;
+    document.getElementById('loadingSub').textContent  = sub;
+    document.getElementById('loadingOverlay').classList.add('show');
+}
+function hideLoading() {
+    document.getElementById('loadingOverlay').classList.remove('show');
+}
+function showAlert(msg, type) {
+    const el = document.getElementById('alertBox');
+    el.textContent = msg;
+    el.className   = 'alert show alert-' + type;
+    el.scrollIntoView({behavior:'smooth', block:'nearest'});
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 5000);
+}
+</script>
+</body>
+</html>

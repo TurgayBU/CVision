@@ -1,13 +1,3 @@
-"""
-job_routes.py
-app.py dosyanıza şu satırları ekleyin:
-
-    from job_routes import job_bp
-    app.register_blueprint(job_bp)
-
-Sonra bu dosyayı proje kök dizinine koyun.
-"""
-
 from flask import Blueprint, request, jsonify, session
 from job_analyzer import JobAnalyzer
 import config
