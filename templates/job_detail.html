@@ -176,6 +176,192 @@
             .page   { padding:24px 16px 60px; }
             .interview-cta { flex-direction:column; align-items:flex-start; }
         }
+        #rec-fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 1000;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent, #4f8ef7);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(79,142,247,.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    transition: transform .2s, box-shadow .2s;
+  }
+  #rec-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(79,142,247,.5); }
+  #rec-fab .rec-badge {
+    position: absolute;
+    top: -4px; right: -4px;
+    width: 18px; height: 18px;
+    background: var(--green, #34d399);
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Overlay */
+  #rec-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    background: rgba(0,0,0,.5);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s;
+  }
+  #rec-overlay.open { opacity: 1; pointer-events: all; }
+
+  /* Panel */
+  #rec-panel {
+    position: fixed;
+    bottom: 90px;
+    right: 28px;
+    z-index: 1002;
+    width: 360px;
+    max-height: 520px;
+    background: var(--surface, #0f1420);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 18px;
+    overflow: hidden;
+    transform: translateY(20px) scale(.97);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .28s cubic-bezier(.4,0,.2,1), opacity .28s;
+    display: flex;
+    flex-direction: column;
+  }
+  #rec-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+
+  .rec-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .rec-header-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .rec-close {
+    width: 28px; height: 28px;
+    border: none;
+    background: rgba(255,255,255,.06);
+    border-radius: 50%;
+    color: var(--label, #8892aa);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .rec-close:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+  /* İçerik */
+  .rec-body {
+    padding: 12px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .rec-body::-webkit-scrollbar { width: 3px; }
+  .rec-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
+
+  /* Durum mesajları */
+  .rec-loading, .rec-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--muted, #5a6480);
+    font-size: 13px;
+  }
+  .rec-spinner {
+    width: 32px; height: 32px;
+    border: 2px solid rgba(255,255,255,.08);
+    border-top-color: var(--accent, #4f8ef7);
+    border-radius: 50%;
+    animation: rec-spin .7s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes rec-spin { to { transform: rotate(360deg); } }
+
+  /* Kart */
+  .rec-card {
+    background: var(--surface2, #161c2e);
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color .2s, transform .15s;
+    text-decoration: none;
+    display: block;
+  }
+  .rec-card:last-child { margin-bottom: 0; }
+  .rec-card:hover { border-color: rgba(79,142,247,.4); transform: translateY(-1px); }
+  .rec-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .rec-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text, #dde2f0);
+    line-height: 1.35;
+  }
+  .rec-card-company {
+    font-size: 11px;
+    color: var(--label, #8892aa);
+    margin-top: 2px;
+  }
+  .rec-score-ring {
+    flex-shrink: 0;
+    width: 42px; height: 42px;
+    position: relative;
+  }
+  .rec-score-ring svg { transform: rotate(-90deg); }
+  .rec-score-ring .ring-bg  { fill: none; stroke: rgba(255,255,255,.06); stroke-width: 3; }
+  .rec-score-ring .ring-val { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 100; transition: stroke-dashoffset 1s .15s; }
+  .rec-score-num {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .rec-card-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .rec-chip {
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 500;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.08);
+    color: var(--label, #8892aa);
+    white-space: nowrap;
+  }
+  .rec-chip.loc { color: var(--accent, #4f8ef7); border-color: rgba(79,142,247,.2); background: rgba(79,142,247,.06); }
+
+  @media(max-width: 420px) {
+    #rec-panel { right: 12px; left: 12px; width: auto; }
+    #rec-fab   { right: 16px; bottom: 16px; }
+  }
     </style>
 </head>
 <body>
@@ -324,8 +510,151 @@
 
     </div>
 </div>
+<button id="rec-fab" onclick="toggleRecPanel()" title="İş Önerileri">
+  🎯
+  <span class="rec-badge" id="rec-badge" style="display:none">0</span>
+</button>
 
+<!-- Overlay (tıklayınca kapanır) -->
+<div id="rec-overlay" onclick="closeRecPanel()"></div>
+
+<!-- Pop-up paneli -->
+<div id="rec-panel">
+  <div class="rec-header">
+    <div class="rec-header-title">
+      <span>✨</span> Sana Özel İş Önerileri
+    </div>
+    <button class="rec-close" onclick="closeRecPanel()">✕</button>
+  </div>
+  <div class="rec-body" id="rec-body">
+    <div class="rec-loading" id="rec-loading" style="display:none">
+      <div class="rec-spinner"></div>
+      <div>CV\'n analiz ediliyor…</div>
+    </div>
+    <div class="rec-empty" id="rec-empty" style="display:none">
+      Öneri bulunamadı.<br>CV\'ni analiz ettiğinden emin ol.
+    </div>
+    <div id="rec-cards"></div>
+  </div>
+</div>
 <script>
+    (function() {
+  let loaded = false;
+
+  /* cv_text_id'yi URL veya global değişkenden al */
+  function getCvTextId() {
+    const p = new URLSearchParams(location.search);
+    if (p.get('cv_text_id')) return p.get('cv_text_id');
+    if (typeof window.cvTextId !== 'undefined') return window.cvTextId;
+    return null;
+  }
+
+  window.toggleRecPanel = function() {
+    const panel   = document.getElementById('rec-panel');
+    const overlay = document.getElementById('rec-overlay');
+    const isOpen  = panel.classList.contains('open');
+    if (isOpen) {
+      closeRecPanel();
+    } else {
+      panel.classList.add('open');
+      overlay.classList.add('open');
+      if (!loaded) loadRecommendations();
+    }
+  };
+
+  window.closeRecPanel = function() {
+    document.getElementById('rec-panel').classList.remove('open');
+    document.getElementById('rec-overlay').classList.remove('open');
+  };
+
+  window.loadRecommendations = async function(cvTextIdOverride) {
+    const cvTextId = cvTextIdOverride || getCvTextId();
+    if (!cvTextId) {
+      showState('empty');
+      return;
+    }
+
+    showState('loading');
+    try {
+      const res  = await fetch(`/api/job-recommendations?cv_text_id=${cvTextId}`);
+      const data = await res.json();
+
+      if (!data.success || !data.recommendations || data.recommendations.length === 0) {
+        showState('empty');
+        return;
+      }
+
+      renderCards(data.recommendations);
+      loaded = true;
+
+      /* Badge güncelle */
+      const badge = document.getElementById('rec-badge');
+      badge.textContent = data.recommendations.length;
+      badge.style.display = 'flex';
+
+    } catch (e) {
+      console.error('Öneri yükleme hatası:', e);
+      showState('empty');
+    }
+  };
+
+  function showState(state) {
+    document.getElementById('rec-loading').style.display = state === 'loading' ? 'block' : 'none';
+    document.getElementById('rec-empty').style.display   = state === 'empty'   ? 'block' : 'none';
+    document.getElementById('rec-cards').style.display   = state === 'cards'   ? 'block' : 'none';
+  }
+
+  function renderCards(recs) {
+    const container = document.getElementById('rec-cards');
+    container.innerHTML = '';
+
+    recs.forEach(({ score, job }) => {
+      const scoreColor  = score >= 75 ? '#34d399' : score >= 50 ? '#fbbf24' : '#f87171';
+      /* strokeDashoffset = 100 - score (dasharray=100 → bir çember tam) */
+      const dashOffset  = 100 - score;
+
+      const locParts = [job.location_city, job.location_country].filter(Boolean);
+      const locStr   = locParts.join(', ');
+
+      const card = document.createElement('a');
+      card.className = 'rec-card';
+      card.href = job.source_url
+        ? `/job-detail?job_id=${job.job_analysis_id}`
+        : '#';
+
+      card.innerHTML = `
+        <div class="rec-card-top">
+          <div>
+            <div class="rec-card-title">${esc(job.job_title || 'Pozisyon Belirtilmemiş')}</div>
+            <div class="rec-card-company">${esc(job.company_name || '')}</div>
+          </div>
+          <div class="rec-score-ring">
+            <svg viewBox="0 0 36 36" width="42" height="42">
+              <circle class="ring-bg"  cx="18" cy="18" r="15.9"/>
+              <circle class="ring-val" cx="18" cy="18" r="15.9"
+                stroke="${scoreColor}"
+                style="stroke-dashoffset:${dashOffset}"/>
+            </svg>
+            <div class="rec-score-num" style="color:${scoreColor}">${score}</div>
+          </div>
+        </div>
+        <div class="rec-card-meta">
+          ${locStr ? `<span class="rec-chip loc">📍 ${esc(locStr)}</span>` : ''}
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+
+    showState('cards');
+  }
+
+  function esc(str) {
+    return String(str || '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+})();
 // ── helpers ──────────────────────────────────────────────────────────────────
 const pJ = v => { if(!v) return []; if(Array.isArray(v)) return v; try{return JSON.parse(v)||[];}catch{return[];} };
 const sf = (v,fb='—') => (v===null||v===undefined||v==='') ? fb : String(v);

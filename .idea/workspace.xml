@@ -4,15 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3f8465f1-1d46-4758-9585-e0794c173ed6" name="Changes" comment="job detail gösteren">
-      <change afterPath="$PROJECT_DIR$/interview_engine.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/interview_routes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/interview.html" afterDir="false" />
+    <list default="true" id="3f8465f1-1d46-4758-9585-e0794c173ed6" name="Changes" comment="cv ayarlamalı">
+      <change afterPath="$PROJECT_DIR$/job_recommendation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/job_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/job_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/cv_analysis.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/cv_analysis.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/job_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/job_detail.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,8 +20,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -40,15 +37,18 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;TurgayBU&quot;
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "history": [
+    {
+      "author": "TurgayBU"
+    }
+  ],
+  "lastFilter": {
+    "author": "TurgayBU"
   }
-}</component>
+}]]></component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/TurgayBU/CVision.git&quot;,
@@ -118,13 +118,7 @@
       <workItem from="1773387827160" duration="644000" />
       <workItem from="1774589553523" duration="3163000" />
       <workItem from="1774594207979" duration="1098000" />
-      <workItem from="1775307353461" duration="1005000" />
-      <workItem from="1775317533105" duration="2142000" />
-      <workItem from="1775323902399" duration="1159000" />
-      <workItem from="1775325173329" duration="201000" />
-      <workItem from="1775366484330" duration="5635000" />
-      <workItem from="1775713814857" duration="3000" />
-      <workItem from="1775802849451" duration="2813000" />
+      <workItem from="1775307353461" duration="695000" />
     </task>
     <task id="LOCAL-00001" summary="First comes first goes">
       <option name="closed" value="true" />
@@ -166,15 +160,7 @@
       <option name="project" value="LOCAL" />
       <updated>1772905229401</updated>
     </task>
-    <task id="LOCAL-00006" summary="job detail gösteren">
-      <option name="closed" value="true" />
-      <created>1775308289737</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1775308289737</updated>
-    </task>
-    <option name="localTasksCounter" value="7" />
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -197,13 +183,12 @@
     <MESSAGE value="Yeni Database Entegreli" />
     <MESSAGE value="CV çekmeli" />
     <MESSAGE value="cv ayarlamalı" />
-    <MESSAGE value="job detail gösteren" />
-    <option name="LAST_COMMIT_MESSAGE" value="job detail gösteren" />
+    <option name="LAST_COMMIT_MESSAGE" value="cv ayarlamalı" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/CVision$extract_link.coverage" NAME="extract_link Coverage Results" MODIFIED="1774590023157" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CVision$extract_cv.coverage" NAME="extract_cv Coverage Results" MODIFIED="1774595236198" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CVision$main.coverage" NAME="main Coverage Results" MODIFIED="1775324594281" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CVision$main.coverage" NAME="main Coverage Results" MODIFIED="1774595241792" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CVision$config.coverage" NAME="config Coverage Results" MODIFIED="1772293850476" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CVision$cv_ai_extract.coverage" NAME="cv_ai_extract Coverage Results" MODIFIED="1772904848141" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>

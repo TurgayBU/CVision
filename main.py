@@ -21,7 +21,7 @@ from cv_ai_extract import AICVResponseGroq as AICVResponse
 from extract_cv import CVProcessor
 from interview_routes import interview_bp
 
-
+from job_recommendation import JobRecommendation
 # ── Flask uygulaması oluştur ──────────────────────────────────────────────────
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
@@ -668,6 +668,32 @@ def interview_page():
     if 'user_id' not in session:
         return redirect(url_for('index'))
     return render_template('interview.html')
+
+
+
+
+@app.route('/api/job-recommendations', methods=['GET'])
+def get_job_recommendations():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Oturum açmanız gerekiyor'}), 401
+
+    cv_text_id = request.args.get('cv_text_id', type=int)
+    if not cv_text_id:
+        return jsonify({'success': False, 'error': 'cv_text_id gerekli'}), 400
+
+    try:
+        recommender = JobRecommendation(
+            user_id=session['user_id'],
+            cv_text_id=cv_text_id,
+            top_n=3
+        )
+        results = recommender.recommend_jobs()
+        return jsonify({'success': True, 'recommendations': results})
+    except Exception as e:
+        print(f"Öneri hatası: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
