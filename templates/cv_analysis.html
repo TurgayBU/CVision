@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CVision — AI Analiz Platformu</title>
+    <title>CVision — AI Analysis Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -748,10 +748,10 @@
         </div>
         <div class="nav-links">
             <a href="/dashboard">Dashboard</a>
-            <a href="/cv-analysis" class="active">CV Analiz</a>
+            <a href="/cv-analysis" class="active">CV Analysis</a>
             <a href="/interview">🎙️ Mülakat</a>
-            <a href="/jobs">İlanlar</a>
-            <a href="/api/logout" id="logoutBtn">Çıkış</a>
+            <a href="/jobs">Listings</a>
+            <a href="/api/logout" id="logoutBtn">Logout</a>
         </div>
         <div class="nav-user">
             <div class="avatar">T</div>
@@ -762,8 +762,8 @@
     <!-- MAIN -->
     <div class="main">
         <div class="page-header">
-            <h1>AI Analiz Merkezi</h1>
-            <p>CV'lerinizi analiz edin, iş ilanlarıyla eşleştirin ve önerileri görün</p>
+            <h1>AI Analysis Center</h1>
+            <p>Analyze your CVs, match with job listings and see recommendations</p>
         </div>
 
         <!-- Alert -->
@@ -775,29 +775,29 @@
                 <div class="stat-icon purple">📄</div>
                 <div>
                     <div class="stat-num" id="totalCvs">0</div>
-                    <div class="stat-label">Toplam CV</div>
+                    <div class="stat-label">Total CVs</div>
                 </div>
             </div>
             <div class="stat-tile">
                 <div class="stat-icon green">✅</div>
                 <div>
                     <div class="stat-num" id="analyzedCvs">0</div>
-                    <div class="stat-label">Analiz Edildi</div>
+                    <div class="stat-label">Analyzed</div>
                 </div>
             </div>
             <div class="stat-tile">
                 <div class="stat-icon amber">⏳</div>
                 <div>
                     <div class="stat-num" id="pendingCvs">0</div>
-                    <div class="stat-label">Bekleyen</div>
+                    <div class="stat-label">Pending</div>
                 </div>
             </div>
         </div>
 
         <!-- Tab bar -->
         <div class="tab-bar">
-            <button class="tab-btn active" onclick="switchTab('cv', this)">📋 CV Analizi</button>
-            <button class="tab-btn" onclick="switchTab('job', this)">💼 İş Eşleştirme</button>
+            <button class="tab-btn active" onclick="switchTab('cv', this)">📋 CV Analysis</button>
+            <button class="tab-btn" onclick="switchTab('job', this)">💼 Job Matching</button>
         </div>
 
         <!-- ══ TAB: CV ANALİZ ══ -->
@@ -808,23 +808,23 @@
                 <div class="card-head">
                     <div class="card-head-left">
                         <div class="card-icon">🔍</div>
-                        <span class="card-title">CV Seçimi ve Analiz</span>
+                        <span class="card-title">CV Selection and Analysis</span>
                     </div>
                     <span class="badge badge-purple">DeepSeek AI</span>
                 </div>
                 <div class="card-body">
                     <div class="info-box">
-                        <span>📌</span> Analiz etmek istediğiniz CV'yi seçin — AI tüm alanları otomatik olarak çıkarır.<br>
-                        <span>✏️</span> Sonuçları düzenleyebilir ve veritabanına kaydedebilirsiniz.
+                        <span>📌</span> Select the CV you want to analyze — AI extracts all fields automatically.<br>
+                        <span>✏️</span> You can edit the results and save them to the database.
                     </div>
                     <div class="form-row">
-                        <label class="form-label">CV Seçin</label>
+                        <label class="form-label">Select CV</label>
                         <select class="form-select" id="cvSelect">
-                            <option value="">Yükleniyor...</option>
+                            <option value="">Loading...</option>
                         </select>
                     </div>
                     <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeCV()" disabled>
-                        ✦ Analiz Et
+                        ✦ Analyze
                     </button>
                 </div>
             </div>
@@ -832,8 +832,8 @@
             <!-- Loading -->
             <div class="loading-overlay" id="loading">
                 <div class="loader"></div>
-                <div class="loading-text">Analiz ediliyor…</div>
-                <div class="loading-sub">DeepSeek AI yanıt bekleniyor</div>
+                <div class="loading-text">Analyzing…</div>
+                <div class="loading-sub">Waiting for DeepSeek AI response</div>
             </div>
 
             <!-- Result Card -->
@@ -841,38 +841,38 @@
                 <div class="card-head">
                     <div class="card-head-left">
                         <div class="card-icon">📊</div>
-                        <span class="card-title">Analiz Sonuçları</span>
+                        <span class="card-title">Analysis Results</span>
                     </div>
                     <span class="badge badge-purple">cv_text_id: <span id="currentCvTextId"></span></span>
                 </div>
                 <div class="card-body">
                     <div class="result-grid">
                         <div class="result-field">
-                            <div class="result-field-label">📍 Adres</div>
+                            <div class="result-field-label">📍 Address</div>
                             <div class="result-field-content" id="cvAddress">—</div>
                         </div>
                         <div class="result-field">
-                            <div class="result-field-label">🗣️ Diller</div>
+                            <div class="result-field-label">🗣️ Languages</div>
                             <div class="result-field-content" id="cvLanguages">—</div>
                         </div>
                         <div class="result-field">
-                            <div class="result-field-label">💻 Yetenekler</div>
+                            <div class="result-field-label">💻 Skills</div>
                             <div class="result-field-content" id="cvSkills">—</div>
                         </div>
                         <div class="result-field">
-                            <div class="result-field-label">🎓 Eğitim</div>
+                            <div class="result-field-label">🎓 Education</div>
                             <div class="result-field-content" id="cvEducation">—</div>
                         </div>
                         <div class="result-field full-width">
-                            <div class="result-field-label">💼 İş Deneyimi</div>
+                            <div class="result-field-label">💼 Work Experience</div>
                             <div class="result-field-content" id="cvExperience">—</div>
                         </div>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-success" onclick="saveAnalysis()">💾 Kaydet</button>
-                        <button class="btn btn-ghost" onclick="editFields()">✏️ Düzenle</button>
-                        <button class="btn btn-ghost" onclick="viewRawText()">📄 Ham Metin</button>
-                        <button class="btn btn-danger" onclick="resetAnalysis()">↺ Sıfırla</button>
+                        <button class="btn btn-success" onclick="saveAnalysis()">💾 Save</button>
+                        <button class="btn btn-ghost" onclick="editFields()">✏️ Edit</button>
+                        <button class="btn btn-ghost" onclick="viewRawText()">📄 Raw Text</button>
+                        <button class="btn btn-danger" onclick="resetAnalysis()">↺ Reset</button>
                     </div>
                 </div>
             </div>
@@ -888,30 +888,30 @@
                         <div class="card-icon">💼</div>
                         <span class="card-title">İş İlanı Analizi</span>
                     </div>
-                    <span class="badge badge-purple">AI Eşleştirme</span>
+                    <span class="badge badge-purple">AI Matching</span>
                 </div>
                 <div class="card-body">
                     <div class="info-box">
-                        <span>🔗</span> İş ilanı URL'si veya açıklamasını girin. AI, CV'niz ile uyumluluğu analiz eder ve eksiklikleri gösterir.
+                        <span>🔗</span> Enter the job listing URL or description. AI analyzes compatibility with your CV and shows gaps.
                     </div>
                     <div class="form-row">
-                        <label class="form-label">Kullanılacak CV</label>
+                        <label class="form-label">CV to Use</label>
                         <select class="form-select" id="jobCvSelect">
-                            <option value="">CV seçin...</option>
+                            <option value="">Select CV...</option>
                         </select>
                     </div>
                     <div class="form-row">
-                        <label class="form-label">Kullanılacak Job</label>
+                        <label class="form-label">Job to Use</label>
                         <select class="form-select" id="jobSelect">
-                            <option value="">CV seçin...</option>
+                            <option value="">Select CV...</option>
                         </select>
                     </div>
                     <div class="form-row">
-                        <label class="form-label">İş İlanı URL veya Açıklaması</label>
-                        <textarea class="modal-field" style="width:100%; padding:10px 13px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.5; resize:vertical; min-height:100px; outline:none;" id="jobInput" placeholder="https://... veya iş ilanı metnini buraya yapıştırın"></textarea>
+                        <label class="form-label">Job Listing URL or Description</label>
+                        <textarea class="modal-field" style="width:100%; padding:10px 13px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:'DM Sans',sans-serif; font-size:13.5px; line-height:1.5; resize:vertical; min-height:100px; outline:none;" id="jobInput" placeholder="https://... or paste job listing text here"></textarea>
                     </div>
                     <button class="btn btn-primary" onclick="analyzeJob()" id="jobAnalyzeBtn">
-                        ✦ Eşleştir ve Analiz Et
+                        ✦ Match and Analyze
                     </button>
                 </div>
             </div>
@@ -919,8 +919,8 @@
             <!-- Job Loading -->
             <div class="loading-overlay" id="jobLoading">
                 <div class="loader"></div>
-                <div class="loading-text">Eşleştirme yapılıyor…</div>
-                <div class="loading-sub">İlan ile CV karşılaştırılıyor</div>
+                <div class="loading-text">Matching in progress…</div>
+                <div class="loading-sub">Comparing listing with CV</div>
             </div>
 
             <!-- Job Result Card -->
@@ -929,8 +929,8 @@
                     <div class="card-head-left">
                         <div class="card-icon">🎯</div>
                         <div>
-                            <div class="card-title" id="jobTitle">Pozisyon</div>
-                            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="jobCompany">Şirket</div>
+                            <div class="card-title" id="jobTitle">Position</div>
+                            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="jobCompany">Company</div>
                         </div>
                     </div>
                     <div class="match-score-badge">
@@ -946,7 +946,7 @@
                         </svg>
                         <div class="score-text" id="scoreText">
                             <span id="scoreNum">—</span>
-                            <small>Uyum</small>
+                            <small>Match</small>
                         </div>
                     </div>
                 </div>
@@ -956,24 +956,24 @@
                         <div class="job-meta" id="jobMeta"></div>
                         <div class="divider"></div>
 
-                        <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:10px;">Eşleşen Yetkinlikler</div>
+                        <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:10px;">Matched Skills</div>
                         <div class="skill-chips" id="matchedSkills"></div>
 
                         <div class="divider"></div>
 
-                        <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:10px;">Eksik / Geliştirilmesi Gereken</div>
+                        <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:10px;">Missing / Needs Improvement</div>
                         <div class="skill-chips" id="missingSkills"></div>
 
                         <div class="divider"></div>
 
-                        <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:12px;">AI Önerileri</div>
+                        <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:12px;">AI Suggestions</div>
                         <ul class="suggestion-list" id="suggestions"></ul>
                     </div>
                 </div>
 
                 <div style="padding: 0 24px 24px;">
                     <div class="btn-group" style="margin-top:0;">
-                        <button class="btn btn-success" onclick="saveJobAnalysis()">💾 Analizi Kaydet</button>
+                        <button class="btn btn-success" onclick="saveJobAnalysis()">💾 Analizi Save</button>
                         <button class="btn btn-danger" onclick="resetJobAnalysis()">↺ Yeni Analiz</button>
                     </div>
                 </div>
@@ -985,20 +985,20 @@
     <div id="editModal" class="modal">
         <div class="modal-box">
             <div class="modal-head">
-                ✏️ CV Bilgilerini Düzenle
+                ✏️ Edit CV Information
                 <button class="modal-close" onclick="closeEditModal()">✕</button>
             </div>
             <div class="modal-body">
                 <div class="modal-field">
-                    <label class="form-label">Adres</label>
+                    <label class="form-label">Address</label>
                     <textarea id="editAddress" rows="2"></textarea>
                 </div>
                 <div class="modal-field">
-                    <label class="form-label">Yetenekler</label>
+                    <label class="form-label">Skills</label>
                     <textarea id="editSkills" rows="3"></textarea>
                 </div>
                 <div class="modal-field">
-                    <label class="form-label">İş Deneyimi</label>
+                    <label class="form-label">Work Experience</label>
                     <textarea id="editExperience" rows="4"></textarea>
                 </div>
                 <div class="modal-field">
@@ -1006,13 +1006,13 @@
                     <textarea id="editEducation" rows="3"></textarea>
                 </div>
                 <div class="modal-field">
-                    <label class="form-label">Diller</label>
+                    <label class="form-label">Languages</label>
                     <textarea id="editLanguages" rows="2"></textarea>
                 </div>
             </div>
             <div class="modal-foot">
-                <button class="btn btn-ghost" onclick="closeEditModal()">İptal</button>
-                <button class="btn btn-primary" onclick="saveEdits()">Kaydet</button>
+                <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveEdits()">Save</button>
             </div>
         </div>
     </div>
@@ -1021,14 +1021,14 @@
     <div id="rawTextModal" class="modal">
         <div class="modal-box">
             <div class="modal-head">
-                📄 Ham CV Metni
+                📄 Raw CV Text
                 <button class="modal-close" onclick="closeRawTextModal()">✕</button>
             </div>
             <div class="modal-body">
                 <pre id="rawTextContent"></pre>
             </div>
             <div class="modal-foot">
-                <button class="btn btn-ghost" onclick="closeRawTextModal()">Kapat</button>
+                <button class="btn btn-ghost" onclick="closeRawTextModal()">Close</button>
             </div>
         </div>
     </div>
@@ -1099,14 +1099,14 @@
                 sel.disabled   = false;
                 btn.disabled   = false;
             } else {
-                sel.innerHTML  = '<option value="">Henüz CV yüklenmemiş</option>';
-                sel2.innerHTML = '<option value="">Henüz CV yüklenmemiş</option>';
+                sel.innerHTML  = '<option value="">No CV uploaded yet</option>';
+                sel2.innerHTML = '<option value="">No CV uploaded yet</option>';
                 sel.disabled   = true;
                 btn.disabled   = true;
-                showAlert("Henüz CV yüklenmemiş. Lütfen önce CV yükleyin.", 'warning');
+                showAlert("No CV uploaded yet. Lütfen önce CV yükleyin.", 'warning');
             }
         } catch(e) {
-            showAlert('CV listesi yüklenemedi', 'error');
+            showAlert('Could not load CV list', 'error');
         }
     }
     async function loadJobs() {
@@ -1117,7 +1117,7 @@
         const analyzeBtn = document.getElementById('analyzeBtn');
 
         if (d.success && d.jobs && d.jobs.length > 0) {
-            const opts = '<option value="">İş analizi seçin…</option>' + d.jobs.map(job => {
+            const opts = '<option value="">Select job analysis…</option>' + d.jobs.map(job => {
                 const date = new Date(job.analyzed_at).toLocaleDateString('tr-TR');
                 const title = job.job_title || 'İş pozisyonu belirtilmemiş';
                 const company = job.company_name ? ` - ${job.company_name}` : '';
@@ -1133,14 +1133,14 @@
             if (analyzeBtn) analyzeBtn.disabled = false;
 
         } else {
-            jobSelect.innerHTML = '<option value="">Henüz iş analizi bulunmuyor</option>';
+            jobSelect.innerHTML = '<option value="">No job analysis available yet</option>';
             jobSelect.disabled = true;
             if (analyzeBtn) analyzeBtn.disabled = true;
             showAlert("Henüz iş analizi yapılmamış. Lütfen önce iş analizi yapın.", 'warning');
         }
     } catch(e) {
-        console.error('İş analizleri yüklenirken hata:', e);
-        showAlert('İş analizleri listesi yüklenemedi', 'error');
+        console.error('Error loading job analyses:', e);
+        showAlert('Could not load job analyses list', 'error');
     }
 }
     // ─────────────────────────────────────────
@@ -1148,7 +1148,7 @@
     // ─────────────────────────────────────────
     async function analyzeCV() {
         const cvTextId = document.getElementById('cvSelect').value;
-        if (!cvTextId) { showAlert('Lütfen bir CV seçin', 'warning'); return; }
+        if (!cvTextId) { showAlert('Please select a CV', 'warning'); return; }
 
         const userId = '{{ session.user_id }}';
         document.getElementById('cvSelectionCard').style.display = 'none';
@@ -1179,20 +1179,20 @@
 
                 document.getElementById('cvSelectionCard').style.display = 'block';
                 document.getElementById('resultCard').style.display      = 'block';
-                showAlert('✅ CV başarıyla analiz edildi!', 'success');
+                showAlert('✅ CV analyzed successfully!', 'success');
             } else {
                 document.getElementById('cvSelectionCard').style.display = 'block';
-                showAlert('❌ ' + (d.error || 'Analiz hatası'), 'error');
+                showAlert('❌ ' + (d.error || 'Analysis error'), 'error');
             }
         } catch(e) {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('cvSelectionCard').style.display = 'block';
-            showAlert('❌ Bağlantı hatası: ' + e.message, 'error');
+            showAlert('❌ Connection error: ' + e.message, 'error');
         }
     }
 
     async function saveAnalysis() {
-        if (!currentCVData || !currentCvTextId) { showAlert('Analiz bulunamadı', 'warning'); return; }
+        if (!currentCVData || !currentCvTextId) { showAlert('Analysis not found', 'warning'); return; }
         const userId = '{{ session.user_id }}';
         try {
             const r = await fetch('/save-cv-analysis', {
@@ -1202,11 +1202,11 @@
             });
             const d = await r.json();
             if (d.success) {
-                showAlert('✅ Analiz kaydedildi!', 'success');
+                showAlert('✅ Analysis saved!', 'success');
                 loadStats();
-                setTimeout(() => { if(confirm('Yeni CV analiz etmek ister misiniz?')) resetAnalysis(); }, 2000);
+                setTimeout(() => { if(confirm('Would you like to analyze a new CV?')) resetAnalysis(); }, 2000);
             } else {
-                showAlert('❌ ' + (d.error || 'Kaydetme hatası'), 'error');
+                showAlert('❌ ' + (d.error || 'Save error'), 'error');
             }
         } catch(e) { showAlert('❌ ' + e.message, 'error'); }
     }
@@ -1219,7 +1219,7 @@
     const jobInput = document.getElementById('jobInput').value.trim();
 
     if (!cvTextId) {
-        showAlert('Lütfen bir CV seçin', 'warning');
+        showAlert('Please select a CV', 'warning');
         return;
     }
     if (!jobInput) {
@@ -1245,13 +1245,13 @@
             document.getElementById('jobAnalyzeBtn').disabled = false;
             showAlert(
                 '❌ CV analiz sonuçları bulunamadı!\n\n' +
-                'Lütfen önce CV Analizi sekmesine gidin ve CV\'yi analiz edin.',
+                'Lütfen önce CV Analysisi sekmesine gidin ve CV\'yi analiz edin.',
                 'error'
             );
             return;
         }
 
-        // 2. CV analiz edilmişse, job matching yap
+        // 2. CV is analyzed, proceed with job matching
         const r = await fetch('/analyze-job', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1271,14 +1271,14 @@
             currentJobResult = d;
             renderJobResult(d);
             document.getElementById('jobResultCard').style.display = 'block';
-            showAlert('✅ İş analizi tamamlandı!', 'success');
+            showAlert('✅ Job analysis complete!', 'success');
         } else {
-            showAlert('❌ ' + (d.error || 'Analiz hatası'), 'error');
+            showAlert('❌ ' + (d.error || 'Analysis error'), 'error');
         }
     } catch(e) {
         document.getElementById('jobLoading').style.display = 'none';
         document.getElementById('jobAnalyzeBtn').disabled = false;
-        showAlert('❌ Bağlantı hatası: ' + e.message, 'error');
+        showAlert('❌ Connection error: ' + e.message, 'error');
     }
 }
     function buildDemoJobResult(input) {
@@ -1287,7 +1287,7 @@
             job_title:   'Senior Frontend Developer',
             company:     'TechCorp A.Ş.',
             score:       74,
-            tags:        [{ label: 'Uzaktan', type: 'purple' }, { label: 'Tam Zamanlı', type: 'blue' }, { label: '3-5 yıl tecrübe', type: 'amber' }],
+            tags:        [{ label: 'Remote', type: 'purple' }, { label: 'Tam Zamanlı', type: 'blue' }, { label: '3-5 yıl tecrübe', type: 'amber' }],
             matched:     ['React', 'TypeScript', 'CSS', 'Git', 'REST API'],
             missing:     ['GraphQL', 'Docker', 'AWS'],
             suggestions: [
@@ -1300,7 +1300,7 @@
     }
 
     function renderJobResult(d) {
-        document.getElementById('jobTitle').textContent   = d.job_title || 'Pozisyon';
+        document.getElementById('jobTitle').textContent   = d.job_title || 'Position';
         document.getElementById('jobCompany').textContent = d.company   || '';
 
         const score = d.score || 0;
@@ -1365,8 +1365,8 @@
             renderJobAnalyses(allJobAnalyses);
         } catch(e) {
             el.innerHTML = `<div class="ja-empty">
-                ⚠️ Veri yüklenemedi: ${e.message}<br>
-                <small style="color:#bbb">/api/job-analyses endpoint'i gereklidir</small>
+                ⚠️ Could not load data: ${e.message}<br>
+                <small style="color:#bbb">/api/job-analyses endpoint is required</small>
             </div>`;
         }
     }
@@ -1396,7 +1396,7 @@
     function renderJobAnalyses(jobs) {
         const el = document.getElementById('ja-content');
         if (!el) return;
-        if (!jobs.length) { el.innerHTML = '<div class="ja-empty">Kayıt bulunamadı.</div>'; return; }
+        if (!jobs.length) { el.innerHTML = '<div class="ja-empty">No records found.</div>'; return; }
 
         el.innerHTML = '<div class="ja-list" id="ja-list"></div>';
         const list = document.getElementById('ja-list');
@@ -1408,16 +1408,16 @@
             const prefSkills = parseJsonField(j.preferred_skills);
             const langs      = parseJsonField(j.languages);
             const eduFields  = parseJsonField(j.edu_preferred_fields);
-            const location   = [j.location_district, j.location_city, j.location_country].filter(Boolean).join(', ') || 'Belirtilmemiş';
+            const location   = [j.location_district, j.location_city, j.location_country].filter(Boolean).join(', ') || 'Not specified';
             const salary     = j.salary_min && j.salary_max
                 ? `${Number(j.salary_min).toLocaleString('tr-TR')} – ${Number(j.salary_max).toLocaleString('tr-TR')} ${j.salary_currency || ''}`
-                : j.salary_min ? `${Number(j.salary_min).toLocaleString('tr-TR')}+ ${j.salary_currency || ''}` : 'Belirtilmemiş';
+                : j.salary_min ? `${Number(j.salary_min).toLocaleString('tr-TR')}+ ${j.salary_currency || ''}` : 'Not specified';
             const exp        = j.exp_min_years != null && j.exp_max_years != null
                 ? `${j.exp_min_years}–${j.exp_max_years} yıl`
-                : j.exp_min_years != null ? `${j.exp_min_years}+ yıl` : 'Belirtilmemiş';
+                : j.exp_min_years != null ? `${j.exp_min_years}+ yıl` : 'Not specified';
             const langText   = langs.length
                 ? langs.map(l => typeof l === 'object' ? `${l.language||''} (${l.level||''})` : l).join(', ')
-                : 'Belirtilmemiş';
+                : 'Not specified';
             const isOpen     = openJobId === j.job_analysis_id;
 
             const item = document.createElement('div');
@@ -1435,7 +1435,7 @@
                     </div>
                     <div class="ja-badges">
                         ${j.employment_type ? `<span class="ja-badge type">${j.employment_type}</span>`  : ''}
-                        ${j.is_remote       ? `<span class="ja-badge remote">Uzaktan</span>`             : ''}
+                        ${j.is_remote       ? `<span class="ja-badge remote">Remote</span>`             : ''}
                         ${j.work_type       ? `<span class="ja-badge work">${j.work_type}</span>`        : ''}
                         ${score != null     ? `<span class="ja-badge score">Skor: ${score}%</span>`     : ''}
                     </div>
@@ -1443,19 +1443,19 @@
                 </div>
                 <div class="ja-detail">
                     <div class="ja-detail-grid">
-                        <div><div class="ja-field-label">Konum</div><div class="ja-field-val">${location}</div></div>
-                        <div><div class="ja-field-label">Maaş</div><div class="ja-field-val">${salary}</div></div>
-                        <div><div class="ja-field-label">Deneyim</div><div class="ja-field-val">${exp}</div></div>
-                        <div><div class="ja-field-label">Min. Eğitim</div><div class="ja-field-val">${j.edu_min_level || 'Belirtilmemiş'}</div></div>
-                        <div><div class="ja-field-label">Diller</div><div class="ja-field-val">${langText}</div></div>
-                        <div><div class="ja-field-label">Kaynak</div><div class="ja-field-val">${
+                        <div><div class="ja-field-label">Location</div><div class="ja-field-val">${location}</div></div>
+                        <div><div class="ja-field-label">Salary</div><div class="ja-field-val">${salary}</div></div>
+                        <div><div class="ja-field-label">Experience</div><div class="ja-field-val">${exp}</div></div>
+                        <div><div class="ja-field-label">Min. Education</div><div class="ja-field-val">${j.edu_min_level || 'Not specified'}</div></div>
+                        <div><div class="ja-field-label">Languages</div><div class="ja-field-val">${langText}</div></div>
+                        <div><div class="ja-field-label">Source</div><div class="ja-field-val">${
                             j.source_url
                             ? `<a href="${j.source_url}" target="_blank" style="color:#667eea;font-size:12px;word-break:break-all">${j.source_url.substring(0,55)}…</a>`
                             : '—'
                         }</div></div>
-                        ${reqSkills.length  ? `<div class="ja-full"><div class="ja-field-label">Zorunlu beceriler</div><div class="ja-chips">${reqSkills.map(s=>`<span class="ja-chip">${s}</span>`).join('')}</div></div>`  : ''}
-                        ${prefSkills.length ? `<div class="ja-full"><div class="ja-field-label">Tercih edilen beceriler</div><div class="ja-chips">${prefSkills.map(s=>`<span class="ja-chip">${s}</span>`).join('')}</div></div>` : ''}
-                        ${eduFields.length  ? `<div class="ja-full"><div class="ja-field-label">Tercih edilen alanlar</div><div class="ja-chips">${eduFields.map(s=>`<span class="ja-chip">${s}</span>`).join('')}</div></div>`  : ''}
+                        ${reqSkills.length  ? `<div class="ja-full"><div class="ja-field-label">Required skills</div><div class="ja-chips">${reqSkills.map(s=>`<span class="ja-chip">${s}</span>`).join('')}</div></div>`  : ''}
+                        ${prefSkills.length ? `<div class="ja-full"><div class="ja-field-label">Preferred skills</div><div class="ja-chips">${prefSkills.map(s=>`<span class="ja-chip">${s}</span>`).join('')}</div></div>` : ''}
+                        ${eduFields.length  ? `<div class="ja-full"><div class="ja-field-label">Preferred fields</div><div class="ja-chips">${eduFields.map(s=>`<span class="ja-chip">${s}</span>`).join('')}</div></div>`  : ''}
                     </div>
                 </div>
             `;
@@ -1484,7 +1484,7 @@
             document.getElementById('rawTextContent').textContent = currentRawText;
             document.getElementById('rawTextModal').style.display = 'flex';
         } else {
-            showAlert('Ham metin bulunamadı', 'warning');
+            showAlert('Raw text not found', 'warning');
         }
     }
     function closeRawTextModal() { document.getElementById('rawTextModal').style.display = 'none'; }
@@ -1512,7 +1512,7 @@
         document.getElementById('cvEducation').textContent  = currentCVData[3] || '—';
         document.getElementById('cvLanguages').textContent  = currentCVData[4] || '—';
         closeEditModal();
-        showAlert('✅ Güncellendi', 'success');
+        showAlert('✅ Updated', 'success');
     }
     function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 

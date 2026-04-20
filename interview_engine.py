@@ -1,7 +1,7 @@
 """
 interview_engine.py
-İş ilanı + CV verisi üzerinden mülakat soruları üretir,
-kullanıcı cevaplarını değerlendirir ve DB'ye kaydeder.
+Generates interview questions from job listing + CV data,
+evaluates user answers and saves to DB.
 """
 
 import json
@@ -13,109 +13,109 @@ from mysql.connector import Error
 
 
 # ---------------------------------------------------------------------------
-# Prompt şablonları
+# Prompt templates
 # ---------------------------------------------------------------------------
 
 QUESTION_GEN_PROMPT = """
-Sen deneyimli bir teknik işe alım uzmanısın.
-Aşağıdaki iş ilanı ve aday CV bilgilerini kullanarak bu pozisyon için mülakat soruları hazırla.
+You are an experienced technical recruiter.
+Using the job listing and candidate CV information below, prepare interview questions for this position.
 
-İŞ İLANI BİLGİLERİ:
-- Pozisyon: {job_title}
-- Şirket: {company}
-- Zorunlu Beceriler: {required_skills}
-- Tercih Edilen Beceriler: {preferred_skills}
-- Deneyim: {experience}
-- Eğitim: {education}
+JOB LISTING INFORMATION:
+- Position: {job_title}
+- Company: {company}
+- Required Skills: {required_skills}
+- Preferred Skills: {preferred_skills}
+- Experience: {experience}
+- Education: {education}
 
-ADAY CV BİLGİLERİ:
-- Beceriler: {cv_skills}
-- Deneyim: {cv_experience}
-- Eğitim: {cv_education}
-- Diller: {cv_languages}
+CANDIDATE CV INFORMATION:
+- Skills: {cv_skills}
+- Experience: {cv_experience}
+- Education: {cv_education}
+- Languages: {cv_languages}
 
-YALNIZCA geçerli bir JSON nesnesi döndür, başka hiçbir şey yazma.
+Return ONLY a valid JSON object, nothing else.
 
-Şu kategorilerde toplam {total_count} soru üret:
-- technical: {tech_count} soru (teknik/pozisyona özel)
-- behavioral: {behav_count} soru (davranışsal, STAR metoduna uygun)
-- situational: {sit_count} soru (senaryo tabanlı)
-- cv_based: {cv_count} soru (CV'deki boşluklar/güçlü noktalar üzerine)
+Generate a total of {total_count} questions in these categories:
+- technical: {tech_count} questions (technical/position-specific)
+- behavioral: {behav_count} questions (behavioral, STAR method)
+- situational: {sit_count} questions (scenario-based)
+- cv_based: {cv_count} questions (gaps/strengths in CV)
 
-JSON formatı:
+JSON format:
 {{
   "questions": [
     {{
       "id": 1,
       "category": "technical|behavioral|situational|cv_based",
       "difficulty": "easy|medium|hard",
-      "question": "Soru metni",
-      "hint": "Değerlendirici için ipucu (kullanıcıya gösterilmez)",
-      "ideal_answer_points": ["Beklenen cevap noktası 1", "Nokta 2"]
+      "question": "Question text",
+      "hint": "Hint for evaluator (not shown to user)",
+      "ideal_answer_points": ["Expected answer point 1", "Point 2"]
     }}
   ],
-  "interview_focus": "Bu mülakatta odaklanılması gereken ana konu özeti"
+  "interview_focus": "Summary of main topics to focus on in this interview"
 }}
 """.strip()
 
 
 EVALUATE_PROMPT = """
-Sen deneyimli bir teknik işe alım uzmanısın. Aşağıdaki mülakat sorusuna verilen cevabı değerlendir.
+You are an experienced technical recruiter. Evaluate the answer given to the following interview question.
 
-POZİSYON: {job_title} @ {company}
+POSITION: {job_title} @ {company}
 
-SORU: {question}
-KATEGORİ: {category}
-ZORLUK: {difficulty}
+QUESTION: {question}
+CATEGORY: {category}
+DIFFICULTY: {difficulty}
 
-BEKLENEN CEVAP NOKTALARI:
+EXPECTED ANSWER POINTS:
 {ideal_points}
 
-ADAYIN CEVABI:
+CANDIDATE'S ANSWER:
 {answer}
 
-YALNIZCA geçerli bir JSON nesnesi döndür:
+Return ONLY a valid JSON object:
 {{
-  "score": <0-100 arası sayı>,
+  "score": <number between 0-100>,
   "grade": "A|B|C|D|F",
-  "strengths": ["Güçlü yön 1", "Güçlü yön 2"],
-  "improvements": ["Geliştirilmesi gereken 1", "Geliştirilmesi gereken 2"],
-  "feedback": "Detaylı geri bildirim paragrafı (2-3 cümle)",
-  "model_answer_hint": "Örnek iyi cevap yönlendirmesi"
+  "strengths": ["Strength 1", "Strength 2"],
+  "improvements": ["Area to improve 1", "Area to improve 2"],
+  "feedback": "Detailed feedback paragraph (2-3 sentences)",
+  "model_answer_hint": "Example good answer guidance"
 }}
 """.strip()
 
 
 FINAL_REPORT_PROMPT = """
-Sen deneyimli bir işe alım danışmanısın. Aşağıdaki mülakat oturumunu değerlendirip kapsamlı bir rapor hazırla.
+You are an experienced recruitment consultant. Evaluate the interview session below and prepare a comprehensive report.
 
-POZİSYON: {job_title} @ {company}
+POSITION: {job_title} @ {company}
 
-MÜLAKAT SONUÇLARI:
+INTERVIEW RESULTS:
 {results_json}
 
-YALNIZCA geçerli bir JSON nesnesi döndür:
+Return ONLY a valid JSON object:
 {{
   "overall_score": <0-100>,
   "overall_grade": "A|B|C|D|F",
   "hiring_recommendation": "strong_yes|yes|maybe|no|strong_no",
-  "recommendation_reason": "Tavsiye gerekçesi (2-3 cümle)",
+  "recommendation_reason": "Recommendation rationale (2-3 sentences)",
   "category_scores": {{
-    "technical": <0-100 veya null>,
-    "behavioral": <0-100 veya null>,
-    "situational": <0-100 veya null>,
-    "cv_based": <0-100 veya null>
+    "technical": <0-100 or null>,
+    "behavioral": <0-100 or null>,
+    "situational": <0-100 or null>,
+    "cv_based": <0-100 or null>
   }},
-  "top_strengths": ["En güçlü yön 1", "2", "3"],
-  "critical_gaps": ["Kritik eksik 1", "2"],
-  "development_plan": ["Gelişim önerisi 1", "2", "3"],
-  "interview_summary": "Genel mülakat özeti paragrafı"
+  "top_strengths": ["Top strength 1", "2", "3"],
+  "critical_gaps": ["Critical gap 1", "2"],
+  "development_plan": ["Development suggestion 1", "2", "3"],
+  "interview_summary": "General interview summary paragraph"
 }}
 """.strip()
 
 
 # ---------------------------------------------------------------------------
-# Ana sınıf
+# Main class
 # ---------------------------------------------------------------------------
 
 class InterviewEngine:
@@ -137,7 +137,7 @@ class InterviewEngine:
         try:
             self._conn = mysql.connector.connect(**self.db_config)
         except Error as e:
-            print(f"[InterviewEngine] DB bağlantı hatası: {e}")
+            print(f"[InterviewEngine] DB connection error: {e}")
             self._conn = None
 
     def disconnect(self):
@@ -150,10 +150,10 @@ class InterviewEngine:
         return self._conn.cursor(dictionary=True)
 
     def _ensure_tables(self):
-        """Gerekli tabloları oluştur."""
+        """Create required tables."""
         cursor = self._cursor()
         try:
-            # Mülakat oturumları
+            # Interview sessions
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS interview_sessions (
                     session_id        INT AUTO_INCREMENT PRIMARY KEY,
@@ -176,7 +176,7 @@ class InterviewEngine:
                 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             """)
 
-            # Mülakat soruları
+            # Interview questions
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS interview_questions (
                     question_id   INT AUTO_INCREMENT PRIMARY KEY,
@@ -201,12 +201,12 @@ class InterviewEngine:
 
             self._conn.commit()
         except Error as e:
-            print(f"[InterviewEngine] Tablo oluşturma hatası: {e}")
+            print(f"[InterviewEngine] Table creation error: {e}")
         finally:
             cursor.close()
 
     # ------------------------------------------------------------------
-    # Groq API yardımcısı
+    # Groq API helper
     # ------------------------------------------------------------------
 
     def _call_groq(self, prompt: str, max_tokens: int = 2000) -> dict:
@@ -226,44 +226,44 @@ class InterviewEngine:
         )
         resp.raise_for_status()
         content = resp.json()["choices"][0]["message"]["content"].strip()
-        # Markdown blokları temizle
+        # Clean markdown blocks
         content = re.sub(r"^```[a-z]*\n?", "", content)
         content = re.sub(r"\n?```$", "", content)
         return json.loads(content)
 
     # ------------------------------------------------------------------
-    # Soru üretimi
+    # Question generation
     # ------------------------------------------------------------------
 
     def generate_questions(self, job_data: dict, cv_data: dict,
                            total: int = 10) -> dict:
         """
-        job_data: job_analyses satırı
-        cv_data:  cv_analyses satırı  (None olabilir)
+        job_data: job_analyses row
+        cv_data:  cv_analyses row (can be None)
         """
-        # Dağılım hesapla
+        # Calculate distribution
         tech   = max(1, round(total * 0.35))
         behav  = max(1, round(total * 0.25))
         sit    = max(1, round(total * 0.20))
         cv_q   = total - tech - behav - sit
 
         def _arr(v):
-            if not v: return "Belirtilmemiş"
+            if not v: return "Not specified"
             if isinstance(v, list): return ", ".join(str(x) for x in v)
             try: return ", ".join(json.loads(v))
             except: return str(v)
 
         prompt = QUESTION_GEN_PROMPT.format(
-            job_title        = job_data.get("job_title", "Pozisyon"),
-            company          = job_data.get("company_name", "Şirket"),
+            job_title        = job_data.get("job_title", "Position"),
+            company          = job_data.get("company_name", "Company"),
             required_skills  = _arr(job_data.get("required_skills")),
             preferred_skills = _arr(job_data.get("preferred_skills")),
-            experience       = f"{job_data.get('exp_min_years','?')}–{job_data.get('exp_max_years','?')} yıl",
-            education        = job_data.get("edu_min_level", "Belirtilmemiş"),
-            cv_skills        = cv_data.get("cv_skills",    "Belirtilmemiş") if cv_data else "CV yok",
-            cv_experience    = cv_data.get("cv_experience","Belirtilmemiş") if cv_data else "CV yok",
-            cv_education     = cv_data.get("cv_education", "Belirtilmemiş") if cv_data else "CV yok",
-            cv_languages     = cv_data.get("cv_languages", "Belirtilmemiş") if cv_data else "CV yok",
+            experience       = f"{job_data.get('exp_min_years','?')}–{job_data.get('exp_max_years','?')} years",
+            education        = job_data.get("edu_min_level", "Not specified"),
+            cv_skills        = cv_data.get("cv_skills",    "Not specified") if cv_data else "No CV",
+            cv_experience    = cv_data.get("cv_experience","Not specified") if cv_data else "No CV",
+            cv_education     = cv_data.get("cv_education", "Not specified") if cv_data else "No CV",
+            cv_languages     = cv_data.get("cv_languages", "Not specified") if cv_data else "No CV",
             total_count      = total,
             tech_count       = tech,
             behav_count      = behav,
@@ -273,23 +273,23 @@ class InterviewEngine:
         return self._call_groq(prompt, max_tokens=3000)
 
     # ------------------------------------------------------------------
-    # Oturum başlatma
+    # Session creation
     # ------------------------------------------------------------------
 
     def create_session(self, user_id: int, job_analysis_id: int,
                        cv_text_id: int | None, job_data: dict,
                        cv_data: dict | None, question_count: int = 10) -> dict:
         """
-        Yeni mülakat oturumu oluştur, soruları üret ve DB'ye kaydet.
-        Döner: { session_id, questions: [...] }
+        Create a new interview session, generate questions and save to DB.
+        Returns: { session_id, questions: [...] }
         """
-        # Soruları üret
+        # Generate questions
         gen = self.generate_questions(job_data, cv_data, question_count)
         questions = gen.get("questions", [])
 
         cursor = self._cursor()
         try:
-            # Oturumu kaydet
+            # Save session
             cursor.execute("""
                 INSERT INTO interview_sessions
                 (user_id, job_analysis_id, cv_text_id, job_title, company_name,
@@ -303,7 +303,7 @@ class InterviewEngine:
             self._conn.commit()
             session_id = cursor.lastrowid
 
-            # Soruları kaydet
+            # Save questions
             for i, q in enumerate(questions):
                 cursor.execute("""
                     INSERT INTO interview_questions
@@ -319,7 +319,7 @@ class InterviewEngine:
                 ))
             self._conn.commit()
 
-            # question_id'leri al
+            # Get question_ids
             cursor.execute("""
                 SELECT question_id, question_order, category, difficulty, question_text
                 FROM interview_questions WHERE session_id=%s ORDER BY question_order
@@ -333,18 +333,18 @@ class InterviewEngine:
                 "total": len(saved_qs)
             }
         except Error as e:
-            print(f"[InterviewEngine] Oturum oluşturma hatası: {e}")
+            print(f"[InterviewEngine] Session creation error: {e}")
             raise
         finally:
             cursor.close()
 
     # ------------------------------------------------------------------
-    # Cevap değerlendirme
+    # Answer evaluation
     # ------------------------------------------------------------------
 
     def evaluate_answer(self, question_id: int, user_answer: str,
                         job_title: str, company: str) -> dict:
-        """Tek bir cevabı değerlendir, DB'ye kaydet."""
+        """Evaluate a single answer, save to DB."""
         cursor = self._cursor()
         try:
             cursor.execute(
@@ -353,7 +353,7 @@ class InterviewEngine:
             )
             q = cursor.fetchone()
             if not q:
-                raise ValueError(f"Soru bulunamadı: {question_id}")
+                raise ValueError(f"Question not found: {question_id}")
 
             ideal = q.get("ideal_points") or "[]"
             if isinstance(ideal, str):
@@ -366,12 +366,12 @@ class InterviewEngine:
                 question     = q["question_text"],
                 category     = q["category"],
                 difficulty   = q["difficulty"],
-                ideal_points = ideal_str or "Genel beklentiler",
+                ideal_points = ideal_str or "General expectations",
                 answer       = user_answer[:2000]
             )
             result = self._call_groq(prompt, max_tokens=1000)
 
-            # DB güncelle
+            # Update DB
             cursor.execute("""
                 UPDATE interview_questions
                 SET user_answer=%s, score=%s, grade=%s,
@@ -390,7 +390,7 @@ class InterviewEngine:
                 question_id
             ))
 
-            # Cevaplanan sayısını artır
+            # Increment answered count
             cursor.execute("""
                 UPDATE interview_sessions
                 SET answered = answered + 1
@@ -402,17 +402,17 @@ class InterviewEngine:
             self._conn.commit()
             return result
         except Error as e:
-            print(f"[InterviewEngine] Değerlendirme hatası: {e}")
+            print(f"[InterviewEngine] Evaluation error: {e}")
             raise
         finally:
             cursor.close()
 
     # ------------------------------------------------------------------
-    # Final rapor
+    # Final report
     # ------------------------------------------------------------------
 
     def finalize_session(self, session_id: int) -> dict:
-        """Tüm cevapları özetleyen final raporu üret ve kaydet."""
+        """Generate and save final report summarizing all answers."""
         cursor = self._cursor()
         try:
             cursor.execute(
@@ -421,7 +421,7 @@ class InterviewEngine:
             )
             session = cursor.fetchone()
             if not session:
-                raise ValueError("Oturum bulunamadı")
+                raise ValueError("Session not found")
 
             cursor.execute("""
                 SELECT category, difficulty, question_text,
@@ -433,7 +433,7 @@ class InterviewEngine:
             answered = cursor.fetchall()
 
             if not answered:
-                raise ValueError("Cevaplanmış soru yok")
+                raise ValueError("No answered questions")
 
             results_json = json.dumps(answered, ensure_ascii=False, default=str)
             prompt = FINAL_REPORT_PROMPT.format(
@@ -443,7 +443,7 @@ class InterviewEngine:
             )
             report = self._call_groq(prompt, max_tokens=1500)
 
-            # Oturumu güncelle
+            # Update session
             cursor.execute("""
                 UPDATE interview_sessions
                 SET overall_score=%s, overall_grade=%s,
@@ -461,13 +461,13 @@ class InterviewEngine:
             self._conn.commit()
             return report
         except Error as e:
-            print(f"[InterviewEngine] Final rapor hatası: {e}")
+            print(f"[InterviewEngine] Final report error: {e}")
             raise
         finally:
             cursor.close()
 
     # ------------------------------------------------------------------
-    # Sorgular
+    # Queries
     # ------------------------------------------------------------------
 
     def get_session(self, session_id: int, user_id: int) -> dict | None:

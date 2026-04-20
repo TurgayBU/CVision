@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CVision — Mülakat Simülatörü</title>
+<title>CVision — Interview Simulator</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,500;0,700;1,300;1,500&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -570,9 +570,9 @@ body::before {
 
 <!-- Navbar -->
 <nav class="navbar">
-    <div class="logo">CV<em>ision</em> <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);font-weight:300;margin-left:6px;">/ mülakat</span></div>
+    <div class="logo">CV<em>ision</em> <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);font-weight:300;margin-left:6px;">/ interview</span></div>
     <div class="nav-right">
-        <a href="/cv-analysis" class="nav-btn">← Analize Dön</a>
+        <a href="/cv-analysis" class="nav-btn">← Back to Analysis</a>
         <a href="/dashboard" class="nav-btn">Dashboard</a>
     </div>
 </nav>
@@ -583,32 +583,32 @@ body::before {
 <!-- Loading overlay -->
 <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner"></div>
-    <div class="loading-text" id="loadingText">Hazırlanıyor…</div>
-    <div class="loading-sub" id="loadingSub">Yapay zeka sorularınızı oluşturuyor</div>
+    <div class="loading-text" id="loadingText">Preparing…</div>
+    <div class="loading-sub" id="loadingSub">AI is generating your questions</div>
 </div>
 
 <!-- ═══════════════════════════════ SETUP SCREEN ═══════════════════════════════ -->
 <div class="setup-screen" id="setupScreen">
-    <h1 class="screen-title">AI <em>Mülakat</em><br>Simülatörü</h1>
-    <p class="screen-sub">İş ilanınız ve CV'niz üzerinden kişiselleştirilmiş mülakat soruları alın, cevaplarınız yapay zeka tarafından değerlendirilsin.</p>
+    <h1 class="screen-title">AI <em>Interview</em><br>Simulator</h1>
+    <p class="screen-sub">Get personalized interview questions based on your job listing and CV, and have your answers evaluated by AI.</p>
 
     <div class="setup-card">
-        <div class="setup-card-head">⚙️ &nbsp;Mülakat Ayarları</div>
+        <div class="setup-card-head">⚙️ &nbsp;Interview Settings</div>
         <div class="setup-card-body">
             <div class="field">
-                <label>İş İlanı Seçin</label>
+                <label>Select Job Listing</label>
                 <select id="jobSelect">
-                    <option value="">Yükleniyor…</option>
+                    <option value="">Loading…</option>
                 </select>
             </div>
             <div class="field">
-                <label>CV Seçin <span style="color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0">(opsiyonel, kişiselleştirmeyi artırır)</span></label>
+                <label>Select CV <span style="color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0">(optional, improves personalization)</span></label>
                 <select id="cvSelect">
-                    <option value="">CV seçin…</option>
+                    <option value="">Select CV…</option>
                 </select>
             </div>
             <div class="field">
-                <label>Soru Sayısı</label>
+                <label>Number of Questions</label>
                 <div class="q-count-row" id="qCountRow">
                     <button class="q-count-btn" data-count="5" onclick="setQCount(this)">5</button>
                     <button class="q-count-btn active" data-count="8" onclick="setQCount(this)">8</button>
@@ -620,7 +620,7 @@ body::before {
     </div>
 
     <button class="start-btn" id="startBtn" onclick="startInterview()">
-        <span>Mülakatı Başlat</span> <span>→</span>
+        <span>Start Interview</span> <span>→</span>
     </button>
 </div>
 
@@ -630,7 +630,7 @@ body::before {
     <!-- Progress -->
     <div class="progress-header" id="progressHeader">
         <div>
-            <div class="progress-label">Soru İlerlemesi</div>
+            <div class="progress-label">Question Progress</div>
             <div class="progress-track" style="width:280px;">
                 <div class="progress-fill" id="progressFill" style="width:0%"></div>
             </div>
@@ -653,16 +653,16 @@ body::before {
     <!-- Answer -->
     <div class="answer-card" id="answerCard">
         <div class="answer-head">
-            <span>Cevabınız</span>
-            <span class="char-count" id="charCount">0 karakter</span>
+            <span>Your Answer</span>
+            <span class="char-count" id="charCount">0 characters</span>
         </div>
         <textarea class="answer-textarea" id="answerTextarea"
-                  placeholder="Cevabınızı buraya yazın. Ayrıntılı ve düşünceli cevaplar daha yüksek puan alır…"
+                  placeholder="Write your answer here. Detailed and thoughtful answers receive higher scores…"
                   oninput="updateCharCount()"></textarea>
         <div class="answer-footer">
-            <button class="btn-skip" onclick="skipQuestion()">Soruyu Geç →</button>
+            <button class="btn-skip" onclick="skipQuestion()">Skip Question →</button>
             <button class="btn-submit" id="submitAnswerBtn" onclick="submitAnswer()">
-                <span>Cevabı Gönder</span>
+                <span>Submit Answer</span>
             </button>
         </div>
     </div>
@@ -680,22 +680,22 @@ body::before {
         </div>
         <div class="eval-body">
             <div class="eval-section">
-                <div class="eval-section-title">✅ Güçlü Yönler</div>
+                <div class="eval-section-title">✅ Strengths</div>
                 <ul class="eval-list strengths" id="evalStrengths"></ul>
             </div>
             <div class="eval-section">
-                <div class="eval-section-title">⚡ Geliştirilmesi Gerekenler</div>
+                <div class="eval-section-title">⚡ Areas for Improvement</div>
                 <ul class="eval-list improvements" id="evalImprovements"></ul>
             </div>
             <div class="eval-section">
-                <div class="eval-section-title">💬 Geri Bildirim</div>
+                <div class="eval-section-title">💬 Feedback</div>
                 <div class="eval-feedback" id="evalFeedback"></div>
                 <div class="eval-hint" id="evalHint"></div>
             </div>
         </div>
         <div style="padding:0 22px 22px;">
             <button class="btn-next" id="nextBtn" onclick="nextQuestion()">
-                <span id="nextBtnText">Sonraki Soru →</span>
+                <span id="nextBtnText">Next Question →</span>
             </button>
         </div>
     </div>
@@ -705,36 +705,36 @@ body::before {
 <div class="report-screen" id="reportScreen">
 
     <div class="report-hero">
-        <div class="report-hero-title">Mülakat Tamamlandı</div>
+        <div class="report-hero-title">Interview Complete</div>
         <div class="big-grade" id="bigGrade"><span id="bigGradeText"></span></div>
         <div class="report-score" id="reportScore"></div>
-        <div style="color:var(--muted);font-size:14px;">Genel Puan</div>
+        <div style="color:var(--muted);font-size:14px;">Overall Score</div>
         <div class="report-rec" id="reportRec"></div>
     </div>
 
     <div class="report-grid" id="reportGrid">
         <!-- Kategori puanları -->
         <div class="report-card">
-            <div class="report-card-head">📊 Kategori Puanları</div>
+            <div class="report-card-head">📊 Category Scores</div>
             <div class="report-card-body" id="catScores"></div>
         </div>
         <!-- Güçlü yönler -->
         <div class="report-card">
-            <div class="report-card-head">🏆 En Güçlü Yönler</div>
+            <div class="report-card-head">🏆 Top Strengths</div>
             <div class="report-card-body">
                 <ul class="report-list" id="reportStrengths"></ul>
             </div>
         </div>
         <!-- Kritik eksikler -->
         <div class="report-card">
-            <div class="report-card-head">⚠️ Kritik Eksikler</div>
+            <div class="report-card-head">⚠️ Critical Gaps</div>
             <div class="report-card-body">
                 <ul class="report-list" id="reportGaps"></ul>
             </div>
         </div>
         <!-- Gelişim planı -->
         <div class="report-card">
-            <div class="report-card-head">🗺️ Gelişim Planı</div>
+            <div class="report-card-head">🗺️ Development Plan</div>
             <div class="report-card-body">
                 <ul class="report-list" id="reportPlan"></ul>
             </div>
@@ -743,19 +743,19 @@ body::before {
 
     <!-- Özet -->
     <div class="report-card" style="margin-bottom:24px;">
-        <div class="report-card-head">📝 Mülakat Özeti</div>
+        <div class="report-card-head">📝 Interview Summary</div>
         <div class="report-card-body">
             <div class="summary-text" id="reportSummary"></div>
         </div>
     </div>
 
     <!-- Soru gözden geçirme -->
-    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:500;margin-bottom:16px;">Soru Soru İnceleme</div>
+    <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:500;margin-bottom:16px;">Question-by-Question Review</div>
     <div id="qReviewList"></div>
 
     <div class="report-actions">
         <a href="/dashboard" class="btn-primary">← Dashboard</a>
-        <button class="btn-secondary" onclick="location.reload()">🔄 Yeni Mülakat</button>
+        <button class="btn-secondary" onclick="location.reload()">🔄 New Interview</button>
     </div>
 </div>
 
@@ -772,18 +772,18 @@ let selectedQCount = 8;
 let finalReport   = null;
 
 const catLabels = {
-    technical:   '⚙️ Teknik',
-    behavioral:  '🧠 Davranışsal',
-    situational: '💡 Senaryo',
-    cv_based:    '📄 CV Bazlı'
+    technical:   '⚙️ Technical',
+    behavioral:  '🧠 Behavioral',
+    situational: '💡 Situational',
+    cv_based:    '📄 CV-Based'
 };
 const catClass = { technical:'cat-technical', behavioral:'cat-behavioral', situational:'cat-situational', cv_based:'cat-cv_based' };
 const recLabels = {
-    strong_yes: ['🌟 Kesinlikle İşe Alın', 'var(--green)', 'rgba(45,106,79,.1)', 'rgba(45,106,79,.3)'],
-    yes:        ['✅ İşe Alınabilir',        'var(--accent2)','rgba(42,100,150,.1)','rgba(42,100,150,.3)'],
-    maybe:      ['🤔 Değerlendirin',         'var(--gold)','rgba(184,134,11,.1)','rgba(184,134,11,.3)'],
-    no:         ['❌ Tavsiye Edilmez',        'var(--accent)','rgba(200,75,49,.1)','rgba(200,75,49,.3)'],
-    strong_no:  ['🚫 Kesinlikle Hayır',      '#666','rgba(0,0,0,.06)','rgba(0,0,0,.2)'],
+    strong_yes: ['🌟 Strong Hire', 'var(--green)', 'rgba(45,106,79,.1)', 'rgba(45,106,79,.3)'],
+    yes:        ['✅ Hire',        'var(--accent2)','rgba(42,100,150,.1)','rgba(42,100,150,.3)'],
+    maybe:      ['🤔 Consider',         'var(--gold)','rgba(184,134,11,.1)','rgba(184,134,11,.3)'],
+    no:         ['❌ Not Recommended',        'var(--accent)','rgba(200,75,49,.1)','rgba(200,75,49,.3)'],
+    strong_no:  ['🚫 Strong No',      '#666','rgba(0,0,0,.06)','rgba(0,0,0,.2)'],
 };
 
 // ─────────────────────────────────────────────────────
@@ -810,13 +810,13 @@ async function loadJobs() {
         const d = await r.json();
         const sel = document.getElementById('jobSelect');
         if (d.success && d.jobs?.length) {
-            sel.innerHTML = '<option value="">İş ilanı seçin…</option>' +
-                d.jobs.map(j => `<option value="${j.job_analysis_id}">${j.job_title || 'Pozisyon'} — ${j.company_name || ''}</option>`).join('');
+            sel.innerHTML = '<option value="">Select job listing…</option>' +
+                d.jobs.map(j => `<option value="${j.job_analysis_id}">${j.job_title || 'Position'} — ${j.company_name || ''}</option>`).join('');
             // Auto-select
             const auto = sel.dataset.autoselect;
             if (auto) sel.value = auto;
         } else {
-            sel.innerHTML = '<option value="">Henüz iş ilanı analizi yok</option>';
+            sel.innerHTML = '<option value="">No job analysis available yet</option>';
         }
     } catch(e) { console.error(e); }
 }
@@ -827,7 +827,7 @@ async function loadCVs() {
         const d = await r.json();
         const sel = document.getElementById('cvSelect');
         if (d.success && d.cvs?.length) {
-            sel.innerHTML = '<option value="">CV seçin (opsiyonel)…</option>' +
+            sel.innerHTML = '<option value="">Select CV (optional)…</option>' +
                 d.cvs.map(cv => {
                     const date = new Date(cv.created_at).toLocaleDateString('tr-TR');
                     return `<option value="${cv.cv_text_id}">#${cv.cv_text_id} — ${date}</option>`;
@@ -851,9 +851,9 @@ async function startInterview() {
     const jobId    = document.getElementById('jobSelect').value;
     const cvTextId = document.getElementById('cvSelect').value;
 
-    if (!jobId) { showAlert('Lütfen bir iş ilanı seçin.', 'error'); return; }
+    if (!jobId) { showAlert('Please select a job listing.', 'error'); return; }
 
-    showLoading('Sorular hazırlanıyor…', 'Yapay zeka CV ve iş ilanını analiz ediyor');
+    showLoading('Preparing questions…', 'AI is analyzing CV and job listing');
 
     try {
         const r = await fetch('/api/interview/start', {
@@ -868,7 +868,7 @@ async function startInterview() {
         const d = await r.json();
         hideLoading();
 
-        if (!d.success) { showAlert(d.error || 'Başlatma hatası', 'error'); return; }
+        if (!d.success) { showAlert(d.error || 'Startup error', 'error'); return; }
 
         sessionId  = d.session_id;
         questions  = d.questions;
@@ -879,7 +879,7 @@ async function startInterview() {
         renderQuestion();
     } catch(e) {
         hideLoading();
-        showAlert('Bağlantı hatası: ' + e.message, 'error');
+        showAlert('Connection error: ' + e.message, 'error');
     }
 }
 
@@ -904,14 +904,14 @@ function renderQuestion() {
     const diffRow = document.getElementById('diffRow');
     diffRow.className = 'difficulty-row diff-' + q.difficulty;
     document.getElementById('diffLabel').textContent =
-        {easy:'Kolay', medium:'Orta', hard:'Zor'}[q.difficulty] || q.difficulty;
+        {easy:'Easy', medium:'Medium', hard:'Hard'}[q.difficulty] || q.difficulty;
 
     // Question text
     document.getElementById('questionText').textContent = q.question_text;
 
     // Reset answer area
     document.getElementById('answerTextarea').value = '';
-    document.getElementById('charCount').textContent = '0 karakter';
+    document.getElementById('charCount').textContent = '0 characters';
     document.getElementById('answerCard').style.display = 'block';
     document.getElementById('evalCard').style.display   = 'none';
     document.getElementById('submitAnswerBtn').disabled = false;
@@ -922,7 +922,7 @@ function renderQuestion() {
 
 function updateCharCount() {
     const len = document.getElementById('answerTextarea').value.length;
-    document.getElementById('charCount').textContent = len + ' karakter';
+    document.getElementById('charCount').textContent = len + ' characters';
 }
 
 // ─────────────────────────────────────────────────────
@@ -931,12 +931,12 @@ function updateCharCount() {
 async function submitAnswer() {
     const answer = document.getElementById('answerTextarea').value.trim();
     if (answer.length < 10) {
-        showAlert('Lütfen daha uzun bir cevap yazın (en az 10 karakter).', 'error');
+        showAlert('Please make your answer longer (At least 10 characters).', 'error');
         return;
     }
 
     document.getElementById('submitAnswerBtn').disabled = true;
-    showLoading('Cevabınız değerlendiriliyor…', 'Yapay zeka analiz yapıyor');
+    showLoading('Your Answer Analyzing...', 'AI is analyzing');
 
     try {
         const r = await fetch('/api/interview/answer', {
@@ -950,12 +950,12 @@ async function submitAnswer() {
         const d = await r.json();
         hideLoading();
 
-        if (!d.success) { showAlert(d.error || 'Değerlendirme hatası', 'error'); document.getElementById('submitAnswerBtn').disabled=false; return; }
+        if (!d.success) { showAlert(d.error || 'Evaluation error', 'error'); document.getElementById('submitAnswerBtn').disabled=false; return; }
 
         renderEvaluation(d.evaluation);
     } catch(e) {
         hideLoading();
-        showAlert('Bağlantı hatası: ' + e.message, 'error');
+        showAlert('Connection error: ' + e.message, 'error');
         document.getElementById('submitAnswerBtn').disabled = false;
     }
 }
@@ -973,7 +973,7 @@ function renderEvaluation(ev) {
     // Score bar
     const score = ev.score || 0;
     const scoreColor = score >= 70 ? 'var(--green)' : score >= 45 ? 'var(--gold)' : 'var(--accent)';
-    document.getElementById('evalScoreLabel').textContent = `Puan: ${score}/100`;
+    document.getElementById('evalScoreLabel').textContent = `Score: ${score}/100`;
     const fill = document.getElementById('evalFill');
     fill.style.background = scoreColor;
     setTimeout(() => { fill.style.width = score + '%'; }, 100);
@@ -998,7 +998,7 @@ function renderEvaluation(ev) {
 
     // Next button text
     const isLast = currentIndex === questions.length - 1;
-    document.getElementById('nextBtnText').textContent = isLast ? 'Raporu Görüntüle →' : 'Sonraki Soru →';
+    document.getElementById('nextBtnText').textContent = isLast ? 'Show Report →' : 'Next Question →';
 
     window.scrollTo({top: document.getElementById('evalCard').offsetTop - 80, behavior:'smooth'});
 }
@@ -1016,7 +1016,7 @@ async function nextQuestion() {
 }
 
 async function skipQuestion() {
-    if (!confirm('Bu soruyu geçmek istediğinize emin misiniz? Puanınızı etkileyebilir.')) return;
+    if (!confirm('Are you sure you want to skip this question? It may affect your score.')) return;
     currentIndex++;
     if (currentIndex >= questions.length) {
         await generateReport();
@@ -1029,7 +1029,7 @@ async function skipQuestion() {
 // RAPOR
 // ─────────────────────────────────────────────────────
 async function generateReport() {
-    showLoading('Rapor hazırlanıyor…', 'Tüm cevaplar analiz ediliyor');
+    showLoading('Preparing report…', 'All answers are being analyzed');
     try {
         const r = await fetch('/api/interview/finalize', {
             method:'POST',
@@ -1039,7 +1039,7 @@ async function generateReport() {
         const d = await r.json();
         hideLoading();
 
-        if (!d.success) { showAlert(d.error || 'Rapor oluşturma hatası', 'error'); return; }
+        if (!d.success) { showAlert(d.error || 'Report generation error', 'error'); return; }
 
         finalReport = d.report;
         renderReport(d.report);
@@ -1049,7 +1049,7 @@ async function generateReport() {
 
     } catch(e) {
         hideLoading();
-        showAlert('Bağlantı hatası: ' + e.message, 'error');
+        showAlert('Connection error: ' + e.message, 'error');
     }
 }
 
@@ -1133,7 +1133,7 @@ function renderQReview(qs) {
                 </div>
             </div>
             <div class="q-review-body" id="review-${i}">
-                <div class="answer-label" style="margin-bottom:6px">Cevabınız</div>
+                <div class="answer-label" style="margin-bottom:6px">Your Answer</div>
                 <div class="answer-text">${q.user_answer||'—'}</div>
                 ${q.feedback ? `<div class="eval-feedback" style="margin-top:12px">${q.feedback}</div>` : ''}
                 ${q.model_answer_hint ? `<div class="eval-hint" style="margin-top:8px">💡 ${q.model_answer_hint}</div>` : ''}

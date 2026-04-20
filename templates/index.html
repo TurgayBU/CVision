@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-    <html lang="tr">
+    <html lang="eng">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Giriş Ekranı</title>
+        <title>Login Screen</title>
         <style>
             * {
                 margin: 0;
@@ -263,7 +263,7 @@
             </form>
         </div>
 
-        <!-- Şifremi Unuttum Modal -->
+        <!-- Forgot Password Modal -->
         <div class="modal" id="forgotModal">
             <div class="modal-content">
                 <span class="close-modal" id="closeForgotModal">&times;</span>
@@ -281,7 +281,7 @@
             </div>
         </div>
 
-        <!-- Kayıt Ol Modal -->
+        <!-- Register Modal -->
         <div class="modal" id="registerModal">
             <div class="modal-content">
                 <span class="close-modal" id="closeRegisterModal">&times;</span>
@@ -358,7 +358,7 @@
                 }, 5000);
             }
 
-            // Giriş işlemi
+            // Login process
             document.getElementById('loginForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
 
@@ -369,7 +369,7 @@
                 const successMessage = document.getElementById('successMessage');
                 const loginBtn = document.getElementById('loginBtn');
 
-                // Butonu devre dışı bırak ve loading ekle
+                // Disable button and add loading
                 loginBtn.disabled = true;
                 loginBtn.innerHTML = '<span class="loading"></span>Entering...';
 
@@ -391,7 +391,7 @@
                     if (response.ok) {
                         showMessage(successMessage, data.message, 'success');
 
-                        // 2 saniye sonra yönlendir
+                        // Redirect after 2 seconds
                         setTimeout(() => {
                             window.location.href = '/dashboard';
                         }, 2000);
@@ -401,13 +401,13 @@
                 } catch (error) {
                     showMessage(errorMessage, 'Cannot connect server!', 'error');
                 } finally {
-                    // Butonu eski haline getir
+                    // Restore button
                     loginBtn.disabled = false;
                     loginBtn.innerHTML = '<span>Login</span>';
                 }
             });
 
-            // Şifremi unuttum - e-posta gönderme
+            // Forgot password - send email
             document.getElementById('sendResetLink').addEventListener('click', async function() {
                 const email = document.getElementById('forgotEmail').value;
                 const infoMessage = document.getElementById('infoMessage');
@@ -449,7 +449,7 @@
                 }
             });
 
-            // Kayıt ol işlemi
+            // Registration process
             document.getElementById('registerBtn').addEventListener('click', async function() {
                 const username = document.getElementById('regUsername').value;
                 const email = document.getElementById('regEmail').value;
@@ -458,7 +458,7 @@
                 const infoMessage = document.getElementById('infoMessage');
                 const registerBtn = this;
 
-                // Validasyonlar
+                // Validations
                 if (!username || !email || !password || !passwordConfirm) {
                     showMessage(infoMessage, 'Please fill all spaces!', 'error');
                     return;
@@ -513,7 +513,7 @@
                 }
             });
 
-            // Oturum kontrolü
+            // Session check
             async function checkSession() {
                 try {
                     const response = await fetch('/api/check-session');
@@ -528,7 +528,7 @@
                 }
             }
 
-            // Sayfa yüklendiğinde oturum kontrolü yap
+            // Check session on page load
             checkSession();
         </script>
     </body>

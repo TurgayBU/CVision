@@ -1,33 +1,33 @@
 import mysql.connector
-from config import DB_CONFIG, api_key  # config.py'da groq_api_key tanımlı olmalı
-from groq import Groq  # Groq kütüphanesini import et
+from config import DB_CONFIG, api_key
+from groq import Groq
 import time
 from functools import wraps
 
-class AICVResponseGroq:  # Sınıf adını değiştirelim (isteğe bağlı)
+class AICVResponseGroq:
     def __init__(self, db_config, api_key):
         self.db_config = db_config
         self.connection = None
         self.api_key = api_key
 
-        # Groq istemcisini oluştur
+        # Create Groq client
         self.client = Groq(api_key=api_key)
-        # Kullanılacak model (ücretsiz ve güçlü)
-        self.model = "llama-3.3-70b-versatile"  # veya "mixtral-8x7b-32768", "gemma2-9b-it"
+        # Model to use
+        self.model = "llama-3.3-70b-versatile"
 
     def connect(self):
         try:
             self.connection = mysql.connector.connect(**self.db_config)
-            print("✅ MySQL bağlantısı başarılı")
+            print("✅ MySQL connection successful")
             return True
         except Exception as e:
-            print(f"❌ MySQL bağlantı hatası: {e}")
+            print(f"❌ MySQL connection error: {e}")
             return False
 
     def disconnect(self):
         if self.connection and self.connection.is_connected():
             self.connection.close()
-            print("🔌 MySQL bağlantısı kapatıldı")
+            print("🔌 MySQL connection closed")
 
     def Get_CV_Text(self, user_id, cv_text_id):
         try:
@@ -42,15 +42,15 @@ class AICVResponseGroq:  # Sınıf adını değiştirelim (isteğe bağlı)
 
             if result:
                 return result['raw_text']
-            print(f"❌ CV metni bulunamadı: user_id={user_id}, cv_text_id={cv_text_id}")
+            print(f"❌ CV text not found: user_id={user_id}, cv_text_id={cv_text_id}")
             return None
 
         except Exception as e:
-            print(f"❌ Veritabanı sorgu hatası: {e}")
+            print(f"❌ Database query error: {e}")
             return None
 
     def rate_limit(max_per_minute=30):
-        """Dakikada maksimum istek sayısını sınırla"""
+        """Limit maximum number of requests per minute"""
         min_interval = 60.0 / max_per_minute
         last_called = [0.0]
 
@@ -69,11 +69,10 @@ class AICVResponseGroq:  # Sınıf adını değiştirelim (isteğe bağlı)
 
         return decorator
 
-    # PromptingAI metodunun üstüne @rate_limit() ekle
     @rate_limit(max_per_minute=25)
     def PromptingAI(self, raw_text):
         if not self.api_key:
-            print("❌ API anahtarı bulunamadı")
+            print("❌ API key not found")
             return None
 
         try:
@@ -99,9 +98,9 @@ cv_education='Answer is here'
 cv_languages='Answer is here'
 """
 
-            print("🔄 Groq API'ye istek gönderiliyor...")
+            print("🔄 Sending request to Groq API...")
 
-            # Groq API çağrısı
+            # Groq API call
             chat_completion = self.client.chat.completions.create(
                 messages=[
                     {
@@ -122,14 +121,14 @@ cv_languages='Answer is here'
 
             if chat_completion and chat_completion.choices:
                 ai_response = chat_completion.choices[0].message.content
-                print("✅ Groq API yanıtı alındı")
+                print("✅ Groq API response received")
                 return self.ParseResponse(ai_response)
             else:
-                print("❌ API yanıtı boş")
+                print("❌ API response is empty")
                 return None
 
         except Exception as e:
-            print(f"❌ AI sorgulama hatası: {e}")
+            print(f"❌ AI query error: {e}")
             return None
 
     def ParseResponse(self, response):
@@ -158,33 +157,33 @@ cv_languages='Answer is here'
                     elif 'languages' in key or 'language' in key:
                         cv_languages = value
 
-            print("✅ API yanıtı parse edildi")
+            print("✅ API response parsed")
             return [cv_address, cv_skills, cv_experience, cv_education, cv_languages]
 
         except Exception as e:
-            print(f"❌ Parse hatası: {e}")
+            print(f"❌ Parse error: {e}")
             return [cv_address, cv_skills, cv_experience, cv_education, cv_languages]
 
     def CheckMechanism(self, CV):
         try:
-            print("\n📋 Lütfen CV bilgilerini onaylayın:")
-            print(f"📍 Adres: {CV[0]}")
-            print(f"💻 Yetenekler: {CV[1]}")
-            print(f"💼 Deneyim: {CV[2]}")
-            print(f"🎓 Eğitim: {CV[3]}")
-            print(f"🗣️ Diller: {CV[4]}")
+            print("\n📋 Please confirm the CV information:")
+            print(f"📍 Address: {CV[0]}")
+            print(f"💻 Skills: {CV[1]}")
+            print(f"💼 Experience: {CV[2]}")
+            print(f"🎓 Education: {CV[3]}")
+            print(f"🗣️ Languages: {CV[4]}")
 
             while True:
-                confirm = input("\n✅ Bu bilgiler doğru mu? (evet/hayır): ").strip().lower()
-                if confirm in ['evet', 'e', 'yes', 'y']:
+                confirm = input("\n✅ Is this information correct? (yes/no): ").strip().lower()
+                if confirm in ['yes', 'y']:
                     return True
-                elif confirm in ['hayır', 'h', 'hayir', 'no', 'n']:
+                elif confirm in ['no', 'n']:
                     return False
                 else:
-                    print("Lütfen 'evet' veya 'hayır' yazın")
+                    print("Please type 'yes' or 'no'")
 
         except Exception as e:
-            print(f"❌ Onay hatası: {e}")
+            print(f"❌ Confirmation error: {e}")
             return False
 
     def SaveInDatabase(self, CV, user_id=None, cv_text_id=None):
@@ -193,7 +192,7 @@ cv_languages='Answer is here'
                 self.connect()
 
             if cv_text_id is None:
-                print("❌ cv_text_id zorunlu!")
+                print("❌ cv_text_id is required!")
                 return False
 
             cursor = self.connection.cursor()
@@ -220,7 +219,6 @@ cv_languages='Answer is here'
 
             cv_address = CV[0][:200] if CV[0] else ''
 
-            # Sorguda 7 değer olmalı: user_id, cv_text_id, cv_address, cv_skills, cv_experience, cv_education, cv_languages
             query = """
             INSERT INTO cv_analyses 
             (user_id, cv_text_id, cv_address, cv_skills, cv_experience, cv_education, cv_languages) 
@@ -229,7 +227,7 @@ cv_languages='Answer is here'
 
             values = (
                 user_id,
-                cv_text_id,  # BU SATIR EKLENMİŞ OLMALI!
+                cv_text_id,
                 cv_address,
                 cv_skills_json,
                 cv_experience_json,
@@ -237,55 +235,55 @@ cv_languages='Answer is here'
                 cv_languages_json
             )
 
-            print(f"📝 Kaydedilecek veri: {values}")
-            print(f"📝 Sorgu: {query}")
+            print(f"📝 Data to be saved: {values}")
+            print(f"📝 Query: {query}")
 
             cursor.execute(query, values)
             self.connection.commit()
 
-            print("✅ Veritabanına kaydedildi")
+            print("✅ Saved to database")
             cursor.close()
             return True
 
         except Exception as e:
-            print(f"❌ Veritabanı kayıt hatası: {e}")
+            print(f"❌ Database save error: {e}")
             return False
-# Test fonksiyonu
-def test_analysis():
-    """Belirli bir cv_text_id'yi analiz et"""
-    user_id = 4
-    cv_text_id = 1  # Turgay'ın CV'si
 
-    # config.py'dan groq_api_key'i al
+# Test function
+def test_analysis():
+    """Analyze a specific cv_text_id"""
+    user_id = 4
+    cv_text_id = 1
+
     ai = AICVResponseGroq(DB_CONFIG, api_key)
 
     try:
-        # CV metnini al
+        # Get CV text
         raw_text = ai.Get_CV_Text(user_id, cv_text_id)
 
         if raw_text:
-            print(f"📄 CV metni alındı ({len(raw_text)} karakter)")
+            print(f"📄 CV text retrieved ({len(raw_text)} characters)")
 
-            # AI ile analiz et
+            # Analyze with AI
             cv_data = ai.PromptingAI(raw_text)
 
             if cv_data:
-                print("\n📊 ANALİZ SONUÇLARI:")
-                print(f"📍 Adres: {cv_data[0]}")
-                print(f"💻 Yetenekler: {cv_data[1]}")
-                print(f"💼 Deneyim: {cv_data[2]}")
-                print(f"🎓 Eğitim: {cv_data[3]}")
-                print(f"🗣️ Diller: {cv_data[4]}")
+                print("\n📊 ANALYSIS RESULTS:")
+                print(f"📍 Address: {cv_data[0]}")
+                print(f"💻 Skills: {cv_data[1]}")
+                print(f"💼 Experience: {cv_data[2]}")
+                print(f"🎓 Education: {cv_data[3]}")
+                print(f"🗣️ Languages: {cv_data[4]}")
 
-                # Onay iste
+                # Ask for confirmation
                 if ai.CheckMechanism(cv_data):
                     ai.SaveInDatabase(cv_data, user_id)
                 else:
-                    print("❌ İşlem iptal edildi")
+                    print("❌ Operation cancelled")
             else:
-                print("❌ Analiz başarısız")
+                print("❌ Analysis failed")
         else:
-            print("❌ CV metni bulunamadı")
+            print("❌ CV text not found")
 
     finally:
         ai.disconnect()

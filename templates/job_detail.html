@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CVision — Analiz Raporu</title>
+    <title>CVision — Analysis Report</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -371,9 +371,9 @@
     <!-- Sağ grup: mülakat butonu + geri butonu -->
     <div class="nav-right">
         <a id="navInterviewBtn" href="#" class="btn-interview">
-            🎙️ Mülakat Başlat
+            🎙️ Start Interview
         </a>
-        <a href="/dashboard" class="btn-sm">← Yeni Analiz</a>
+        <a href="/dashboard" class="btn-sm">← New Analysis</a>
     </div>
 </nav>
 
@@ -383,18 +383,18 @@
     <div class="loading-state" id="loadingState">
         <div class="spinner"></div>
         <div>
-            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:600;margin-bottom:6px;">Rapor yükleniyor…</div>
-            <div style="font-size:13px;color:var(--muted)">Analiz sonuçları getiriliyor</div>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:600;margin-bottom:6px;">Loading report…</div>
+            <div style="font-size:13px;color:var(--muted)">Fetching analysis results</div>
         </div>
     </div>
 
     <!-- Error -->
     <div class="error-state" id="errorState" style="display:none;">
         <div class="err-icon">⚠️</div>
-        <h2>Veri bulunamadı</h2>
-        <p id="errorMsg">Bu analize ait bilgiler yüklenemedi.</p>
+        <h2>Data not found</h2>
+        <p id="errorMsg">Could not load information for this analysis.</p>
         <br><br>
-        <a href="/dashboard" class="btn-sm">← Geri Dön</a>
+        <a href="/dashboard" class="btn-sm">← Go Back</a>
     </div>
 
     <!-- Content -->
@@ -403,7 +403,7 @@
         <!-- HERO -->
         <div class="hero">
             <div>
-                <div class="hero-eyebrow">Analiz Raporu</div>
+                <div class="hero-eyebrow">Analysis Report</div>
                 <h1 id="heroTitle">—</h1>
                 <div class="hero-meta">
                     <span id="heroCompany"></span>
@@ -425,7 +425,7 @@
                     </svg>
                     <div class="ring-label">
                         <span class="ring-pct" id="ringPct">—</span>
-                        <span class="ring-sub">Tamamlık</span>
+                        <span class="ring-sub">Completeness</span>
                     </div>
                 </div>
                 <span class="score-label" id="scoreLbl"></span>
@@ -437,19 +437,19 @@
             <div class="panel">
                 <div class="panel-hd">
                     <div class="panel-title"><div class="panel-icon i-blue">💼</div>İş İlanı Detayları</div>
-                    <a id="srcLink" href="#" target="_blank" class="src-link" style="display:none;">Kaynağa Git ↗</a>
+                    <a id="srcLink" href="#" target="_blank" class="src-link" style="display:none;">Go to Source ↗</a>
                 </div>
                 <div class="panel-body">
                     <div class="cols3">
-                        <div class="info-field"><div class="info-label">Pozisyon</div><div class="info-val" id="jTitle">—</div></div>
-                        <div class="info-field"><div class="info-label">Şirket</div><div class="info-val" id="jCompany">—</div></div>
-                        <div class="info-field"><div class="info-label">Departman</div><div class="info-val" id="jDept">—</div></div>
-                        <div class="info-field"><div class="info-label">Konum</div><div class="info-val" id="jLocation">—</div></div>
-                        <div class="info-field"><div class="info-label">Çalışma Tipi</div><div class="info-val" id="jWorkType">—</div></div>
-                        <div class="info-field"><div class="info-label">İstihdam</div><div class="info-val" id="jEmpType">—</div></div>
-                        <div class="info-field"><div class="info-label">Deneyim</div><div class="info-val" id="jExp">—</div></div>
-                        <div class="info-field"><div class="info-label">Min. Eğitim</div><div class="info-val" id="jEdu">—</div></div>
-                        <div class="info-field"><div class="info-label">Maaş</div><div class="info-val" id="jSalary">—</div></div>
+                        <div class="info-field"><div class="info-label">Position</div><div class="info-val" id="jTitle">—</div></div>
+                        <div class="info-field"><div class="info-label">Company</div><div class="info-val" id="jCompany">—</div></div>
+                        <div class="info-field"><div class="info-label">Department</div><div class="info-val" id="jDept">—</div></div>
+                        <div class="info-field"><div class="info-label">Location</div><div class="info-val" id="jLocation">—</div></div>
+                        <div class="info-field"><div class="info-label">Work Type</div><div class="info-val" id="jWorkType">—</div></div>
+                        <div class="info-field"><div class="info-label">Employment</div><div class="info-val" id="jEmpType">—</div></div>
+                        <div class="info-field"><div class="info-label">Experience</div><div class="info-val" id="jExp">—</div></div>
+                        <div class="info-field"><div class="info-label">Min. Education</div><div class="info-val" id="jEdu">—</div></div>
+                        <div class="info-field"><div class="info-label">Salary</div><div class="info-val" id="jSalary">—</div></div>
                     </div>
                 </div>
             </div>
@@ -460,14 +460,14 @@
                 </div>
                 <div class="panel-body" id="cvPanel">
                     <div class="cv-notice" id="cvNotice" style="display:none;">
-                        CV analizi bulunamadı.<br>
-                        <a href="/cv-analysis" style="color:var(--amber);font-weight:600;">CV Analiz →</a>
+                        CV analysis not found.<br>
+                        <a href="/cv-analysis" style="color:var(--amber);font-weight:600;">CV Analysis →</a>
                     </div>
                     <div id="cvContent">
-                        <div class="info-field"><div class="info-label">📍 Konum</div><div class="info-val" id="cvAddress">—</div></div>
-                        <div class="info-field"><div class="info-label">🗣️ Diller</div><div class="info-val" id="cvLanguages">—</div></div>
-                        <div class="info-field"><div class="info-label">🎓 Eğitim</div><div class="info-val" id="cvEducation">—</div></div>
-                        <div class="info-field"><div class="info-label">💼 Deneyim</div><div class="info-val scroll" id="cvExperience">—</div></div>
+                        <div class="info-field"><div class="info-label">📍 Location</div><div class="info-val" id="cvAddress">—</div></div>
+                        <div class="info-field"><div class="info-label">🗣️ Languages</div><div class="info-val" id="cvLanguages">—</div></div>
+                        <div class="info-field"><div class="info-label">🎓 Education</div><div class="info-val" id="cvEducation">—</div></div>
+                        <div class="info-field"><div class="info-label">💼 Experience</div><div class="info-val scroll" id="cvExperience">—</div></div>
                     </div>
                 </div>
             </div>
@@ -476,11 +476,11 @@
         <!-- ROW 2: Beceriler -->
         <div class="cols">
             <div class="panel">
-                <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-blue">⚡</div>Zorunlu Beceriler</div></div>
+                <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-blue">⚡</div>Essential Skills</div></div>
                 <div class="panel-body"><div class="chips" id="reqSkills"></div></div>
             </div>
             <div class="panel">
-                <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-purple">✨</div>Tercih Edilen Beceriler</div></div>
+                <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-purple">✨</div>Preferred Skills</div></div>
                 <div class="panel-body"><div class="chips" id="prefSkills"></div></div>
             </div>
         </div>
@@ -488,11 +488,11 @@
         <!-- ROW 3: CV Becerileri + Benefits/Missing -->
         <div class="cols">
             <div class="panel">
-                <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-green">💡</div>CV Becerileri</div></div>
+                <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-green">💡</div>CV Skills</div></div>
                 <div class="panel-body"><div class="chips" id="cvSkills"></div></div>
             </div>
             <div class="panel" id="extraPanel">
-                <div class="panel-hd"><div class="panel-title" id="extraTitle"><div class="panel-icon i-green">🎁</div>Yan Haklar</div></div>
+                <div class="panel-hd"><div class="panel-title" id="extraTitle"><div class="panel-icon i-green">🎁</div>Fringe Benefits</div></div>
                 <div class="panel-body"><div class="chips" id="extraChips"></div></div>
             </div>
         </div>
@@ -500,17 +500,17 @@
         <!-- ── MÜLAkat CTA BANNER ── -->
         <div class="interview-cta" id="interviewCta">
             <div class="interview-cta-text">
-                <h3>🎙️ Mülakat Simülatörü</h3>
-                <p>Bu iş ilanına özel AI mülakat soruları alın, cevaplarınız anında değerlendirilsin.</p>
+                <h3>🎙️ Interview Simulator</h3>
+                <p>Get AI interview questions tailored to this job listing, with your answers evaluated instantly.</p>
             </div>
             <a id="ctaInterviewBtn" href="#" class="btn-cta-interview">
-                Mülakatı Başlat →
+                Start Interview →
             </a>
         </div>
 
     </div>
 </div>
-<button id="rec-fab" onclick="toggleRecPanel()" title="İş Önerileri">
+<button id="rec-fab" onclick="toggleRecPanel()" title="Job Recommendations">
   🎯
   <span class="rec-badge" id="rec-badge" style="display:none">0</span>
 </button>
@@ -522,7 +522,7 @@
 <div id="rec-panel">
   <div class="rec-header">
     <div class="rec-header-title">
-      <span>✨</span> Sana Özel İş Önerileri
+      <span>✨</span> Job Recommendations for You
     </div>
     <button class="rec-close" onclick="closeRecPanel()">✕</button>
   </div>
@@ -532,7 +532,7 @@
       <div>CV\'n analiz ediliyor…</div>
     </div>
     <div class="rec-empty" id="rec-empty" style="display:none">
-      Öneri bulunamadı.<br>CV\'ni analiz ettiğinden emin ol.
+      No recommendations found.<br>CV\'ni analiz ettiğinden emin ol.
     </div>
     <div id="rec-cards"></div>
   </div>
@@ -625,7 +625,7 @@
       card.innerHTML = `
         <div class="rec-card-top">
           <div>
-            <div class="rec-card-title">${esc(job.job_title || 'Pozisyon Belirtilmemiş')}</div>
+            <div class="rec-card-title">${esc(job.job_title || 'Position Not Specified')}</div>
             <div class="rec-card-company">${esc(job.company_name || '')}</div>
           </div>
           <div class="rec-score-ring">
@@ -663,7 +663,7 @@ const st = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=
 function chips(containerId, items, cls='neutral') {
     const el = document.getElementById(containerId);
     if (!el) return;
-    if (!items || !items.length) { el.innerHTML='<span class="empty">Bilgi yok</span>'; return; }
+    if (!items || !items.length) { el.innerHTML='<span class="empty">No information</span>'; return; }
     el.innerHTML = items.map(s => {
         const label = typeof s==='object' ? (s.skill||s.language||JSON.stringify(s)) : s;
         return `<span class="chip ${cls}">${label}</span>`;
@@ -680,7 +680,7 @@ function scoreSetup(rawScore) {
     setTimeout(() => { document.getElementById('ringFill').style.strokeDashoffset = 283-(pct/100)*283; }, 200);
     const lbl = document.getElementById('scoreLbl');
     const bgMap = {'var(--green)':'rgba(52,211,153,.1)','var(--amber)':'rgba(251,191,36,.1)','var(--red)':'rgba(248,113,113,.1)'};
-    lbl.textContent = pct>=75?'🔥 Yüksek Tamamlık':pct>=50?'✅ Orta Tamamlık':'⚠️ Düşük Tamamlık';
+    lbl.textContent = pct>=75?'🔥 Yüksek Completeness':pct>=50?'✅ Orta Completeness':'⚠️ Düşük Completeness';
     lbl.style.cssText = `color:${color};border-color:${color};background:${bgMap[color]||'transparent'}`;
 }
 
@@ -713,7 +713,7 @@ async function loadAll() {
         const jr = await fetch(`/api/job-detail/${jobId}`);
         if (!jr.ok) throw new Error(`HTTP ${jr.status}`);
         const jd = await jr.json();
-        if (!jd.success) { showErr(jd.error||'İş analizi bulunamadı.'); return; }
+        if (!jd.success) { showErr(jd.error||'Job analysis not found.'); return; }
         renderJob(jd.job);
 
         // 2. CV analizi — /api/cv-analysis?cv_text_id=X
@@ -731,7 +731,7 @@ async function loadAll() {
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('content').style.display      = 'block';
     } catch(e) {
-        showErr('Bağlantı hatası: '+e.message);
+        showErr('Connection error: '+e.message);
     }
 }
 
@@ -748,10 +748,10 @@ function showCVNotice() {
 
 // ── render job ───────────────────────────────────────────────────────────────
 function renderJob(job) {
-    const empMap  = {full_time:'Tam Zamanlı',part_time:'Yarı Zamanlı',contract:'Sözleşmeli',internship:'Staj',freelance:'Freelance'};
-    const workMap = {remote:'Uzaktan',onsite:'Ofis',hybrid:'Hibrit'};
+    const empMap  = {full_time:'Full-Time',part_time:'Part-Time',contract:'Contract',internship:'Internship',freelance:'Freelance'};
+    const workMap = {remote:'Remote',onsite:'Onsite',hybrid:'Hybrid'};
 
-    document.getElementById('heroTitle').textContent = sf(job.job_title,'Pozisyon Belirtilmemiş');
+    document.getElementById('heroTitle').textContent = sf(job.job_title,'Position Not Specified');
     document.getElementById('heroCompany').textContent = sf(job.company_name,'');
 
     const locParts = [job.location_district,job.location_city,job.location_country].filter(Boolean);
@@ -760,7 +760,7 @@ function renderJob(job) {
     // tags
     const tEl = document.getElementById('heroTags');
     [ {v:empMap[job.employment_type]||job.employment_type, c:'blue'},
-      {v:job.is_remote?'Uzaktan':null, c:'green'},
+      {v:job.is_remote?'Remote':null, c:'green'},
       {v:workMap[job.work_type]||job.work_type, c:'purple'},
       {v:job.department, c:'amber'}
     ].forEach(t => { if(t.v) tEl.innerHTML+=`<span class="tag ${t.c}">${t.v}</span>`; });
@@ -780,7 +780,7 @@ function renderJob(job) {
     st('jEmpType',  empMap[job.employment_type]||job.employment_type);
 
     const expP = [];
-    if (job.exp_min_years!=null) expP.push(job.exp_min_years+(job.exp_max_years?'–'+job.exp_max_years:'+')+' yıl');
+    if (job.exp_min_years!=null) expP.push(job.exp_min_years+(job.exp_max_years?'–'+job.exp_max_years:'+')+' years');
     if (job.exp_description) expP.push(job.exp_description);
     st('jExp', expP.join(' · ')||null);
     st('jEdu', job.edu_min_level);
@@ -800,7 +800,7 @@ function renderJob(job) {
         chips('extraChips', benefits, 'green');
     } else if (missing.length) {
         document.getElementById('extraTitle').innerHTML =
-            '<div class="panel-icon i-amber">⚠️</div>İlanda Belirtilmemiş';
+            '<div class="panel-icon i-amber">⚠️</div>İlanda Not specified';
         chips('extraChips', missing, 'amber');
     } else {
         document.getElementById('extraPanel').style.display='none';
@@ -821,7 +821,7 @@ function renderCV(cv) {
     if(cv.cv_skills){ try{skills=JSON.parse(cv.cv_skills);}catch{skills=cv.cv_skills.split(',').map(s=>s.trim()).filter(Boolean);} }
     if(Array.isArray(skills)&&skills.length) chips('cvSkills',skills,'neutral');
     else if(cv.cv_skills) document.getElementById('cvSkills').innerHTML=`<span class="info-val">${cv.cv_skills}</span>`;
-    else document.getElementById('cvSkills').innerHTML='<span class="empty">Beceri bilgisi yok</span>';
+    else document.getElementById('cvSkills').innerHTML='<span class="empty">No skill information</span>';
 }
 
 loadAll();

@@ -12,18 +12,18 @@ def _get_analyzer() -> JobAnalyzer:
 
 # -----------------------------------------------------------------------
 # POST /api/analyze-job
-# Body: { "source": "<URL veya ham metin>" }
+# Body: { "source": "<URL or raw text>" }
 # -----------------------------------------------------------------------
 @job_bp.route("/api/analyze-job", methods=["POST"])
 def analyze_job():
     if "user_id" not in session:
-        return jsonify({"success": False, "error": "Oturum açmanız gerekiyor"}), 401
+        return jsonify({"success": False, "error": "You need to be logged in"}), 401
 
     data = request.get_json(silent=True) or {}
     source = (data.get("source") or "").strip()
 
     if not source:
-        return jsonify({"success": False, "error": "İş ilanı URL'si veya metni gerekli"}), 400
+        return jsonify({"success": False, "error": "Job listing URL or text is required"}), 400
 
     analyzer = _get_analyzer()
     try:
@@ -41,7 +41,7 @@ def analyze_job():
 @job_bp.route("/api/user-jobs", methods=["GET"])
 def list_user_jobs():
     if "user_id" not in session:
-        return jsonify({"success": False, "error": "Oturum açmanız gerekiyor"}), 401
+        return jsonify({"success": False, "error": "You need to be logged in"}), 401
 
     analyzer = _get_analyzer()
     try:
@@ -59,13 +59,13 @@ def list_user_jobs():
 @job_bp.route("/api/job-detail/<int:job_analysis_id>", methods=["GET"])
 def job_detail(job_analysis_id):
     if "user_id" not in session:
-        return jsonify({"success": False, "error": "Oturum açmanız gerekiyor"}), 401
+        return jsonify({"success": False, "error": "You need to be logged in"}), 401
 
     analyzer = _get_analyzer()
     try:
         job = analyzer.get_job_detail(job_analysis_id, session["user_id"])
         if not job:
-            return jsonify({"success": False, "error": "İlan bulunamadı"}), 404
+            return jsonify({"success": False, "error": "Listing not found"}), 404
         return jsonify({"success": True, "job": job})
     except Exception as exc:
         return jsonify({"success": False, "error": str(exc)}), 500
@@ -75,18 +75,18 @@ def job_detail(job_analysis_id):
 
 # -----------------------------------------------------------------------
 # PATCH /api/job-detail/<id>
-# Eksik alanları kullanıcı cevabıyla tamamlar
+# Fills missing fields with user response
 # Body: { "field": "value", ... }
-# Örnek: { "location_city": "İstanbul", "edu_min_level": "bachelor" }
+# Example: { "location_city": "Istanbul", "edu_min_level": "bachelor" }
 # -----------------------------------------------------------------------
 @job_bp.route("/api/job-detail/<int:job_analysis_id>", methods=["PATCH"])
 def update_job(job_analysis_id):
     if "user_id" not in session:
-        return jsonify({"success": False, "error": "Oturum açmanız gerekiyor"}), 401
+        return jsonify({"success": False, "error": "You need to be logged in"}), 401
 
     data = request.get_json(silent=True) or {}
     if not data:
-        return jsonify({"success": False, "error": "Güncellenecek alan gönderilmedi"}), 400
+        return jsonify({"success": False, "error": "No fields to update provided"}), 400
 
     ALLOWED = {
         "job_title", "department", "employment_type", "company_name",
@@ -99,7 +99,7 @@ def update_job(job_analysis_id):
 
     filtered = {k: v for k, v in data.items() if k in ALLOWED}
     if not filtered:
-        return jsonify({"success": False, "error": "Geçerli alan bulunamadı"}), 400
+        return jsonify({"success": False, "error": "No valid fields found"}), 400
 
     analyzer = _get_analyzer()
     try:

@@ -1,6 +1,6 @@
 """
 job_analyzer.py
-İş ilanı URL'sinden metin çeker ve Groq AI ile analiz eder.
+Fetches text from a job listing URL and analyzes it with Groq AI.
 """
 
 import re
@@ -13,7 +13,7 @@ from mysql.connector import Error
 
 
 # ---------------------------------------------------------------------------
-# Metin çekme yardımcıları
+# Text fetching helpers
 # ---------------------------------------------------------------------------
 
 HEADERS = {
@@ -27,20 +27,20 @@ HEADERS = {
 
 def fetch_text_from_url(url: str, timeout: int = 15) -> str:
     """
-    Verilen URL'den ham metni çeker.
-    LinkedIn / Kariyer.net / Indeed gibi sitelerde çalışır;
-    JS render gerektiren sayfalar için metin kısmen gelebilir.
+    Fetches raw text from the given URL.
+    Works with LinkedIn / Kariyer.net / Indeed;
+    JS-rendered pages may return partial text.
     """
     try:
         resp = requests.get(url, headers=HEADERS, timeout=timeout)
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "html.parser")
 
-        # Gereksiz tag'leri kaldır
+        # Remove unnecessary tags
         for tag in soup(["script", "style", "nav", "footer", "header", "aside"]):
             tag.decompose()
 
-        # Önce iş ilanı içerik alanlarını dene
+        # Try job listing content areas first
         selectors = [
             # LinkedIn
             "div.description__text",
@@ -49,7 +49,7 @@ def fetch_text_from_url(url: str, timeout: int = 15) -> str:
             # Kariyer.net
             "div.job-description",
             "div.position-detail-text",
-            # Genel
+            # General
             "article",
             "main",
             "div[class*='job']",
@@ -60,15 +60,15 @@ def fetch_text_from_url(url: str, timeout: int = 15) -> str:
             if el and len(el.get_text(strip=True)) > 200:
                 return _clean(el.get_text(separator="\n"))
 
-        # Hiçbiri yoksa tüm body
+        # Fall back to full body
         return _clean(soup.get_text(separator="\n"))
 
     except Exception as exc:
-        raise RuntimeError(f"URL'den metin çekilemedi: {exc}") from exc
+        raise RuntimeError(f"Could not fetch text from URL: {exc}") from exc
 
 
 def _clean(text: str) -> str:
-    """Gereksiz boşlukları ve tekrarlayan satırları temizler."""
+    """Cleans unnecessary whitespace and duplicate lines."""
     lines = [ln.strip() for ln in text.splitlines()]
     seen, result = set(), []
     for ln in lines:
@@ -83,14 +83,14 @@ def _clean(text: str) -> str:
 # ---------------------------------------------------------------------------
 
 JOB_ANALYSIS_PROMPT = """
-Sen bir işe alım uzmanı ve metin analistisin.
-Verilen iş ilanı metnini detaylıca analiz edip YALNIZCA geçerli bir JSON nesnesi döndür.
-Başka hiçbir şey yazma — ne açıklama, ne markdown, ne ``` bloğu.
+You are a recruiter and text analyst.
+Analyze the given job listing text in detail and return ONLY a valid JSON object.
+Write nothing else — no explanation, no markdown, no ``` block.
 
-İş İlanı Metni:
+Job Listing Text:
 {raw_text}
 
-Döndüreceğin JSON şeması (bilinmeyenleri null bırak):
+JSON schema to return (leave unknowns as null):
 {{
   "job_title": "string",
   "department": "string|null",
@@ -119,7 +119,7 @@ Döndüreceğin JSON şeması (bilinmeyenleri null bırak):
   "languages": [
     {{
       "language": "string",
-      "level": "a1|a2|b1|b2|c1|c2|ana_dil",
+      "level": "a1|a2|b1|b2|c1|c2|native",
       "is_required": true/false
     }}
   ],
@@ -140,15 +140,15 @@ Döndüreceğin JSON şeması (bilinmeyenleri null bırak):
 
 
 # ---------------------------------------------------------------------------
-# Ana sınıf
+# Main class
 # ---------------------------------------------------------------------------
 
 class JobAnalyzer:
     """
-    İş ilanı analizi:
-      - URL veya ham metin kabul eder
-      - Groq API ile JSON analizi yapar
-      - MySQL'e kaydeder
+    Job listing analysis:
+      - Accepts URL or raw text
+      - Analyzes with Groq API and returns JSON
+      - Saves to MySQL
     """
 
     def __init__(self, db_config: dict, groq_api_key: str,
@@ -167,7 +167,7 @@ class JobAnalyzer:
         try:
             self._conn = mysql.connector.connect(**self.db_config)
         except Error as e:
-            print(f"[JobAnalyzer] DB bağlantı hatası: {e}")
+            print(f"[JobAnalyzer] DB connection error: {e}")
             self._conn = None
 
     def disconnect(self):
@@ -180,24 +180,24 @@ class JobAnalyzer:
         return self._conn.cursor(dictionary=True)
 
     # ------------------------------------------------------------------
-    # Metin alma
+    # Text retrieval
     # ------------------------------------------------------------------
 
     def get_raw_text(self, source: str) -> tuple[str, str]:
         """
-        source: URL ya da düz metin.
-        Döner: (raw_text, source_url_or_empty)
+        source: URL or plain text.
+        Returns: (raw_text, source_url_or_empty)
         """
         if source.startswith("http://") or source.startswith("https://"):
             return fetch_text_from_url(source), source
         return source, ""
 
     # ------------------------------------------------------------------
-    # AI analizi
+    # AI analysis
     # ------------------------------------------------------------------
 
     def analyze_with_ai(self, raw_text: str) -> dict:
-        """Groq API'ye istek atar, JSON parse eder."""
+        """Sends request to Groq API, parses JSON."""
         prompt = JOB_ANALYSIS_PROMPT.format(raw_text=raw_text[:6000])
 
         payload = {
@@ -220,22 +220,22 @@ class JobAnalyzer:
         resp.raise_for_status()
         content = resp.json()["choices"][0]["message"]["content"].strip()
 
-        # Bazen model ``` bloğuna sarabilir; temizle
+        # Sometimes model may wrap in ``` block; clean it
         content = re.sub(r"^```[a-z]*\n?", "", content)
         content = re.sub(r"\n?```$", "", content)
 
         return json.loads(content)
 
     # ------------------------------------------------------------------
-    # DB kayıt
+    # DB save
     # ------------------------------------------------------------------
 
     def save_to_db(self, user_id: int, raw_text: str,
                    analysis: dict, source_url: str = "") -> int | None:
         """
-        job_analyses tablosuna kaydeder.
-        Tablo yoksa otomatik oluşturur.
-        Döner: job_analysis_id
+        Saves to job_analyses table.
+        Creates table automatically if not exists.
+        Returns: job_analysis_id
         """
         self._ensure_table()
         cursor = self._cursor()
@@ -300,14 +300,14 @@ class JobAnalyzer:
             self._conn.commit()
             return cursor.lastrowid
         except Error as e:
-            print(f"[JobAnalyzer] DB kayıt hatası: {e}")
+            print(f"[JobAnalyzer] DB save error: {e}")
             self._conn.rollback()
             return None
         finally:
             cursor.close()
 
     def _ensure_table(self):
-        """job_analyses tablosunu yoksa oluşturur."""
+        """Creates job_analyses table if not exists."""
         cursor = self._cursor()
         try:
             cursor.execute("""
@@ -352,7 +352,7 @@ class JobAnalyzer:
             cursor.close()
 
     # ------------------------------------------------------------------
-    # Kullanıcının ilanlarını listele
+    # List user's job listings
     # ------------------------------------------------------------------
 
     def get_user_jobs(self, user_id: int) -> list[dict]:
@@ -395,13 +395,13 @@ class JobAnalyzer:
             cursor.close()
 
     # ------------------------------------------------------------------
-    # Ana akış (tek çağrı)
+    # Main flow (single call)
     # ------------------------------------------------------------------
 
     def run(self, user_id: int, source: str) -> dict:
         """
-        source: URL ya da ham metin
-        Döner: {
+        source: URL or raw text
+        Returns: {
             'job_analysis_id': int,
             'analysis': dict,
             'needs_more_info': bool,
@@ -410,7 +410,7 @@ class JobAnalyzer:
         """
         raw_text, source_url = self.get_raw_text(source)
         if len(raw_text.strip()) < 50:
-            raise ValueError("İş ilanı metni çok kısa veya okunamadı.")
+            raise ValueError("Job listing text is too short or could not be read.")
 
         analysis = self.analyze_with_ai(raw_text)
         job_id = self.save_to_db(user_id, raw_text, analysis, source_url)

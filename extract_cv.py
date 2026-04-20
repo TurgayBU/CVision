@@ -10,34 +10,33 @@ from datetime import datetime
 import config
 from config import DB_CONFIG
 
-# cv_ai_extract'ten AICVResponse sınıfını import et
 from cv_ai_extract import AICVResponseGroq
 
 
 class CVProcessor:
     def __init__(self, db_config):
         """
-        db_config: Veritabanı bağlantı bilgileri (host, database, user, password)
+        db_config: Database connection info (host, database, user, password)
         """
         self.db_config = db_config
         self.connection = None
 
     def connect_db(self):
-        """Veritabanı bağlantısı oluştur"""
+        """Create database connection"""
         try:
             self.connection = mysql.connector.connect(**self.db_config)
-            print("✅ Veritabanına başarıyla bağlanıldı")
+            print("✅ Successfully connected to database")
         except Error as e:
-            print(f"❌ Veritabanı bağlantı hatası: {e}")
+            print(f"❌ Database connection error: {e}")
 
     def disconnect_db(self):
-        """Veritabanı bağlantısını kapat"""
+        """Close database connection"""
         if self.connection and self.connection.is_connected():
             self.connection.close()
-            print("🔌 Veritabanı bağlantısı kapatıldı")
+            print("🔌 Database connection closed")
 
     def extract_text_from_pdf(self, pdf_path):
-        """PDF'den metin çıkar"""
+        """Extract text from PDF"""
         text = ""
         try:
             with open(pdf_path, 'rb') as file:
@@ -47,35 +46,35 @@ class CVProcessor:
                     if page_text:
                         text += page_text
         except Exception as e:
-            print(f"📄 PDF okuma hatası: {e}")
+            print(f"📄 PDF read error: {e}")
 
-            # Eğer normal PDF okuma başarısız olursa OCR dene
+            # Try OCR if normal PDF reading fails
             try:
-                print("🔄 OCR deneniyor...")
+                print("🔄 Attempting OCR...")
                 images = convert_from_path(pdf_path)
                 for image in images:
                     text += pytesseract.image_to_string(image, lang='tur+eng')
-                print("✅ OCR başarılı")
+                print("✅ OCR successful")
             except Exception as ocr_error:
-                print(f"❌ OCR hatası: {ocr_error}")
+                print(f"❌ OCR error: {ocr_error}")
 
         return text
 
     def extract_text_from_docx(self, docx_path):
-        """DOCX'den metin çıkar"""
+        """Extract text from DOCX"""
         text = ""
         try:
             doc = Document(docx_path)
             for paragraph in doc.paragraphs:
                 text += paragraph.text + "\n"
         except Exception as e:
-            print(f"📄 DOCX okuma hatası: {e}")
+            print(f"📄 DOCX read error: {e}")
         return text
 
     def extract_text_from_file(self, file_path):
-        """Dosya türüne göre metin çıkar"""
+        """Extract text based on file type"""
         if not os.path.exists(file_path):
-            print(f"❌ Dosya bulunamadı: {file_path}")
+            print(f"❌ File not found: {file_path}")
             return None
 
         file_extension = os.path.splitext(file_path)[1].lower()
@@ -85,12 +84,12 @@ class CVProcessor:
         elif file_extension == '.docx':
             return self.extract_text_from_docx(file_path)
         else:
-            print(f"❌ Desteklenmeyen dosya türü: {file_extension}")
+            print(f"❌ Unsupported file type: {file_extension}")
             return None
 
     def save_cv_to_database(self, user_id, file_path, job_info=None):
         """
-        CV'yi veritabanına kaydet ve AI analizi için tetikle
+        Save CV to database and trigger AI analysis
         """
         if not self.connection or not self.connection.is_connected():
             self.connect_db()
@@ -99,18 +98,18 @@ class CVProcessor:
         try:
             cursor = self.connection.cursor(dictionary=True)
 
-            # CV'den metin çıkar
-            print(f"📄 CV'den metin çıkarılıyor: {file_path}")
+            # Extract text from CV
+            print(f"📄 Extracting text from CV: {file_path}")
             cv_text = self.extract_text_from_file(file_path)
 
             if not cv_text:
-                print("❌ CV metni çıkarılamadı")
+                print("❌ Could not extract CV text")
                 return None
 
-            # Metni temizle ve kısalt (çok uzunsa)
-            cv_text_clean = cv_text.strip()[:10000]  # Maksimum 10000 karakter
+            # Clean and truncate text
+            cv_text_clean = cv_text.strip()[:10000]  # Maximum 10000 characters
 
-            # SADECE cv_text tablosuna kaydet
+            # Save only to cv_text table
             insert_query = """
             INSERT INTO cv_text 
             (user_id, raw_text)
@@ -123,16 +122,16 @@ class CVProcessor:
             self.connection.commit()
 
             cv_text_id = cursor.lastrowid
-            print(f"✅ CV metni başarıyla kaydedildi. cv_text_id: {cv_text_id}")
+            print(f"✅ CV text saved successfully. cv_text_id: {cv_text_id}")
 
-            # OTOMATİK AI ANALİZİ - Yeni eklenen kısım
-            print(f"🤖 AI analizi başlatılıyor...")
+            # AUTOMATIC AI ANALYSIS
+            print(f"🤖 Starting AI analysis...")
             self.analyze_cv_with_ai(user_id, cv_text_id, cv_text_clean)
 
             return cv_text_id
 
         except Error as e:
-            print(f"❌ Veritabanı hatası: {e}")
+            print(f"❌ Database error: {e}")
             if self.connection:
                 self.connection.rollback()
             return None
@@ -142,54 +141,50 @@ class CVProcessor:
 
     def analyze_cv_with_ai(self, user_id, cv_text_id, raw_text):
         """
-        Kaydedilen CV'yi AI ile analiz et
+        Analyze saved CV with AI
         """
         try:
-            # AI analizcisini oluştur
+            # Create AI analyzer
             ai_analyzer = AICVResponseGroq(self.db_config, config.api_key)
 
-            # Bağlantıyı kur
+            # Establish connection
             if not ai_analyzer.connection:
                 ai_analyzer.connect()
 
-            # AI ile analiz et
-            print(f"🔍 CV analiz ediliyor...")
+            # Analyze with AI
+            print(f"🔍 Analyzing CV...")
             cv_data = ai_analyzer.PromptingAI(raw_text)
 
             if cv_data:
-                print("✅ AI analizi tamamlandı")
-                print(f"📊 Analiz sonuçları:")
-                print(f"   📍 Adres: {cv_data[0][:50]}...")
-                print(f"   💻 Yetenekler: {cv_data[1][:50]}...")
-                print(f"   💼 Deneyim: {cv_data[2][:50]}...")
-                print(f"   🎓 Eğitim: {cv_data[3][:50]}...")
-                print(f"   🗣️ Diller: {cv_data[4][:50]}...")
-
-                # Otomatik kaydetme (opsiyonel)
-                # Eğer otomatik kaydetmek isterseniz:
-                # ai_analyzer.SaveInDatabase(cv_data, user_id)
+                print("✅ AI analysis complete")
+                print(f"📊 Analysis results:")
+                print(f"   📍 Address: {cv_data[0][:50]}...")
+                print(f"   💻 Skills: {cv_data[1][:50]}...")
+                print(f"   💼 Experience: {cv_data[2][:50]}...")
+                print(f"   🎓 Education: {cv_data[3][:50]}...")
+                print(f"   🗣️ Languages: {cv_data[4][:50]}...")
 
                 return cv_data
             else:
-                print("❌ AI analizi başarısız")
+                print("❌ AI analysis failed")
                 return None
 
         except Exception as e:
-            print(f"❌ AI analiz hatası: {e}")
+            print(f"❌ AI analysis error: {e}")
             return None
         finally:
             if ai_analyzer:
                 ai_analyzer.disconnect()
 
     def process_multiple_cvs(self, user_id, cv_folder_path):
-        """Bir klasördeki tüm CV'leri işle"""
+        """Process all CVs in a folder"""
         processed_cvs = []
 
         for filename in os.listdir(cv_folder_path):
             file_path = os.path.join(cv_folder_path, filename)
 
             if os.path.isfile(file_path):
-                print(f"\n📁 İşleniyor: {filename}")
+                print(f"\n📁 Processing: {filename}")
                 cv_id = self.save_cv_to_database(user_id, file_path)
                 if cv_id:
                     processed_cvs.append({
@@ -206,7 +201,7 @@ class CVProcessor:
         return processed_cvs
 
     def get_user_cvs(self, user_id):
-        """Kullanıcının tüm CV'lerini getir (cv_text tablosundan)"""
+        """Get all CVs for a user (from cv_text table)"""
         if not self.connection or not self.connection.is_connected():
             self.connect_db()
 
@@ -227,14 +222,14 @@ class CVProcessor:
             return results
 
         except Error as e:
-            print(f"❌ Veritabanı hatası: {e}")
+            print(f"❌ Database error: {e}")
             return []
         finally:
             if cursor:
                 cursor.close()
 
     def get_cv_text_by_id(self, cv_text_id):
-        """Belirli bir cv_text_id'ye ait metni getir"""
+        """Get text for a specific cv_text_id"""
         if not self.connection or not self.connection.is_connected():
             self.connect_db()
 
@@ -248,7 +243,7 @@ class CVProcessor:
             return result
 
         except Error as e:
-            print(f"❌ Veritabanı hatası: {e}")
+            print(f"❌ Database error: {e}")
             return None
         finally:
             if cursor:
@@ -258,25 +253,25 @@ class CVProcessor:
 def main():
     processor = CVProcessor(DB_CONFIG)
 
-    # Tek bir CV yükle
-    user_id = 4  # Turgay BOZOĞLU'nun user_id'si
-    cv_path = "path/to/your/cv.pdf"  # Buraya gerçek dosya yolunu girin
+    # Upload a single CV
+    user_id = 4
+    cv_path = "path/to/your/cv.pdf"  # Enter the actual file path here
 
-    # CV'yi kaydet (AI analizi otomatik başlayacak)
-    print("\n🚀 CV işleme başlatılıyor...")
+    # Save CV (AI analysis will start automatically)
+    print("\n🚀 Starting CV processing...")
     cv_text_id = processor.save_cv_to_database(user_id, cv_path)
 
     if cv_text_id:
-        print(f"\n✅ İşlem tamamlandı! cv_text_id: {cv_text_id}")
+        print(f"\n✅ Processing complete! cv_text_id: {cv_text_id}")
 
-    # Kullanıcının tüm CV'lerini listele
-    print(f"\n📋 Kullanıcı ID {user_id} için CV listesi:")
+    # List all CVs for user
+    print(f"\n📋 CV list for user ID {user_id}:")
     user_cvs = processor.get_user_cvs(user_id)
     for cv in user_cvs:
-        print(f"   📄 cv_text_id: {cv['cv_text_id']}, Tarih: {cv['created_at']}")
-        print(f"      Önizleme: {cv['raw_text_preview'][:100]}...")
+        print(f"   📄 cv_text_id: {cv['cv_text_id']}, Date: {cv['created_at']}")
+        print(f"      Preview: {cv['raw_text_preview'][:100]}...")
 
-    # Bağlantıyı kapat
+    # Close connection
     processor.disconnect_db()
 
 

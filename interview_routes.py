@@ -1,6 +1,6 @@
 """
 interview_routes.py
-Mülakat sistemi Flask Blueprint route'ları.
+Flask Blueprint routes for the interview system.
 """
 
 from flask import Blueprint, request, jsonify, session
@@ -22,12 +22,12 @@ def _get_db():
 
 # ---------------------------------------------------------------------------
 # POST /api/interview/start
-# Body: { job_analysis_id, cv_text_id (opsiyonel), question_count (opsiyonel, default 10) }
+# Body: { job_analysis_id, cv_text_id (optional), question_count (optional, default 10) }
 # ---------------------------------------------------------------------------
 @interview_bp.route("/api/interview/start", methods=["POST"])
 def start_interview():
     if "user_id" not in session:
-        return jsonify({"success": False, "error": "Oturum açmanız gerekiyor"}), 401
+        return jsonify({"success": False, "error": "You need to be logged in"}), 401
 
     data  = request.get_json(silent=True) or {}
     job_id = data.get("job_analysis_id")
@@ -35,14 +35,14 @@ def start_interview():
     q_count = min(int(data.get("question_count", 10)), 15)
 
     if not job_id:
-        return jsonify({"success": False, "error": "job_analysis_id gerekli"}), 400
+        return jsonify({"success": False, "error": "job_analysis_id is required"}), 400
 
     user_id = session["user_id"]
     conn = _get_db()
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # İş ilanı verisini çek
+        # Fetch job listing data
         cursor.execute("""
             SELECT job_analysis_id, job_title, company_name, department,
                    required_skills, preferred_skills, exp_min_years, exp_max_years,
@@ -52,9 +52,9 @@ def start_interview():
         """, (job_id, user_id))
         job_data = cursor.fetchone()
         if not job_data:
-            return jsonify({"success": False, "error": "İş ilanı bulunamadı"}), 404
+            return jsonify({"success": False, "error": "Job listing not found"}), 404
 
-        # CV verisini çek (opsiyonel)
+        # Fetch CV data (optional)
         cv_data = None
         if cv_text_id:
             cursor.execute("""
@@ -65,7 +65,7 @@ def start_interview():
             """, (user_id, cv_text_id))
             cv_data = cursor.fetchone()
 
-        # Engine ile oturum oluştur
+        # Create session with engine
         engine = _engine()
         try:
             result = engine.create_session(
@@ -78,7 +78,7 @@ def start_interview():
         return jsonify({"success": True, **result})
 
     except Exception as e:
-        print(f"[interview/start] Hata: {e}")
+        print(f"[interview/start] Error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
     finally:
         cursor.close()
@@ -92,24 +92,24 @@ def start_interview():
 @interview_bp.route("/api/interview/answer", methods=["POST"])
 def submit_answer():
     if "user_id" not in session:
-        return jsonify({"success": False, "error": "Oturum açmanız gerekiyor"}), 401
+        return jsonify({"success": False, "error": "You need to be logged in"}), 401
 
     data        = request.get_json(silent=True) or {}
     question_id = data.get("question_id")
     answer      = (data.get("answer") or "").strip()
 
     if not question_id or not answer:
-        return jsonify({"success": False, "error": "question_id ve answer gerekli"}), 400
+        return jsonify({"success": False, "error": "question_id and answer are required"}), 400
 
     if len(answer) < 10:
-        return jsonify({"success": False, "error": "Cevap çok kısa (en az 10 karakter)"}), 400
+        return jsonify({"success": False, "error": "Answer is too short (minimum 10 characters)"}), 400
 
     user_id = session["user_id"]
     conn = _get_db()
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # Soru bu kullanıcıya mı ait?
+        # Does this question belong to this user?
         cursor.execute("""
             SELECT iq.question_id, is2.job_title, is2.company_name
             FROM interview_questions iq
@@ -118,7 +118,7 @@ def submit_answer():
         """, (question_id, user_id))
         row = cursor.fetchone()
         if not row:
-            return jsonify({"success": False, "error": "Soru bulunamadı"}), 404
+            return jsonify({"success": False, "error": "Question not found"}), 404
 
         engine = _engine()
         try:
@@ -132,7 +132,7 @@ def submit_answer():
         return jsonify({"success": True, "evaluation": result})
 
     except Exception as e:
-        print(f"[interview/answer] Hata: {e}")
+        print(f"[interview/answer] Error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
     finally:
         cursor.close()
@@ -146,19 +146,19 @@ def submit_answer():
 @interview_bp.route("/api/interview/finalize", methods=["POST"])
 def finalize_interview():
     if "user_id" not in session:
-        return jsonify({"success": False, "error": "Oturum açmanız gerekiyor"}), 401
+        return jsonify({"success": False, "error": "You need to be logged in"}), 401
 
     data       = request.get_json(silent=True) or {}
     session_id = data.get("session_id")
     if not session_id:
-        return jsonify({"success": False, "error": "session_id gerekli"}), 400
+        return jsonify({"success": False, "error": "session_id is required"}), 400
 
     engine = _engine()
     try:
         report = engine.finalize_session(session_id)
         return jsonify({"success": True, "report": report})
     except Exception as e:
-        print(f"[interview/finalize] Hata: {e}")
+        print(f"[interview/finalize] Error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
     finally:
         engine.disconnect()
@@ -170,14 +170,14 @@ def finalize_interview():
 @interview_bp.route("/api/interview/session/<int:session_id>", methods=["GET"])
 def get_session(session_id):
     if "user_id" not in session:
-        return jsonify({"success": False, "error": "Oturum açmanız gerekiyor"}), 401
+        return jsonify({"success": False, "error": "You need to be logged in"}), 401
 
     engine = _engine()
     try:
         s  = engine.get_session(session_id, session["user_id"])
         qs = engine.get_session_questions(session_id)
         if not s:
-            return jsonify({"success": False, "error": "Oturum bulunamadı"}), 404
+            return jsonify({"success": False, "error": "Session not found"}), 404
         return jsonify({"success": True, "session": s, "questions": qs})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -186,12 +186,12 @@ def get_session(session_id):
 
 
 # ---------------------------------------------------------------------------
-# GET /api/interview/sessions  (kullanıcının tüm mülakatları)
+# GET /api/interview/sessions  (all interviews for user)
 # ---------------------------------------------------------------------------
 @interview_bp.route("/api/interview/sessions", methods=["GET"])
 def list_sessions():
     if "user_id" not in session:
-        return jsonify({"success": False, "error": "Oturum açmanız gerekiyor"}), 401
+        return jsonify({"success": False, "error": "You need to be logged in"}), 401
 
     engine = _engine()
     try:

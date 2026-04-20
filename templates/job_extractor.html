@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>İş İlanı Çekici</title>
+    <title>Job Listing Extractor</title>
     <style>
         body { font-family: Arial; padding: 20px; background: #f5f5f5; }
         .container { max-width: 1000px; margin: 0 auto; }
@@ -24,29 +24,29 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔗 İş İlanı Çekici</h1>
+            <h1>🔗 Job Listing Extractor</h1>
             <div>
-                <button class="back-btn" onclick="showList()" id="backBtn" style="display: none;">← Listeye Dön</button>
-                <button onclick="logout()">Çıkış Yap</button>
+                <button class="back-btn" onclick="showList()" id="backBtn" style="display: none;">← Back to List</button>
+                <button onclick="logout()">Logout</button>
             </div>
         </div>
 
-        <!-- Yeni İlan Çekme Formu -->
+        <!-- Fetch New Listingme Formu -->
         <div class="card" id="extractCard">
-            <h3>Yeni İlan Çek</h3>
-            <input type="url" id="jobUrl" placeholder="LinkedIn iş ilanı URL" />
-            <textarea id="jobNotes" placeholder="Notlar (opsiyonel)"></textarea>
-            <button onclick="extractJob()">İlanı Çek ve Kaydet</button>
+            <h3>Fetch New Listing</h3>
+            <input type="url" id="jobUrl" placeholder="LinkedIn job listing URL" />
+            <textarea id="jobNotes" placeholder="Notes (optional)"></textarea>
+            <button onclick="extractJob()">Fetch and Save Listing</button>
             <div id="result" style="margin-top: 10px;"></div>
         </div>
 
         <!-- Kayıtlı İlanlar Listesi -->
         <div class="card" id="listCard">
-            <h3>Kayıtlı İlanlarım</h3>
-            <div id="jobList">Yükleniyor...</div>
+            <h3>My Saved Listings</h3>
+            <div id="jobList">Loading...</div>
         </div>
 
-        <!-- İlan Detayı Gösterimi -->
+        <!-- Listing Detail View -->
         <div class="card" id="detailCard" style="display: none;">
             <div id="jobDetailContent"></div>
         </div>
@@ -83,12 +83,12 @@
             const notes = document.getElementById('jobNotes').value;
 
             if (!url) {
-                alert('URL giriniz');
+                alert('Please enter a URL');
                 return;
             }
 
             const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = '🔍 İlan çekiliyor... (Bu biraz sürebilir)';
+            resultDiv.innerHTML = '🔍 Fetching listing... (This may take a moment)';
 
             try {
                 const response = await fetch('/api/extract-job', {
@@ -101,23 +101,23 @@
 
                 if (data.success) {
                     resultDiv.innerHTML = `✅ ${data.message}<br>
-                                          📍 Kaynak: ${data.source}<br>
-                                          📊 Karakter: ${data.length}`;
+                                          📍 Source: ${data.source}<br>
+                                          📊 Characters: ${data.length}`;
 
-                    // Formu temizle
+                    // Clear form
                     document.getElementById('jobUrl').value = '';
                     document.getElementById('jobNotes').value = '';
 
-                    // Listeyi yenile
+                    // Refresh list
                     loadJobs();
 
-                    // Çekilen ilanı hemen göster
+                    // Show fetched listing immediately
                     setTimeout(() => viewJob(data.job_id), 1000);
                 } else {
-                    resultDiv.innerHTML = `❌ Hata: ${data.error}`;
+                    resultDiv.innerHTML = `❌ Error: ${data.error}`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `❌ Hata: ${error}`;
+                resultDiv.innerHTML = `❌ Error: ${error}`;
             }
         }
 
@@ -133,15 +133,15 @@
                     jobList.innerHTML = data.jobs.map(job => `
                         <div class="job-item" onclick="viewJob(${job.job_id})">
                             <strong>ID: ${job.job_id}</strong> - ${new Date(job.created_at).toLocaleString()}
-                            ${job.notes ? `<br><small>📝 Not: ${job.notes}</small>` : ''}
+                            ${job.notes ? `<br><small>📝 Note: ${job.notes}</small>` : ''}
                             <div class="preview">📄 ${job.preview || 'Önizleme yok'}</div>
                         </div>
                     `).join('');
                 } else {
-                    jobList.innerHTML = 'Henüz kayıtlı ilan yok. Yukarıdan yeni ilan çekin.';
+                    jobList.innerHTML = 'No saved listings yet. Fetch a new listing above.';
                 }
             } catch (error) {
-                document.getElementById('jobList').innerHTML = 'Hata oluştu';
+                document.getElementById('jobList').innerHTML = 'An error occurred';
             }
         }
 
@@ -150,7 +150,7 @@
             showDetail();
 
             const detailContent = document.getElementById('jobDetailContent');
-            detailContent.innerHTML = '<div style="text-align: center">Yükleniyor...</div>';
+            detailContent.innerHTML = '<div style="text-align: center">Loading...</div>';
 
             try {
                 const response = await fetch(`/api/job/${jobId}`);
@@ -161,23 +161,23 @@
                     const date = new Date(job.created_at).toLocaleString('tr-TR');
 
                     detailContent.innerHTML = `
-                        <h3>📄 İş İlanı Detayı (ID: ${job.job_id})</h3>
+                        <h3>📄 Job Listing Detail (ID: ${job.job_id})</h3>
                         <div class="stats">
-                            <p>📅 Tarih: ${date}</p>
+                            <p>📅 Date: ${date}</p>
                             <p>🔗 URL: <a href="${job.job_url}" target="_blank">${job.job_url}</a></p>
-                            ${job.notes ? `<p>📝 Not: ${job.notes}</p>` : ''}
-                            <p>📊 Karakter Sayısı: ${job.job_text.length}</p>
+                            ${job.notes ? `<p>📝 Note: ${job.notes}</p>` : ''}
+                            <p>📊 Character Count: ${job.job_text.length}</p>
                         </div>
-                        <h4>📋 İş Tanımı:</h4>
+                        <h4>📋 Job Description:</h4>
                         <div class="job-description">
                             ${job.job_text.replace(/\n/g, '<br>')}
                         </div>
                     `;
                 } else {
-                    detailContent.innerHTML = '<div style="color: red">İlan bulunamadı</div>';
+                    detailContent.innerHTML = '<div style="color: red">Listing not found</div>';
                 }
             } catch (error) {
-                detailContent.innerHTML = `<div style="color: red">Hata: ${error}</div>`;
+                detailContent.innerHTML = `<div style="color: red">Error: ${error}</div>`;
             }
         }
     </script>

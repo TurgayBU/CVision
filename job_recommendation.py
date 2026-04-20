@@ -5,15 +5,15 @@ def get_db():
     try:
         return mysql.connector.connect(**config.DB_CONFIG)
     except Error as e:
-        print(f"Veritabanı bağlantı hatası: {e}")
+        print(f"Database connection error: {e}")
         return None
 
 
 class MinHeap:
     """
-    (score, job_analysis_id) çiftlerini tutan min-heap.
-    Heap'in tepesi her zaman en düşük skorlu ilanı gösterir.
-    Böylece sabit boyutlu (k=3) heap'te en yüksek skorlu k ilanı tutulur.
+    Min-heap holding (score, job_analysis_id) pairs.
+    The top of the heap always points to the lowest-scored listing.
+    This way, the fixed-size (k=3) heap keeps the top-k highest scored listings.
     """
 
     def __init__(self, max_size=3):
@@ -31,10 +31,10 @@ class MinHeap:
 
     def insert(self, score, job_analysis_id):
         """
-        Yeni bir (score, job_id) çifti ekler.
-        Heap max_size dolmamışsa direkt ekle.
-        Doluysa: yeni skor heap tepesindeki (en küçük) skordan büyükse,
-        tepedekini çıkar, yenisini ekle.
+        Inserts a new (score, job_id) pair.
+        If heap is not full, insert directly.
+        If full: if new score is greater than heap top (minimum),
+        remove the top and insert the new one.
         """
         entry = (score, job_analysis_id)
 
@@ -46,7 +46,7 @@ class MinHeap:
             self._heapify_down(0)
 
     def _heapify_up(self, index):
-        """Yeni eklenen elemanı yukarı taşır (heap özelliğini korur)."""
+        """Moves newly added element up (maintains heap property)."""
         while index > 0:
             p = self.parent(index)
             if self.heap[index][0] < self.heap[p][0]:
@@ -56,7 +56,7 @@ class MinHeap:
                 break
 
     def _heapify_down(self, index):
-        """Tepedeki elemanı aşağı taşır (heap özelliğini korur)."""
+        """Moves top element down (maintains heap property)."""
         size = len(self.heap)
         while True:
             smallest = index
@@ -75,11 +75,11 @@ class MinHeap:
                 break
 
     def peek_min(self):
-        """En düşük skorlu elemanı döndürür (çıkarmaz)."""
+        """Returns the lowest-scored element (does not remove)."""
         return self.heap[0] if self.heap else None
 
     def pop_min(self):
-        """En düşük skorlu elemanı çıkarır ve döndürür."""
+        """Removes and returns the lowest-scored element."""
         if not self.heap:
             return None
         if len(self.heap) == 1:
@@ -90,7 +90,7 @@ class MinHeap:
         return min_val
 
     def get_sorted_desc(self):
-        """Heap içeriğini en yüksek skordan en düşüğe sıralı döndürür."""
+        """Returns heap content sorted from highest to lowest score."""
         return sorted(self.heap, key=lambda x: x[0], reverse=True)
 
     def size(self):
@@ -111,11 +111,11 @@ class JobRecommendation:
         self.heap = MinHeap(max_size=top_n)
 
     # ──────────────────────────────────────────────────────────────
-    # Veritabanı yardımcıları
+    # Database helpers
     # ──────────────────────────────────────────────────────────────
 
     def get_cv_analysis_from_db(self):
-        """CV analiz sonuçlarını döndürür: [address, skills, experience, education, languages]"""
+        """Returns CV analysis results: [address, skills, experience, education, languages]"""
         conn = get_db()
         if not conn:
             return None
@@ -133,14 +133,14 @@ class JobRecommendation:
                 return result
             return None
         except Error as e:
-            print(f"CV getirme hatası: {e}")
+            print(f"CV fetch error: {e}")
             return None
         finally:
             cursor.close()
             conn.close()
 
     def get_job_analysis_from_db(self, job_analysis_id):
-        """Belirli bir iş ilanı analizini döndürür."""
+        """Returns a specific job listing analysis."""
         conn = get_db()
         if not conn:
             return None
@@ -158,14 +158,14 @@ class JobRecommendation:
             """, (job_analysis_id,))
             return cursor.fetchone()
         except Error as e:
-            print(f"Job getirme hatası: {e}")
+            print(f"Job fetch error: {e}")
             return None
         finally:
             cursor.close()
             conn.close()
 
     def get_max_job_analysis_id(self):
-        """Veritabanındaki en yüksek job_analysis_id değerini döndürür."""
+        """Returns the highest job_analysis_id in the database."""
         conn = get_db()
         if not conn:
             return 0
@@ -175,19 +175,19 @@ class JobRecommendation:
             result = cursor.fetchone()
             return result[0] if result and result[0] else 0
         except Error as e:
-            print(f"Max ID getirme hatası: {e}")
+            print(f"Max ID fetch error: {e}")
             return 0
         finally:
             cursor.close()
             conn.close()
 
     # ──────────────────────────────────────────────────────────────
-    # Puanlama
+    # Scoring
     # ──────────────────────────────────────────────────────────────
 
     @staticmethod
     def _parse_skills(raw):
-        """JSON veya virgüllü string'den beceri listesi üretir."""
+        """Generates skill list from JSON or comma-separated string."""
         import json
         if not raw:
             return []
@@ -209,53 +209,52 @@ class JobRecommendation:
 
     def calculate_score(self, cv_data, job_data):
         """
-        CV ile iş ilanını karşılaştırarak 0-100 arası puan döndürür.
+        Compares CV with job listing and returns a score between 0-100.
 
-        Ağırlıklar:
-          - Zorunlu beceri eşleşmesi : 50 puan (max)
-          - Tercih edilen beceri      : 20 puan (max)
-          - Şehir eşleşmesi          : 15 puan
-          - Dil eşleşmesi            : 10 puan
-          - Eğitim eşleşmesi         :  5 puan
+        Weights:
+          - Required skill match : 50 points (max)
+          - Preferred skill match : 20 points (max)
+          - City match            : 15 points
+          - Language match        : 10 points
+          - Education match       :  5 points
         """
         if not cv_data or not job_data:
             return 0
 
         score = 0
 
-        # 1. Zorunlu beceriler (50 puan)
+        # 1. Required skills (50 points)
         cv_skills = self._parse_skills(cv_data.get('cv_skills'))
         req_skills = self._parse_skills(job_data.get('required_skills'))
         if req_skills:
             matched = sum(1 for s in req_skills if s in cv_skills)
             score += int((matched / len(req_skills)) * 50)
 
-        # 2. Tercih edilen beceriler (20 puan)
+        # 2. Preferred skills (20 points)
         pref_skills = self._parse_skills(job_data.get('preferred_skills'))
         if pref_skills:
             matched_pref = sum(1 for s in pref_skills if s in cv_skills)
             score += int((matched_pref / len(pref_skills)) * 20)
 
-        # 3. Şehir eşleşmesi (15 puan)
-        # cv_address içinde iş şehrini arar
+        # 3. City match (15 points)
         cv_address = str(cv_data.get('cv_address', '')).lower()
         job_city = str(job_data.get('location_city', '')).lower()
         job_country = str(job_data.get('location_country', '')).lower()
         if job_city and job_city in cv_address:
             score += 15
         elif job_country and job_country in cv_address:
-            score += 7  # Ülke eşleşmesi kısmi puan
+            score += 7  # Partial points for country match
 
-        # 4. Dil eşleşmesi (10 puan)
+        # 4. Language match (10 points)
         cv_langs = str(cv_data.get('cv_languages', '')).lower()
         job_langs = self._parse_skills(job_data.get('languages'))
         if job_langs:
             matched_lang = sum(1 for lang in job_langs if lang in cv_langs)
             score += int((matched_lang / len(job_langs)) * 10)
 
-        # 5. Eğitim eşleşmesi (5 puan)
-        edu_keywords = ['lisans', 'bachelor', 'master', 'yüksek lisans',
-                        'doktora', 'phd', 'önlisans', 'associate']
+        # 5. Education match (5 points)
+        edu_keywords = ['bachelor', 'master', 'associate', 'phd', 'doctorate',
+                        'high school', 'undergraduate', 'postgraduate']
         cv_edu = str(cv_data.get('cv_education', '')).lower()
         job_edu = str(job_data.get('edu_min_level', '') or
                       job_data.get('edu_description', '')).lower()
@@ -267,29 +266,29 @@ class JobRecommendation:
         return min(score, 100)
 
     # ──────────────────────────────────────────────────────────────
-    # Ana analiz akışı
+    # Main analysis flow
     # ──────────────────────────────────────────────────────────────
 
     def analyze_competitivity(self):
         """
-        Tüm iş ilanlarını CV ile karşılaştırır.
-        En yüksek skorlu top_n ilanı MinHeap'te tutar.
-        Dönen değer: [(score, job_analysis_id), ...] yüksekten düşüğe sıralı
+        Compares all job listings with the CV.
+        Keeps top_n highest-scored listings in MinHeap.
+        Returns: [(score, job_analysis_id), ...] sorted high to low
         """
         cv_data = self.get_cv_analysis_from_db()
         if not cv_data:
-            print(f"Kullanıcı {self.user_id} için CV analizi bulunamadı.")
+            print(f"CV analysis not found for user {self.user_id}.")
             return []
 
         max_id = self.get_max_job_analysis_id()
         if max_id == 0:
-            print("Veritabanında iş ilanı bulunamadı.")
+            print("No job listings found in database.")
             return []
 
         for job_id in range(1, max_id + 1):
             job_data = self.get_job_analysis_from_db(job_id)
             if not job_data:
-                continue  # Silinmiş / var olmayan kayıt, atla
+                continue  # Deleted / non-existent record, skip
 
             score = self.calculate_score(cv_data, job_data)
             self.heap.insert(score, job_id)
@@ -298,7 +297,7 @@ class JobRecommendation:
 
     def recommend_jobs(self):
         """
-        En uygun iş ilanlarının detaylarını döndürür.
+        Returns details of the most suitable job listings.
         Format: [{'score': int, 'job': dict}, ...]
         """
         top_matches = self.analyze_competitivity()

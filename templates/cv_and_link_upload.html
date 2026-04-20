@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CVision — Başvuru Asistanı</title>
+    <title>CVision — Application Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -308,33 +308,33 @@
         <div class="logo">CV<span>ision</span></div>
         <div class="user-pill">
             <span class="user-name">👤 <span id="username">{{ session.get('fullname', session.get('username', '')) }}</span></span>
-            <button class="logout-btn" onclick="logout()">Çıkış</button>
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </div>
 
     <!-- başlık -->
     <div class="section-head">
-        <h1>Başvuru Analizi</h1>
-        <p>CV'nizi yükleyin ve başvurmak istediğiniz iş ilanını ekleyin — yapay zeka geri kalanını halleder.</p>
+        <h1>Application Analysis</h1>
+        <p>Upload your CV and add the job listing you want to apply for — AI handles the rest.</p>
     </div>
 
     <!-- steps -->
     <div class="steps">
         <div class="step active" id="step1">
             <div class="step-num" id="stepNum1">1</div>
-            <span>CV Yükleniyor</span>
+            <span>Uploading CV</span>
         </div>
         <div class="step" id="step2">
             <div class="step-num" id="stepNum2">2</div>
-            <span>CV Analiz</span>
+            <span>CV Analysis</span>
         </div>
         <div class="step" id="step3">
             <div class="step-num" id="stepNum3">3</div>
-            <span>İlan Analiz</span>
+            <span>Listing Analysis</span>
         </div>
         <div class="step" id="step4">
             <div class="step-num" id="stepNum4">4</div>
-            <span>Rapor Hazır</span>
+            <span>Report Ready</span>
         </div>
     </div>
 
@@ -353,7 +353,7 @@
 
         <!-- CV yükleme -->
         <div class="card">
-            <div class="card-label">01 — CV Dosyası</div>
+            <div class="card-label">01 — CV File</div>
             <div class="drop-zone" id="dropZone">
                 <input type="file" id="cv" name="cv" accept=".pdf,.doc,.docx" required>
                 <div class="drop-icon">
@@ -364,8 +364,8 @@
                         <polyline points="9 15 12 12 15 15"/>
                     </svg>
                 </div>
-                <div class="drop-title">Dosyayı buraya sürükleyin</div>
-                <div class="drop-sub">veya tıklayarak seçin &nbsp;·&nbsp; PDF, DOC, DOCX</div>
+                <div class="drop-title">Drag file here</div>
+                <div class="drop-sub">or click to select &nbsp;·&nbsp; PDF, DOC, DOCX</div>
             </div>
             <div class="file-chosen" id="fileChosen">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -375,16 +375,16 @@
 
         <!-- İş ilanı -->
         <div class="card">
-            <div class="card-label">02 — İş İlanı</div>
+            <div class="card-label">02 — Job Listing</div>
 
             <div class="source-tabs">
                 <button type="button" class="tab-btn active" onclick="switchTab('url', this)">🔗 Link</button>
-                <button type="button" class="tab-btn" onclick="switchTab('text', this)">📝 Metin</button>
+                <button type="button" class="tab-btn" onclick="switchTab('text', this)">📝 Text</button>
             </div>
 
             <div class="tab-panel active" id="panel-url">
                 <div class="field">
-                    <label for="job_url">İş İlanı URL'si <span class="req">*</span></label>
+                    <label for="job_url">Job Listing URL <span class="req">*</span></label>
                     <input type="url" id="job_url" name="job_url"
                            placeholder="https://linkedin.com/jobs/view/... veya kariyer.net/...">
                 </div>
@@ -392,29 +392,29 @@
 
             <div class="tab-panel" id="panel-text">
                 <div class="field">
-                    <label for="job_text">İlan Metnini Yapıştırın <span class="req">*</span></label>
+                    <label for="job_text">Paste Listing Text <span class="req">*</span></label>
                     <textarea id="job_text" name="job_text"
-                              placeholder="İş ilanının tamamını buraya yapıştırın…"></textarea>
+                              placeholder="Paste the full job listing here…"></textarea>
                 </div>
             </div>
         </div>
 
         <!-- Opsiyonel linkler -->
         <div class="card">
-            <div class="card-label">03 — Profil Linkleri <span style="color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0">(opsiyonel)</span></div>
+            <div class="card-label">03 — Profile Links <span style="color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0">(optional)</span></div>
             <div class="field">
-                <label for="github">GitHub <span class="opt">opsiyonel</span></label>
+                <label for="github">GitHub <span class="opt">optional</span></label>
                 <input type="url" id="github" name="github" placeholder="https://github.com/kullanıcıadı">
             </div>
             <div class="field">
-                <label for="portfolio">Portfolio / Website <span class="opt">opsiyonel</span></label>
+                <label for="portfolio">Portfolio / Website <span class="opt">optional</span></label>
                 <input type="url" id="portfolio" name="portfolio" placeholder="https://portfolio.com">
             </div>
         </div>
 
         <div class="submit-wrap">
-            <button type="submit" class="submit-btn" id="submitBtn">Analiz Et →</button>
-            <p class="submit-hint">CV ve iş ilanı birlikte analiz edilerek<br>uyumluluk raporu hazırlanır.</p>
+            <button type="submit" class="submit-btn" id="submitBtn">Analyze →</button>
+            <p class="submit-hint">CV and job listing are analyzed together<br>to generate a compatibility report.</p>
         </div>
 
     </form>
@@ -504,18 +504,18 @@
         if (!jobSource) {
             showAlert(activeTab === 'url'
                 ? 'Lütfen bir iş ilanı URL\'si girin.'
-                : 'Lütfen iş ilanı metnini yapıştırın.', 'error');
+                : 'Please paste the job listing text.', 'error');
             return;
         }
 
         btn.disabled = true;
-        btn.textContent = 'İşleniyor…';
+        btn.textContent = 'Processing…';
 
         try {
             // ── ADIM 1: CV Yükle ─────────────────────────────────────────
             setStep(1);
             setProgress(10);
-            showAlert('CV yükleniyor…', 'info');
+            showAlert('Uploading CV…', 'info');
 
             const formData = new FormData(this);
             if (activeTab === 'text') formData.set('job_url', '');
@@ -524,8 +524,8 @@
             const d1 = await r1.json();
 
             if (!d1.success) {
-                showAlert(d1.message || 'CV yükleme başarısız.', 'error');
-                btn.disabled = false; btn.textContent = 'Analiz Et →'; return;
+                showAlert(d1.message || 'CV upload failed.', 'error');
+                btn.disabled = false; btn.textContent = 'Analyze →'; return;
             }
 
             const cvTextId = d1.cv_text_id;
@@ -535,7 +535,7 @@
 
             // ── ADIM 2: CV'yi AI ile Analiz Et ───────────────────────────
             setStep(2);
-            showAlert('CV analiz ediliyor…', 'info');
+            showAlert('Analyzing CV…', 'info');
             setProgress(40);
 
             const r2 = await fetch('/analyze-cv', {
@@ -551,10 +551,10 @@
             }
             setProgress(60);
 
-            // ── ADIM 3: İş İlanını Analiz Et → DB'ye Kaydet ─────────────
+            // ── ADIM 3: İş İlanını Analyze → DB'ye Kaydet ─────────────
             // job_routes.py'deki /api/analyze-job endpoint'ini kullan
             setStep(3);
-            showAlert('İş ilanı analiz ediliyor…', 'info');
+            showAlert('Analyzing job listing…', 'info');
 
             const r3 = await fetch('/api/analyze-job', {
                 method: 'POST',
@@ -564,8 +564,8 @@
             const d3 = await r3.json();
 
             if (!d3.success) {
-                showAlert('İş ilanı analizi başarısız: ' + (d3.error || ''), 'error');
-                btn.disabled = false; btn.textContent = 'Analiz Et →'; return;
+                showAlert('Job listing analysis failed: ' + (d3.error || ''), 'error');
+                btn.disabled = false; btn.textContent = 'Analyze →'; return;
             }
 
             const jobAnalysisId = d3.job_analysis_id;
@@ -574,7 +574,7 @@
             // ── ADIM 4: Yönlendir ─────────────────────────────────────────
             setStep(4);
             setProgress(100);
-            showAlert('✅ Analiz tamamlandı! Raporunuz hazırlanıyor…', 'success');
+            showAlert('✅ Analysis complete! Preparing your report…', 'success');
 
             // job_detail sayfasına cv_text_id'yi de ilet — orada CV verisini çekmek için
             setTimeout(() => {
@@ -583,9 +583,9 @@
 
         } catch (err) {
             console.error('Hata:', err);
-            showAlert('Beklenmeyen bir hata: ' + err.message, 'error');
+            showAlert('Unexpected error: ' + err.message, 'error');
             btn.disabled = false;
-            btn.textContent = 'Analiz Et →';
+            btn.textContent = 'Analyze →';
         }
     });
 </script>
