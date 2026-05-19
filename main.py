@@ -251,12 +251,19 @@ def get_cv_analysis_from_db(user_id, cv_text_id):
 # ─────────────────────────────────────────────────────────────────────────────
 # Diğer route'lar (değişmemiş)
 # ─────────────────────────────────────────────────────────────────────────────
-
 @app.route('/')
 def index():
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
     return render_template('index.html')
+
+@app.route('/dashboard')
+def dashboard():
+    """Main dashboard — shown after login."""
+    if 'user_id' not in session:
+        return redirect(url_for('index'))
+    return render_template('dashboard_main.html', session=session)
+
 
 
 @app.route('/api/login', methods=['POST'])
@@ -355,9 +362,8 @@ def logout():
     session.clear()
     return jsonify({'success': True, 'message': 'Çıkış yapıldı'})
 
-
-@app.route('/dashboard')
-def dashboard():
+@app.route('/upload')
+def upload_page():
     if 'user_id' not in session:
         return redirect(url_for('index'))
     return render_template('cv_and_link_upload.html', session=session)
@@ -693,6 +699,160 @@ def get_job_recommendations():
         print(f"Öneri hatası: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+
+@app.route('/api/settings/profile', methods=['POST'])
+def update_profile():
+    """Update username, first name, last name and email."""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Please sign in'}), 401
+
+    data = request.get_json(silent=True) or {}
+    username = (data.get('username') or '').strip()
+    name = (data.get('name') or '').strip()
+    surname = (data.get('surname') or '').strip()
+    email = (data.get('email') or '').strip()
+
+    if not username or not email:
+        return jsonify({'success': False, 'error': 'Username and email are required'}), 400
+
+    conn = get_db()
+    if not conn:
+        return jsonify({'success': False, 'error': 'Database connection error'}), 500
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "UPDATE users SET username=%s, name=%s, surname=%s, email=%s WHERE user_id=%s",
+            (username, name, surname, email, session['user_id'])
+        )
+        conn.commit()
+
+        # Update session values
+        session['username'] = username
+        session['fullname'] = f"{name} {surname}".strip()
+
+        return jsonify({'success': True, 'message': 'Profile updated'})
+    except Exception as e:
+        if hasattr(e, 'errno') and e.errno == 1062:
+            return jsonify({'success': False, 'error': 'Username or email already in use'}), 400
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route('/api/settings/password', methods=['POST'])
+def update_password():
+    """Change password after verifying the current one."""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Please sign in'}), 401
+
+    data = request.get_json(silent=True) or {}
+    current_pw = data.get('current_password', '')
+    new_pw = data.get('new_password', '')
+
+    if not current_pw or not new_pw:
+        return jsonify({'success': False, 'error': 'All fields are required'}), 400
+    if len(new_pw) < 6:
+        return jsonify({'success': False, 'error': 'New password must be at least 6 characters'}), 400
+
+    conn = get_db()
+    if not conn:
+        return jsonify({'success': False, 'error': 'Database connection error'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    try:
+        current_hash = hashlib.sha256(current_pw.encode()).hexdigest()
+        cursor.execute(
+            "SELECT user_id FROM users WHERE user_id=%s AND password_hash=%s",
+            (session['user_id'], current_hash)
+        )
+        if not cursor.fetchone():
+            return jsonify({'success': False, 'error': 'Current password is incorrect'}), 400
+
+        new_hash = hashlib.sha256(new_pw.encode()).hexdigest()
+        cursor.execute(
+            "UPDATE users SET password_hash=%s WHERE user_id=%s",
+            (new_hash, session['user_id'])
+        )
+        conn.commit()
+        return jsonify({'success': True, 'message': 'Password updated'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route('/api/settings/delete-cvs', methods=['POST'])
+def delete_all_cvs():
+    """Delete all CVs and analysis data for the current user."""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Please sign in'}), 401
+
+    conn = get_db()
+    if not conn:
+        return jsonify({'success': False, 'error': 'Database connection error'}), 500
+
+    cursor = conn.cursor()
+    try:
+        uid = session['user_id']
+        cursor.execute("DELETE FROM cv_analyses WHERE user_id=%s", (uid,))
+        cursor.execute("DELETE FROM cv_text     WHERE user_id=%s", (uid,))
+        conn.commit()
+        return jsonify({'success': True, 'message': 'CV data deleted'})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route('/api/settings/delete-account', methods=['POST'])
+def delete_account():
+    """Permanently delete account and all related data."""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Please sign in'}), 401
+
+    data = request.get_json(silent=True) or {}
+    pw = data.get('password', '')
+    if not pw:
+        return jsonify({'success': False, 'error': 'Password is required'}), 400
+
+    conn = get_db()
+    if not conn:
+        return jsonify({'success': False, 'error': 'Database connection error'}), 500
+
+    cursor = conn.cursor(dictionary=True)
+    try:
+        pw_hash = hashlib.sha256(pw.encode()).hexdigest()
+        cursor.execute(
+            "SELECT user_id FROM users WHERE user_id=%s AND password_hash=%s",
+            (session['user_id'], pw_hash)
+        )
+        if not cursor.fetchone():
+            return jsonify({'success': False, 'error': 'Incorrect password'}), 400
+
+        uid = session['user_id']
+        # Delete in order (mind FK constraints)
+        for tbl in ['cv_analyses', 'cv_text', 'job_analyses',
+                    'interview_questions', 'interview_sessions']:
+            try:
+                cursor.execute(f"DELETE FROM {tbl} WHERE user_id=%s", (uid,))
+            except Exception:
+                pass  # skip if table doesn't exist or no FK
+        cursor.execute("DELETE FROM users WHERE user_id=%s", (uid,))
+        conn.commit()
+
+        session.clear()
+        return jsonify({'success': True, 'message': 'Account deleted'})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
