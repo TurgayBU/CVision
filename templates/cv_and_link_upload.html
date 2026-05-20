@@ -4,39 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CVision — Application Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d0f14;
-            --surface: #13161e;
-            --surface2: #1b1f2b;
-            --border: rgba(255,255,255,0.07);
-            --accent: #4f8ef7;
-            --accent2: #a78bfa;
-            --success: #34d399;
-            --error: #f87171;
-            --text: #e8eaf0;
-            --muted: #5a6070;
-            --label: #9ba3b5;
+            --bg: #f8f5f0;           /* afişteki sıcak kum zemini */
+            --surface: #ffffff;       /* bembeyaz kartlar */
+            --surface2: #fefaf5;     /* hafif sıcak hover */
+            --surface3: #f5ede3;     /* soft sıcak ton */
+            --border: #e8e0d5;       /* yumuşak kum border */
+            --border-hover: #d9cfc0; /* biraz daha koyu border */
+            --accent: #e67e22;        /* afişteki turuncu vurgu */
+            --accent2: #f39c12;       /* açık turuncu */
+            --accent-glow: rgba(230,126,34,0.08);
+            --success: #2c7a5e;       /* soft zümrüt */
+            --success-glow: rgba(44,122,94,0.06);
+            --error: #c0392b;         /* yumuşak kırmızı */
+            --error-glow: rgba(192,57,43,0.08);
+            --text: #3d3a36;          /* sıcak koyu gri */
+            --text-muted: #9a948c;    /* soft orta ton */
+            --label: #6b655d;         /* sıcak gri */
+            --radius: 16px;
+            --radius-sm: 10px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
         }
 
+        /* Ambient background - afiş hissi */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
             background:
-                radial-gradient(ellipse 60% 40% at 70% 10%, rgba(79,142,247,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 50% at 10% 80%, rgba(167,139,250,0.09) 0%, transparent 60%);
+                radial-gradient(ellipse 60% 40% at 70% 10%, rgba(230,126,34,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 10% 80%, rgba(243,156,18,0.05) 0%, transparent 60%);
             pointer-events: none;
             z-index: 0;
         }
@@ -44,11 +53,12 @@
         .page {
             position: relative;
             z-index: 1;
-            max-width: 780px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 32px 20px 60px;
+            padding: 32px 24px 60px;
         }
 
+        /* topbar */
         .topbar {
             display: flex;
             justify-content: space-between;
@@ -58,67 +68,139 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
-        .logo span { color: var(--accent); }
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: -0.5px;
+            color: var(--text);
+        }
+        .logo span { color: var(--accent); font-style: italic; }
 
-        .user-pill { display: flex; align-items: center; gap: 12px; }
+        .user-pill { display: flex; align-items: center; gap: 16px; }
         .user-name { font-size: 14px; color: var(--label); font-weight: 500; }
 
         .logout-btn {
             background: transparent;
             border: 1px solid var(--border);
-            color: var(--muted);
-            padding: 7px 14px;
-            border-radius: 8px;
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 30px;
             cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 13px;
-            transition: all .2s;
+            font-weight: 500;
+            transition: all 0.2s;
         }
-        .logout-btn:hover { border-color: var(--error); color: var(--error); }
+        .logout-btn:hover {
+            border-color: var(--error);
+            color: var(--error);
+            background: var(--error-glow);
+        }
 
-        .section-head { margin-bottom: 32px; }
+        /* başlık */
+        .section-head { margin-bottom: 36px; }
         .section-head h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 28px;
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            color: var(--text);
         }
-        .section-head p { font-size: 14px; color: var(--label); font-weight: 300; }
+        .section-head p {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 400;
+            line-height: 1.5;
+        }
 
+        /* steps indicator */
+        .steps {
+            display: flex;
+            gap: 0;
+            margin-bottom: 32px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            overflow: hidden;
+            padding: 4px;
+        }
+        .step {
+            flex: 1;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-radius: 100px;
+            transition: all 0.3s;
+            cursor: default;
+        }
+        .step-num {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .step.active {
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+        .step.active .step-num {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        .step.done { color: var(--success); }
+        .step.done .step-num {
+            background: var(--success-glow);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        /* card */
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: var(--radius);
             padding: 28px;
-            margin-bottom: 16px;
-            transition: border-color .2s;
+            margin-bottom: 20px;
+            transition: all 0.2s;
         }
-        .card:focus-within { border-color: rgba(79,142,247,0.35); }
+        .card:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
         .card-label {
-            font-family: 'Syne', sans-serif;
-            font-size: 11px;
+            font-family: 'Playfair Display', serif;
+            font-size: 12px;
             font-weight: 600;
-            letter-spacing: 1.2px;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 16px;
+            color: var(--accent);
+            margin-bottom: 20px;
         }
 
+        /* drop zone */
         .drop-zone {
             border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 36px 20px;
+            border-radius: 14px;
+            padding: 40px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all .2s;
+            transition: all 0.2s;
             position: relative;
         }
         .drop-zone:hover, .drop-zone.drag-over {
             border-color: var(--accent);
-            background: rgba(79,142,247,0.05);
+            background: var(--accent-glow);
         }
         .drop-zone input[type="file"] {
             position: absolute;
@@ -129,169 +211,180 @@
             height: 100%;
         }
         .drop-icon {
-            width: 44px; height: 44px;
-            border-radius: 12px;
+            width: 48px; height: 48px;
+            border-radius: 14px;
             background: var(--surface2);
+            border: 1px solid var(--border);
             display: flex; align-items: center; justify-content: center;
             margin: 0 auto 14px;
         }
-        .drop-icon svg { width: 22px; height: 22px; stroke: var(--accent); }
-        .drop-title { font-weight: 500; font-size: 15px; margin-bottom: 4px; }
-        .drop-sub { font-size: 13px; color: var(--muted); }
+        .drop-icon svg { width: 24px; height: 24px; stroke: var(--accent); }
+        .drop-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; color: var(--text); }
+        .drop-sub { font-size: 13px; color: var(--text-muted); }
 
         .file-chosen {
             display: none;
             align-items: center;
             gap: 10px;
-            background: var(--surface2);
+            background: var(--success-glow);
+            border: 1px solid rgba(44,122,94,0.2);
             border-radius: 10px;
             padding: 12px 16px;
-            margin-top: 14px;
+            margin-top: 16px;
             font-size: 13px;
+            color: var(--success);
         }
         .file-chosen.show { display: flex; }
-        .file-chosen svg { width: 16px; height: 16px; stroke: var(--success); flex-shrink: 0; }
+        .file-chosen svg { width: 18px; height: 18px; stroke: var(--success); flex-shrink: 0; }
 
-        .field { margin-bottom: 14px; }
+        /* form fields */
+        .field { margin-bottom: 18px; }
         .field:last-child { margin-bottom: 0; }
-        .field label { display: block; font-size: 13px; font-weight: 500; color: var(--label); margin-bottom: 7px; }
+        .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--label);
+            margin-bottom: 8px;
+        }
         .field label .req { color: var(--accent); margin-left: 3px; }
-        .field label .opt { font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+        .field label .opt {
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-left: 8px;
+        }
 
         .field input, .field textarea {
             width: 100%;
             background: var(--surface2);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             color: var(--text);
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 14px;
-            padding: 11px 14px;
+            padding: 12px 16px;
             outline: none;
-            transition: border-color .2s, box-shadow .2s;
+            transition: all 0.2s;
         }
-        .field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+        .field input::placeholder, .field textarea::placeholder { color: var(--text-muted); }
         .field input:focus, .field textarea:focus {
-            border-color: rgba(79,142,247,0.5);
-            box-shadow: 0 0 0 3px rgba(79,142,247,0.08);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            background: var(--surface);
         }
-        .field textarea { height: 88px; resize: vertical; }
+        .field textarea { height: 100px; resize: vertical; }
 
+        /* source tabs */
         .source-tabs {
             display: flex;
-            gap: 6px;
-            margin-bottom: 16px;
+            gap: 8px;
+            margin-bottom: 20px;
             background: var(--surface2);
             padding: 5px;
-            border-radius: 10px;
+            border-radius: 100px;
         }
         .tab-btn {
             flex: 1;
-            padding: 9px;
+            padding: 10px 16px;
             background: transparent;
             border: none;
-            border-radius: 7px;
-            color: var(--muted);
-            font-family: 'DM Sans', sans-serif;
+            border-radius: 100px;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: all .2s;
+            transition: all 0.2s;
         }
         .tab-btn.active {
             background: var(--surface);
-            color: var(--text);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            color: var(--accent);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
         }
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
 
+        /* submit */
         .submit-wrap {
-            margin-top: 24px;
+            margin-top: 28px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
+            flex-wrap: wrap;
         }
         .submit-btn {
             background: var(--accent);
-            color: #fff;
+            color: white;
             border: none;
-            padding: 13px 32px;
-            border-radius: 10px;
-            font-family: 'Syne', sans-serif;
+            padding: 14px 36px;
+            border-radius: 40px;
+            font-family: 'Inter', sans-serif;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: opacity .2s, transform .1s;
+            transition: all 0.2s;
         }
-        .submit-btn:hover { opacity: 0.88; }
+        .submit-btn:hover {
+            background: #d46b1a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230,126,34,0.3);
+        }
         .submit-btn:active { transform: scale(0.98); }
-        .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-        .submit-hint { font-size: 12px; color: var(--muted); line-height: 1.5; }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .submit-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            max-width: 280px;
+        }
 
-        /* ── Steps indicator ── */
-        .steps {
-            display: flex;
-            gap: 0;
-            margin-bottom: 28px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-            padding: 0;
-        }
-        .step {
-            flex: 1;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-            color: var(--muted);
-            border-right: 1px solid var(--border);
-            transition: all .3s;
-        }
-        .step:last-child { border-right: none; }
-        .step-num {
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-            flex-shrink: 0;
-            transition: all .3s;
-        }
-        .step.active { color: var(--text); background: rgba(79,142,247,0.06); }
-        .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
-        .step.done { color: var(--success); }
-        .step.done .step-num { background: rgba(52,211,153,0.15); border-color: var(--success); color: var(--success); }
-
+        /* alert */
         .alert {
             display: none;
             padding: 14px 18px;
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             font-size: 13px;
             font-weight: 500;
-            margin-bottom: 20px;
-            border: 1px solid transparent;
-            animation: slideIn .25s ease;
+            margin-bottom: 24px;
+            animation: slideIn 0.25s ease;
+            align-items: center;
+            gap: 12px;
         }
-        .alert.show { display: flex; align-items: flex-start; gap: 10px; }
-        .alert svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
-        .alert.success { background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.25); color: var(--success); }
-        .alert.error   { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: var(--error); }
-        .alert.info    { background: rgba(79,142,247,0.1);  border-color: rgba(79,142,247,0.25);  color: var(--accent); }
+        .alert.show { display: flex; }
+        .alert svg { width: 18px; height: 18px; flex-shrink: 0; }
+        .alert.success {
+            background: var(--success-glow);
+            border: 1px solid rgba(44,122,94,0.25);
+            color: var(--success);
+        }
+        .alert.error {
+            background: var(--error-glow);
+            border: 1px solid rgba(192,57,43,0.25);
+            color: var(--error);
+        }
+        .alert.info {
+            background: var(--accent-glow);
+            border: 1px solid rgba(230,126,34,0.25);
+            color: var(--accent);
+        }
 
-        .progress-bar { height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; display: none; margin-bottom: 20px; }
+        /* progress bar */
+        .progress-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+            margin-bottom: 24px;
+        }
         .progress-bar.show { display: block; }
         .progress-fill {
             height: 100%;
             width: 0%;
             background: linear-gradient(90deg, var(--accent), var(--accent2));
             border-radius: 2px;
-            transition: width .4s ease;
+            transition: width 0.4s ease;
         }
 
         @keyframes slideIn {
@@ -307,7 +400,7 @@
     <div class="topbar">
         <div class="logo">CV<span>ision</span></div>
         <div class="user-pill">
-            <span class="user-name">👤 <span id="username">{{ session.get('fullname', session.get('username', '')) }}</span></span>
+            <span class="user-name">👤 <span id="username">Berat</span></span>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </div>
@@ -322,7 +415,7 @@
     <div class="steps">
         <div class="step active" id="step1">
             <div class="step-num" id="stepNum1">1</div>
-            <span>Uploading CV</span>
+            <span>Upload CV</span>
         </div>
         <div class="step" id="step2">
             <div class="step-num" id="stepNum2">2</div>
@@ -340,7 +433,11 @@
 
     <!-- alert -->
     <div id="alert" class="alert">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
         <span id="alertText"></span>
     </div>
 
@@ -357,7 +454,7 @@
             <div class="drop-zone" id="dropZone">
                 <input type="file" id="cv" name="cv" accept=".pdf,.doc,.docx" required>
                 <div class="drop-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                         <polyline points="14 2 14 8 20 8"/>
                         <line x1="12" y1="18" x2="12" y2="12"/>
@@ -368,7 +465,9 @@
                 <div class="drop-sub">or click to select &nbsp;·&nbsp; PDF, DOC, DOCX</div>
             </div>
             <div class="file-chosen" id="fileChosen">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
                 <span id="fileName">—</span>
             </div>
         </div>
@@ -386,7 +485,7 @@
                 <div class="field">
                     <label for="job_url">Job Listing URL <span class="req">*</span></label>
                     <input type="url" id="job_url" name="job_url"
-                           placeholder="https://linkedin.com/jobs/view/... veya kariyer.net/...">
+                           placeholder="https://linkedin.com/jobs/view/... or kariyer.net/...">
                 </div>
             </div>
 
@@ -401,10 +500,10 @@
 
         <!-- Opsiyonel linkler -->
         <div class="card">
-            <div class="card-label">03 — Profile Links <span style="color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0">(optional)</span></div>
+            <div class="card-label">03 — Profile Links <span style="color:var(--text-muted);font-size:10px;text-transform:none;letter-spacing:0">(optional)</span></div>
             <div class="field">
                 <label for="github">GitHub <span class="opt">optional</span></label>
-                <input type="url" id="github" name="github" placeholder="https://github.com/kullanıcıadı">
+                <input type="url" id="github" name="github" placeholder="https://github.com/username">
             </div>
             <div class="field">
                 <label for="portfolio">Portfolio / Website <span class="opt">optional</span></label>
@@ -421,17 +520,24 @@
 </div>
 
 <script>
-    // oturum kontrolü
-    fetch('/api/check-session')
-        .then(r => r.json())
-        .then(d => { if (!d.logged_in) location.href = '/'; });
+    // session check
+    async function checkSession() {
+        try {
+            const r = await fetch('/api/check-session');
+            const d = await r.json();
+            if (!d.logged_in) location.href = '/';
+            else if (d.fullname || d.username) {
+                document.getElementById('username').textContent = d.fullname || d.username;
+            }
+        } catch(e) { console.error('Session check failed', e); }
+    }
+    checkSession();
 
     function logout() {
-        fetch('/api/logout').then(r => r.json())
-            .then(d => { if (d.success) location.href = '/'; });
+        fetch('/api/logout').then(() => location.href = '/');
     }
 
-    // dosya seçimi
+    // file selection
     const cvInput    = document.getElementById('cv');
     const dropZone   = document.getElementById('dropZone');
     const fileChosen = document.getElementById('fileChosen');
@@ -455,7 +561,7 @@
         }
     });
 
-    // tab geçişi
+    // tab switching
     let activeTab = 'url';
     function switchTab(tab, btn) {
         activeTab = tab;
@@ -469,15 +575,18 @@
     function showAlert(msg, type) {
         const el = document.getElementById('alert');
         el.className = 'alert show ' + type;
-        document.getElementById('alertText').textContent = msg;
+        document.getElementById('alertText').innerHTML = msg;
         el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => {
+            if (el.classList.contains('show')) el.classList.remove('show');
+        }, 5000);
     }
 
     // progress
     function setProgress(pct) {
         document.getElementById('progressBar').classList.add('show');
         document.getElementById('progressFill').style.width = pct + '%';
-        if (pct >= 100) setTimeout(() => document.getElementById('progressBar').classList.remove('show'), 700);
+        if (pct >= 100) setTimeout(() => document.getElementById('progressBar').classList.remove('show'), 800);
     }
 
     // steps
@@ -485,26 +594,34 @@
         for (let i = 1; i <= 4; i++) {
             const s = document.getElementById('step' + i);
             s.classList.remove('active', 'done');
-            if (i < n)  s.classList.add('done'),   document.getElementById('stepNum' + i).textContent = '✓';
+            if (i < n) {
+                s.classList.add('done');
+                document.getElementById('stepNum' + i).textContent = '✓';
+            }
             if (i === n) s.classList.add('active');
         }
     }
 
-    // ── FORM SUBMIT ──────────────────────────────────────────────────────────
+    // form submit
     document.getElementById('uploadForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const btn = document.getElementById('submitBtn');
 
-        // İş ilanı kaynağı
+        // Job source validation
         const jobUrl  = document.getElementById('job_url').value.trim();
         const jobText = document.getElementById('job_text').value.trim();
         const jobSource = activeTab === 'url' ? jobUrl : jobText;
 
         if (!jobSource) {
             showAlert(activeTab === 'url'
-                ? 'Lütfen bir iş ilanı URL\'si girin.'
+                ? 'Please enter a job listing URL.'
                 : 'Please paste the job listing text.', 'error');
+            return;
+        }
+
+        if (!cvInput.files[0]) {
+            showAlert('Please select a CV file.', 'error');
             return;
         }
 
@@ -512,7 +629,7 @@
         btn.textContent = 'Processing…';
 
         try {
-            // ── ADIM 1: CV Yükle ─────────────────────────────────────────
+            // Step 1: Upload CV
             setStep(1);
             setProgress(10);
             showAlert('Uploading CV…', 'info');
@@ -525,18 +642,18 @@
 
             if (!d1.success) {
                 showAlert(d1.message || 'CV upload failed.', 'error');
-                btn.disabled = false; btn.textContent = 'Analyze →'; return;
+                btn.disabled = false; btn.textContent = 'Analyze →';
+                return;
             }
 
             const cvTextId = d1.cv_text_id;
-
-            const userId = d1.user_id || "{{ session.get('user_id', 0) }}";
+            const userId = d1.user_id || 1;
             setProgress(25);
 
-            // ── ADIM 2: CV'yi AI ile Analiz Et ───────────────────────────
+            // Step 2: Analyze CV with AI
             setStep(2);
-            showAlert('Analyzing CV…', 'info');
-            setProgress(40);
+            showAlert('Analyzing CV with AI…', 'info');
+            setProgress(45);
 
             const r2 = await fetch('/analyze-cv', {
                 method: 'POST',
@@ -546,13 +663,11 @@
             const d2 = await r2.json();
 
             if (!d2.success) {
-                // CV analizi başarısız olsa bile devam et (kritik değil)
-                console.warn('CV analizi başarısız:', d2.error);
+                console.warn('CV analysis warning:', d2.error);
             }
-            setProgress(60);
+            setProgress(65);
 
-            // ── ADIM 3: İş İlanını Analyze → DB'ye Kaydet ─────────────
-            // job_routes.py'deki /api/analyze-job endpoint'ini kullan
+            // Step 3: Analyze Job Listing
             setStep(3);
             showAlert('Analyzing job listing…', 'info');
 
@@ -565,24 +680,24 @@
 
             if (!d3.success) {
                 showAlert('Job listing analysis failed: ' + (d3.error || ''), 'error');
-                btn.disabled = false; btn.textContent = 'Analyze →'; return;
+                btn.disabled = false; btn.textContent = 'Analyze →';
+                return;
             }
 
             const jobAnalysisId = d3.job_analysis_id;
             setProgress(90);
 
-            // ── ADIM 4: Yönlendir ─────────────────────────────────────────
+            // Step 4: Redirect to report
             setStep(4);
             setProgress(100);
             showAlert('✅ Analysis complete! Preparing your report…', 'success');
 
-            // job_detail sayfasına cv_text_id'yi de ilet — orada CV verisini çekmek için
             setTimeout(() => {
                 location.href = `/job-detail?job_id=${jobAnalysisId}&cv_text_id=${cvTextId}`;
             }, 1500);
 
         } catch (err) {
-            console.error('Hata:', err);
+            console.error('Error:', err);
             showAlert('Unexpected error: ' + err.message, 'error');
             btn.disabled = false;
             btn.textContent = 'Analyze →';

@@ -5,7 +5,6 @@ DÜZELTME ÖZET:
 3. CV ve Job match sonuçları birlikte gösteriliyor
 4. Session cleanup yapılıyor
 """
-import app
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_cors import CORS
 import hashlib

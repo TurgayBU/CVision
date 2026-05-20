@@ -4,129 +4,293 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CVision — Analysis Report</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #080b12; --surface: #0f1420; --surface2: #161c2e; --surface3: #1d2540;
-            --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
-            --accent: #4f8ef7; --accent2: #a78bfa; --green: #34d399;
-            --amber: #fbbf24; --red: #f87171; --text: #dde2f0;
-            --muted: #5a6480; --label: #8892aa; --radius: 16px; --radius-sm: 10px;
+            --bg: #f8f5f0;           /* afişteki sıcak kum zemini */
+            --surface: #ffffff;       /* bembeyaz kartlar */
+            --surface2: #fefaf5;     /* hafif sıcak hover */
+            --surface3: #f5ede3;     /* soft sıcak ton */
+            --border: #e8e0d5;       /* yumuşak kum border */
+            --border2: #d9cfc0;      /* biraz daha koyu border */
+            --accent: #e67e22;        /* afişteki turuncu vurgu */
+            --accent2: #f39c12;       /* açık turuncu */
+            --accent-glow: rgba(230,126,34,0.08);
+            --green: #2c7a5e;         /* soft zümrüt */
+            --green-glow: rgba(44,122,94,0.06);
+            --amber: #d4a373;         /* sıcak amber */
+            --amber-glow: rgba(212,163,115,0.08);
+            --red: #c0392b;           /* yumuşak kırmızı */
+            --red-glow: rgba(192,57,43,0.08);
+            --text: #3d3a36;          /* sıcak koyu gri */
+            --text-muted: #9a948c;    /* soft orta ton */
+            --label: #6b655d;         /* sıcak gri */
+            --radius: 16px;
+            --radius-sm: 10px;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        body {
+            font-family:'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
         body::before {
-            content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+            content:'';
+            position:fixed;
+            inset:0;
+            pointer-events:none;
+            z-index:0;
             background:
-                radial-gradient(ellipse 70% 50% at 80% -10%, rgba(79,142,247,0.10) 0%, transparent 55%),
-                radial-gradient(ellipse 50% 60% at -10% 90%, rgba(167,139,250,0.08) 0%, transparent 55%);
+                radial-gradient(ellipse 70% 50% at 80% -10%, rgba(230,126,34,0.06) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 60% at -10% 90%, rgba(243,156,18,0.05) 0%, transparent 55%);
         }
 
         /* navbar */
         .navbar {
-            position:sticky; top:0; z-index:100;
-            background:rgba(8,11,18,0.85); backdrop-filter:blur(24px);
-            border-bottom:1px solid var(--border);
-            display:flex; align-items:center; justify-content:space-between;
-            padding:0 32px; height:58px;
+            position:sticky;
+            top:0;
+            z-index:100;
+            background: rgba(248,245,240,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 32px;
+            height:64px;
         }
-        .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:19px; }
-        .logo span { color:var(--accent); }
+        .logo {
+            font-family:'Playfair Display', serif;
+            font-weight:800;
+            font-size:22px;
+            color: var(--text);
+        }
+        .logo span { color: var(--accent); font-style: italic; }
 
         /* navbar sağ grup */
-        .nav-right { display:flex; align-items:center; gap:10px; }
+        .nav-right { display:flex; align-items:center; gap:12px; }
 
         .btn-sm {
-            padding:7px 16px; border-radius:8px; border:1px solid var(--border);
-            background:var(--surface2); color:var(--label); font-family:'DM Sans',sans-serif;
-            font-size:13px; font-weight:500; cursor:pointer; text-decoration:none;
-            display:inline-flex; align-items:center; gap:6px; transition:all .2s;
+            padding:8px 18px;
+            border-radius:30px;
+            border:1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text-muted);
+            font-family:'Inter', sans-serif;
+            font-size:13px;
+            font-weight:500;
+            cursor:pointer;
+            text-decoration:none;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            transition:all .2s;
         }
-        .btn-sm:hover { border-color:var(--border2); color:var(--text); }
+        .btn-sm:hover {
+            border-color: var(--border2);
+            color: var(--text);
+            background: var(--surface);
+        }
 
-        /* Mülakat butonu — vurgu rengi */
+        /* Mülakat butonu — turuncu vurgu */
         .btn-interview {
-            padding:7px 18px; border-radius:8px;
-            background: linear-gradient(135deg, #a78bfa 0%, #7c6af7 100%);
+            padding:8px 20px;
+            border-radius:30px;
+            background: var(--accent);
             border: none;
-            color: #fff; font-family:'DM Sans',sans-serif;
-            font-size:13px; font-weight:600; cursor:pointer; text-decoration:none;
-            display:none; align-items:center; gap:7px; transition:all .2s;
-            box-shadow: 0 2px 12px rgba(124,106,247,0.35);
+            color: white;
+            font-family:'Inter', sans-serif;
+            font-size:13px;
+            font-weight:600;
+            cursor:pointer;
+            text-decoration:none;
+            display:none;
+            align-items:center;
+            gap:8px;
+            transition:all .2s;
+            box-shadow: 0 2px 10px rgba(230,126,34,0.3);
         }
-        .btn-interview:hover { opacity:.88; transform:translateY(-1px); box-shadow: 0 4px 18px rgba(124,106,247,0.45); }
+        .btn-interview:hover {
+            background: #d46b1a;
+            transform:translateY(-1px);
+            box-shadow: 0 4px 16px rgba(230,126,34,0.4);
+        }
         .btn-interview.visible { display:inline-flex; }
 
         /* layout */
         .page { position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:36px 24px 80px; }
 
         /* hero */
-        .hero { display:grid; grid-template-columns:1fr auto; gap:24px; align-items:start; margin-bottom:32px; animation:fadeUp .5s ease both; }
-        .hero-eyebrow { font-size:11px; font-weight:600; letter-spacing:1.4px; text-transform:uppercase; color:var(--accent); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
-        .hero-eyebrow::before { content:''; width:20px; height:2px; background:var(--accent); }
-        .hero h1 { font-family:'Syne',sans-serif; font-size:30px; font-weight:800; letter-spacing:-1px; line-height:1.15; margin-bottom:6px; }
-        .hero-meta { color:var(--label); font-size:14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:4px; }
-        .hero-tags { display:flex; flex-wrap:wrap; gap:7px; margin-top:14px; }
-        .tag { padding:5px 12px; border-radius:100px; font-size:12px; font-weight:500; border:1px solid; }
-        .tag.blue   { background:rgba(79,142,247,.1);  border-color:rgba(79,142,247,.25);  color:var(--accent); }
-        .tag.purple { background:rgba(167,139,250,.1); border-color:rgba(167,139,250,.25); color:var(--accent2); }
-        .tag.green  { background:rgba(52,211,153,.1);  border-color:rgba(52,211,153,.25);  color:var(--green); }
-        .tag.amber  { background:rgba(251,191,36,.1);  border-color:rgba(251,191,36,.25);  color:var(--amber); }
+        .hero {
+            display:grid;
+            grid-template-columns:1fr auto;
+            gap:28px;
+            align-items:start;
+            margin-bottom:32px;
+            animation:fadeUp .5s ease both;
+        }
+        .hero-eyebrow {
+            font-size:11px;
+            font-weight:600;
+            letter-spacing:1.2px;
+            text-transform:uppercase;
+            color: var(--accent);
+            margin-bottom:12px;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .hero-eyebrow::before { content:''; width:24px; height:2px; background: var(--accent); }
+        .hero h1 {
+            font-family:'Playfair Display', serif;
+            font-size:32px;
+            font-weight:800;
+            letter-spacing:-0.5px;
+            line-height:1.2;
+            margin-bottom:10px;
+        }
+        .hero-meta {
+            color: var(--text-muted);
+            font-size:14px;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-top:6px;
+        }
+        .hero-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+        .tag {
+            padding:5px 14px;
+            border-radius:100px;
+            font-size:12px;
+            font-weight:500;
+            border:1px solid;
+        }
+        .tag.blue   { background: var(--accent-glow); border-color: rgba(230,126,34,0.2); color: var(--accent); }
+        .tag.purple { background: rgba(243,156,18,0.08); border-color: rgba(243,156,18,0.2); color: var(--accent2); }
+        .tag.green  { background: var(--green-glow); border-color: rgba(44,122,94,0.2); color: var(--green); }
+        .tag.amber  { background: var(--amber-glow); border-color: rgba(212,163,115,0.2); color: var(--amber); }
 
         /* score ring */
-        .score-block { display:flex; flex-direction:column; align-items:center; gap:8px; }
-        .ring-wrap { position:relative; width:110px; height:110px; }
+        .score-block { display:flex; flex-direction:column; align-items:center; gap:10px; }
+        .ring-wrap { position:relative; width:120px; height:120px; }
         .ring-wrap svg { transform:rotate(-90deg); }
-        .ring-bg   { fill:none; stroke:var(--surface3); stroke-width:7; }
-        .ring-fill { fill:none; stroke:url(#grad); stroke-width:7; stroke-linecap:round; stroke-dasharray:283; stroke-dashoffset:283; transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1); }
+        .ring-bg   { fill:none; stroke: var(--border); stroke-width:6; }
+        .ring-fill { fill:none; stroke:url(#grad); stroke-width:6; stroke-linecap:round; stroke-dasharray:283; stroke-dashoffset:283; transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1); }
         .ring-label { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-        .ring-pct { font-family:'Syne',sans-serif; font-size:24px; font-weight:800; line-height:1; }
-        .ring-sub { font-size:10px; color:var(--muted); font-weight:500; margin-top:2px; }
-        .score-label { font-size:11px; font-weight:600; padding:4px 12px; border-radius:100px; border:1px solid; }
+        .ring-pct { font-family:'Playfair Display', serif; font-size:26px; font-weight:800; line-height:1; }
+        .ring-sub { font-size:10px; color: var(--text-muted); font-weight:500; margin-top:2px; }
+        .score-label {
+            font-size:11px;
+            font-weight:600;
+            padding:5px 14px;
+            border-radius:100px;
+            border:1px solid;
+        }
 
         /* grids */
-        .cols      { display:grid; grid-template-columns:1fr 1fr;     gap:16px; margin-bottom:16px; }
+        .cols      { display:grid; grid-template-columns:1fr 1fr;     gap:20px; margin-bottom:20px; }
         .cols3     { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:0; }
-        .cols-wide { display:grid; grid-template-columns:2fr 1fr;     gap:16px; margin-bottom:16px; }
+        .cols-wide { display:grid; grid-template-columns:2fr 1fr;     gap:20px; margin-bottom:20px; }
 
         /* panel */
-        .panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; animation:fadeUp .5s ease both; }
-        .panel:nth-child(1){animation-delay:.05s} .panel:nth-child(2){animation-delay:.10s}
-        .panel:nth-child(3){animation-delay:.15s} .panel:nth-child(4){animation-delay:.20s}
-        .panel-hd { padding:15px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-        .panel-title { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px; }
-        .panel-icon  { width:26px; height:26px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; }
-        .i-blue   { background:rgba(79,142,247,.15); } .i-green  { background:rgba(52,211,153,.12); }
-        .i-purple { background:rgba(167,139,250,.12); } .i-amber  { background:rgba(251,191,36,.10); }
-        .panel-body { padding:18px 20px; }
+        .panel {
+            background: var(--surface);
+            border:1px solid var(--border);
+            border-radius: var(--radius);
+            overflow:hidden;
+            animation:fadeUp .5s ease both;
+            transition: box-shadow 0.2s;
+        }
+        .panel:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+        .panel:nth-child(1){animation-delay:.05s}
+        .panel:nth-child(2){animation-delay:.10s}
+        .panel:nth-child(3){animation-delay:.15s}
+        .panel:nth-child(4){animation-delay:.20s}
+        .panel-hd {
+            padding:16px 22px;
+            border-bottom:1px solid var(--border);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+        .panel-title {
+            font-family:'Playfair Display', serif;
+            font-size:14px;
+            font-weight:700;
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+        .panel-icon  {
+            width:30px; height:30px;
+            border-radius:8px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:14px;
+        }
+        .i-blue   { background: var(--accent-glow); }
+        .i-green  { background: var(--green-glow); }
+        .i-purple { background: rgba(243,156,18,0.08); }
+        .i-amber  { background: var(--amber-glow); }
+        .panel-body { padding:20px 22px; }
 
         /* info field */
-        .info-field { margin-bottom:14px; }
+        .info-field { margin-bottom:16px; }
         .info-field:last-child { margin-bottom:0; }
-        .info-label { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
-        .info-val   { font-size:13.5px; color:var(--text); line-height:1.65; white-space:pre-wrap; }
+        .info-label {
+            font-size:10px;
+            font-weight:700;
+            letter-spacing:0.8px;
+            text-transform:uppercase;
+            color: var(--accent);
+            margin-bottom:6px;
+        }
+        .info-val   {
+            font-size:13.5px;
+            color: var(--text);
+            line-height:1.65;
+            white-space:pre-wrap;
+        }
         .info-val.scroll { max-height:160px; overflow-y:auto; }
-        .info-val.scroll::-webkit-scrollbar { width:3px; }
-        .info-val.scroll::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+        .info-val.scroll::-webkit-scrollbar { width:4px; }
+        .info-val.scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius:3px; }
 
         /* chips */
-        .chips { display:flex; flex-wrap:wrap; gap:6px; }
-        .chip { padding:5px 11px; border-radius:100px; font-size:12px; font-weight:500; border:1px solid; }
-        .chip.neutral { background:var(--surface2); border-color:var(--border); color:var(--label); }
-        .chip.green   { background:rgba(52,211,153,.08); border-color:rgba(52,211,153,.2); color:var(--green); }
-        .chip.amber   { background:rgba(251,191,36,.08); border-color:rgba(251,191,36,.2); color:var(--amber); }
-        .empty { font-size:13px; color:var(--muted); font-style:italic; }
+        .chips { display:flex; flex-wrap:wrap; gap:8px; }
+        .chip {
+            padding:6px 14px;
+            border-radius:100px;
+            font-size:12px;
+            font-weight:500;
+            border:1px solid;
+        }
+        .chip.neutral { background: var(--surface2); border-color: var(--border); color: var(--text-muted); }
+        .chip.green   { background: var(--green-glow); border-color: rgba(44,122,94,0.2); color: var(--green); }
+        .chip.amber   { background: var(--amber-glow); border-color: rgba(212,163,115,0.2); color: var(--amber); }
+        .empty { font-size:13px; color: var(--text-muted); font-style:italic; }
 
         /* source link */
-        .src-link { display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-size:12.5px; text-decoration:none; font-weight:500; }
-        .src-link:hover { opacity:.75; }
+        .src-link {
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            color: var(--accent);
+            font-size:12px;
+            text-decoration:none;
+            font-weight:500;
+        }
+        .src-link:hover { opacity:0.7; text-decoration:underline; }
 
-        /* Mülakat CTA banner — sayfanın altında */
+        /* Mülakat CTA banner */
         .interview-cta {
             margin-top: 32px;
             padding: 24px 28px;
-            background: linear-gradient(135deg, rgba(124,106,247,0.12) 0%, rgba(167,139,250,0.06) 100%);
-            border: 1px solid rgba(124,106,247,0.25);
+            background: var(--accent-glow);
+            border: 1px solid rgba(230,126,34,0.2);
             border-radius: var(--radius);
             display: none;
             align-items: center;
@@ -136,34 +300,266 @@
         }
         .interview-cta.visible { display:flex; }
         .interview-cta-text h3 {
-            font-family:'Syne',sans-serif; font-size:16px; font-weight:700;
-            margin-bottom:4px; color:var(--accent2);
+            font-family:'Playfair Display', serif;
+            font-size:17px;
+            font-weight:700;
+            margin-bottom:5px;
+            color: var(--accent);
         }
-        .interview-cta-text p { font-size:13px; color:var(--label); line-height:1.5; }
+        .interview-cta-text p { font-size:13px; color: var(--text-muted); line-height:1.5; }
         .btn-cta-interview {
             padding: 12px 28px;
-            background: linear-gradient(135deg, #a78bfa 0%, #7c6af7 100%);
-            border: none; border-radius: 10px;
-            color: white; font-family:'Syne',sans-serif;
-            font-size:15px; font-weight:700;
-            cursor:pointer; text-decoration:none;
-            display:inline-flex; align-items:center; gap:8px;
+            background: var(--accent);
+            border: none;
+            border-radius: 40px;
+            color: white;
+            font-family:'Inter', sans-serif;
+            font-size:14px;
+            font-weight:600;
+            cursor:pointer;
+            text-decoration:none;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
             white-space:nowrap;
-            box-shadow: 0 4px 20px rgba(124,106,247,0.4);
+            box-shadow: 0 2px 12px rgba(230,126,34,0.3);
             transition: all .2s;
         }
-        .btn-cta-interview:hover { opacity:.88; transform:translateY(-2px); box-shadow: 0 8px 28px rgba(124,106,247,0.5); }
+        .btn-cta-interview:hover {
+            background: #d46b1a;
+            transform:translateY(-2px);
+            box-shadow: 0 6px 20px rgba(230,126,34,0.4);
+        }
 
         /* loading / error */
-        .loading-state { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; gap:16px; text-align:center; }
-        .spinner { width:44px; height:44px; border:3px solid var(--surface3); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
-        .error-state { text-align:center; padding:80px 24px; }
+        .loading-state {
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            min-height:60vh;
+            gap:20px;
+            text-align:center;
+        }
+        .spinner {
+            width:48px;
+            height:48px;
+            border:3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius:50%;
+            animation:spin .8s linear infinite;
+        }
+        .error-state { text-align:center; padding:80px 24px; background: var(--surface); border-radius: var(--radius); border:1px solid var(--border); }
         .error-state .err-icon { font-size:48px; margin-bottom:16px; }
-        .error-state h2 { font-family:'Syne',sans-serif; font-size:22px; margin-bottom:8px; }
-        .error-state p  { color:var(--muted); font-size:14px; }
+        .error-state h2 { font-family:'Playfair Display', serif; font-size:24px; margin-bottom:8px; }
+        .error-state p  { color: var(--text-muted); font-size:14px; }
 
         /* cv-missing notice */
-        .cv-notice { padding:14px 16px; background:rgba(251,191,36,.06); border:1px solid rgba(251,191,36,.18); border-radius:var(--radius-sm); font-size:13px; color:var(--amber); line-height:1.6; }
+        .cv-notice {
+            padding:16px 18px;
+            background: var(--amber-glow);
+            border:1px solid rgba(212,163,115,0.2);
+            border-radius: var(--radius-sm);
+            font-size:13px;
+            color: var(--amber);
+            line-height:1.6;
+        }
+
+        /* recommendation FAB */
+        #rec-fab {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 1000;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(230,126,34,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all .2s;
+            color: white;
+        }
+        #rec-fab:hover {
+            transform: scale(1.08);
+            background: #d46b1a;
+            box-shadow: 0 6px 28px rgba(230,126,34,0.5);
+        }
+        #rec-fab .rec-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            width: 20px; height: 20px;
+            background: var(--green);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Overlay */
+        #rec-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1001;
+            background: rgba(61,58,54,0.6);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s;
+        }
+        #rec-overlay.open { opacity: 1; pointer-events: all; }
+
+        /* Panel */
+        #rec-panel {
+            position: fixed;
+            bottom: 100px;
+            right: 28px;
+            z-index: 1002;
+            width: 380px;
+            max-height: 540px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            transform: translateY(20px) scale(.97);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform .28s cubic-bezier(.4,0,.2,1), opacity .28s;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        #rec-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
+
+        .rec-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .rec-header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+        }
+        .rec-close {
+            width: 30px; height: 30px;
+            border: none;
+            background: var(--surface2);
+            border-radius: 50%;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .15s;
+        }
+        .rec-close:hover { background: var(--border); color: var(--text); }
+
+        .rec-body {
+            padding: 12px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .rec-body::-webkit-scrollbar { width: 4px; }
+        .rec-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+        .rec-loading, .rec-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        .rec-spinner {
+            width: 36px; height: 36px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        .rec-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none;
+            display: block;
+        }
+        .rec-card:last-child { margin-bottom: 0; }
+        .rec-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            background: var(--surface);
+        }
+        .rec-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .rec-card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.35;
+        }
+        .rec-card-company {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+        .rec-score-ring {
+            flex-shrink: 0;
+            width: 44px; height: 44px;
+            position: relative;
+        }
+        .rec-score-ring svg { transform: rotate(-90deg); }
+        .rec-score-ring .ring-bg  { fill: none; stroke: var(--border); stroke-width: 3; }
+        .rec-score-ring .ring-val { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 100; transition: stroke-dashoffset 1s .15s; }
+        .rec-score-num {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700;
+        }
+        .rec-card-meta {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .rec-chip {
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 500;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .rec-chip.loc {
+            color: var(--accent);
+            border-color: rgba(230,126,34,0.2);
+            background: var(--accent-glow);
+        }
 
         @keyframes spin    { to { transform:rotate(360deg); } }
         @keyframes fadeUp  { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
@@ -175,200 +571,15 @@
             .navbar { padding:0 16px; }
             .page   { padding:24px 16px 60px; }
             .interview-cta { flex-direction:column; align-items:flex-start; }
+            #rec-panel { right: 12px; left: 12px; width: auto; }
+            #rec-fab   { right: 16px; bottom: 16px; }
         }
-        #rec-fab {
-    position: fixed;
-    bottom: 28px;
-    right: 28px;
-    z-index: 1000;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--accent, #4f8ef7);
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(79,142,247,.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    transition: transform .2s, box-shadow .2s;
-  }
-  #rec-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(79,142,247,.5); }
-  #rec-fab .rec-badge {
-    position: absolute;
-    top: -4px; right: -4px;
-    width: 18px; height: 18px;
-    background: var(--green, #34d399);
-    border-radius: 50%;
-    font-size: 10px;
-    font-weight: 700;
-    color: #fff;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  /* Overlay */
-  #rec-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1001;
-    background: rgba(0,0,0,.5);
-    backdrop-filter: blur(4px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .25s;
-  }
-  #rec-overlay.open { opacity: 1; pointer-events: all; }
-
-  /* Panel */
-  #rec-panel {
-    position: fixed;
-    bottom: 90px;
-    right: 28px;
-    z-index: 1002;
-    width: 360px;
-    max-height: 520px;
-    background: var(--surface, #0f1420);
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 18px;
-    overflow: hidden;
-    transform: translateY(20px) scale(.97);
-    opacity: 0;
-    pointer-events: none;
-    transition: transform .28s cubic-bezier(.4,0,.2,1), opacity .28s;
-    display: flex;
-    flex-direction: column;
-  }
-  #rec-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: all; }
-
-  .rec-header {
-    padding: 16px 18px 12px;
-    border-bottom: 1px solid rgba(255,255,255,.07);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-  .rec-header-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .rec-close {
-    width: 28px; height: 28px;
-    border: none;
-    background: rgba(255,255,255,.06);
-    border-radius: 50%;
-    color: var(--label, #8892aa);
-    font-size: 16px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .15s;
-  }
-  .rec-close:hover { background: rgba(255,255,255,.12); color: #fff; }
-
-  /* İçerik */
-  .rec-body {
-    padding: 12px;
-    overflow-y: auto;
-    flex: 1;
-  }
-  .rec-body::-webkit-scrollbar { width: 3px; }
-  .rec-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
-
-  /* Durum mesajları */
-  .rec-loading, .rec-empty {
-    padding: 40px 20px;
-    text-align: center;
-    color: var(--muted, #5a6480);
-    font-size: 13px;
-  }
-  .rec-spinner {
-    width: 32px; height: 32px;
-    border: 2px solid rgba(255,255,255,.08);
-    border-top-color: var(--accent, #4f8ef7);
-    border-radius: 50%;
-    animation: rec-spin .7s linear infinite;
-    margin: 0 auto 12px;
-  }
-  @keyframes rec-spin { to { transform: rotate(360deg); } }
-
-  /* Kart */
-  .rec-card {
-    background: var(--surface2, #161c2e);
-    border: 1px solid rgba(255,255,255,.07);
-    border-radius: 12px;
-    padding: 13px 14px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: border-color .2s, transform .15s;
-    text-decoration: none;
-    display: block;
-  }
-  .rec-card:last-child { margin-bottom: 0; }
-  .rec-card:hover { border-color: rgba(79,142,247,.4); transform: translateY(-1px); }
-  .rec-card-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 6px;
-  }
-  .rec-card-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text, #dde2f0);
-    line-height: 1.35;
-  }
-  .rec-card-company {
-    font-size: 11px;
-    color: var(--label, #8892aa);
-    margin-top: 2px;
-  }
-  .rec-score-ring {
-    flex-shrink: 0;
-    width: 42px; height: 42px;
-    position: relative;
-  }
-  .rec-score-ring svg { transform: rotate(-90deg); }
-  .rec-score-ring .ring-bg  { fill: none; stroke: rgba(255,255,255,.06); stroke-width: 3; }
-  .rec-score-ring .ring-val { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 100; transition: stroke-dashoffset 1s .15s; }
-  .rec-score-num {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700;
-  }
-  .rec-card-meta {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .rec-chip {
-    padding: 3px 8px;
-    border-radius: 100px;
-    font-size: 10px;
-    font-weight: 500;
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.08);
-    color: var(--label, #8892aa);
-    white-space: nowrap;
-  }
-  .rec-chip.loc { color: var(--accent, #4f8ef7); border-color: rgba(79,142,247,.2); background: rgba(79,142,247,.06); }
-
-  @media(max-width: 420px) {
-    #rec-panel { right: 12px; left: 12px; width: auto; }
-    #rec-fab   { right: 16px; bottom: 16px; }
-  }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
     <div class="logo">CV<span>ision</span></div>
-    <!-- Sağ grup: mülakat butonu + geri butonu -->
     <div class="nav-right">
         <a id="navInterviewBtn" href="#" class="btn-interview">
             🎙️ Start Interview
@@ -383,8 +594,8 @@
     <div class="loading-state" id="loadingState">
         <div class="spinner"></div>
         <div>
-            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:600;margin-bottom:6px;">Loading report…</div>
-            <div style="font-size:13px;color:var(--muted)">Fetching analysis results</div>
+            <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:8px;">Loading report…</div>
+            <div style="font-size:13px;color:var(--text-muted)">Fetching analysis results</div>
         </div>
     </div>
 
@@ -407,17 +618,17 @@
                 <h1 id="heroTitle">—</h1>
                 <div class="hero-meta">
                     <span id="heroCompany"></span>
-                    <span id="heroLocation" style="color:var(--muted)"></span>
+                    <span id="heroLocation" style="color:var(--text-muted)"></span>
                 </div>
                 <div class="hero-tags" id="heroTags"></div>
             </div>
             <div class="score-block" id="scoreBlock" style="display:none;">
                 <div class="ring-wrap">
-                    <svg viewBox="0 0 100 100" width="110" height="110">
+                    <svg viewBox="0 0 100 100" width="120" height="120">
                         <defs>
                             <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%"   style="stop-color:#4f8ef7"/>
-                                <stop offset="100%" style="stop-color:#34d399"/>
+                                <stop offset="0%"   style="stop-color:#e67e22"/>
+                                <stop offset="100%" style="stop-color:#2c7a5e"/>
                             </linearGradient>
                         </defs>
                         <circle class="ring-bg"   cx="50" cy="50" r="45"/>
@@ -432,11 +643,11 @@
             </div>
         </div>
 
-        <!-- ROW 1: İş detayları + CV özeti -->
+        <!-- ROW 1: Job details + CV summary -->
         <div class="cols-wide">
             <div class="panel">
                 <div class="panel-hd">
-                    <div class="panel-title"><div class="panel-icon i-blue">💼</div>İş İlanı Detayları</div>
+                    <div class="panel-title"><div class="panel-icon i-blue">💼</div>Job Listing Details</div>
                     <a id="srcLink" href="#" target="_blank" class="src-link" style="display:none;">Go to Source ↗</a>
                 </div>
                 <div class="panel-body">
@@ -456,12 +667,12 @@
 
             <div class="panel">
                 <div class="panel-hd">
-                    <div class="panel-title"><div class="panel-icon i-purple">👤</div>CV Özeti</div>
+                    <div class="panel-title"><div class="panel-icon i-purple">👤</div>CV Summary</div>
                 </div>
                 <div class="panel-body" id="cvPanel">
                     <div class="cv-notice" id="cvNotice" style="display:none;">
                         CV analysis not found.<br>
-                        <a href="/cv-analysis" style="color:var(--amber);font-weight:600;">CV Analysis →</a>
+                        <a href="/cv-analysis" style="color:var(--accent);font-weight:600;">CV Analysis →</a>
                     </div>
                     <div id="cvContent">
                         <div class="info-field"><div class="info-label">📍 Location</div><div class="info-val" id="cvAddress">—</div></div>
@@ -473,7 +684,7 @@
             </div>
         </div>
 
-        <!-- ROW 2: Beceriler -->
+        <!-- ROW 2: Skills -->
         <div class="cols">
             <div class="panel">
                 <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-blue">⚡</div>Essential Skills</div></div>
@@ -485,19 +696,19 @@
             </div>
         </div>
 
-        <!-- ROW 3: CV Becerileri + Benefits/Missing -->
+        <!-- ROW 3: CV Skills + Benefits/Missing -->
         <div class="cols">
             <div class="panel">
                 <div class="panel-hd"><div class="panel-title"><div class="panel-icon i-green">💡</div>CV Skills</div></div>
                 <div class="panel-body"><div class="chips" id="cvSkills"></div></div>
             </div>
             <div class="panel" id="extraPanel">
-                <div class="panel-hd"><div class="panel-title" id="extraTitle"><div class="panel-icon i-green">🎁</div>Fringe Benefits</div></div>
+                <div class="panel-hd"><div class="panel-title" id="extraTitle"><div class="panel-icon i-amber">🎁</div>Fringe Benefits</div></div>
                 <div class="panel-body"><div class="chips" id="extraChips"></div></div>
             </div>
         </div>
 
-        <!-- ── MÜLAkat CTA BANNER ── -->
+        <!-- Interview CTA Banner -->
         <div class="interview-cta" id="interviewCta">
             <div class="interview-cta-text">
                 <h3>🎙️ Interview Simulator</h3>
@@ -510,321 +721,309 @@
 
     </div>
 </div>
+
+<!-- Recommendation FAB -->
 <button id="rec-fab" onclick="toggleRecPanel()" title="Job Recommendations">
-  🎯
-  <span class="rec-badge" id="rec-badge" style="display:none">0</span>
+    🎯
+    <span class="rec-badge" id="rec-badge" style="display:none">0</span>
 </button>
 
-<!-- Overlay (tıklayınca kapanır) -->
+<!-- Overlay -->
 <div id="rec-overlay" onclick="closeRecPanel()"></div>
 
-<!-- Pop-up paneli -->
+<!-- Pop-up panel -->
 <div id="rec-panel">
-  <div class="rec-header">
-    <div class="rec-header-title">
-      <span>✨</span> Job Recommendations for You
+    <div class="rec-header">
+        <div class="rec-header-title">
+            <span>✨</span> Job Recommendations for You
+        </div>
+        <button class="rec-close" onclick="closeRecPanel()">✕</button>
     </div>
-    <button class="rec-close" onclick="closeRecPanel()">✕</button>
-  </div>
-  <div class="rec-body" id="rec-body">
-    <div class="rec-loading" id="rec-loading" style="display:none">
-      <div class="rec-spinner"></div>
-      <div>CV\'n analiz ediliyor…</div>
+    <div class="rec-body" id="rec-body">
+        <div class="rec-loading" id="rec-loading" style="display:none">
+            <div class="rec-spinner"></div>
+            <div>Analyzing your CV…</div>
+        </div>
+        <div class="rec-empty" id="rec-empty" style="display:none">
+            No recommendations found.<br>Make sure your CV has been analyzed.
+        </div>
+        <div id="rec-cards"></div>
     </div>
-    <div class="rec-empty" id="rec-empty" style="display:none">
-      No recommendations found.<br>CV\'ni analiz ettiğinden emin ol.
-    </div>
-    <div id="rec-cards"></div>
-  </div>
 </div>
+
 <script>
-    (function() {
-  let loaded = false;
+    // helpers
+    const pJ = v => { if(!v) return []; if(Array.isArray(v)) return v; try{return JSON.parse(v)||[];}catch{return[];} };
+    const sf = (v,fb='—') => (v===null||v===undefined||v==='') ? fb : String(v);
+    const st = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=sf(v); };
 
-  /* cv_text_id'yi URL veya global değişkenden al */
-  function getCvTextId() {
-    const p = new URLSearchParams(location.search);
-    if (p.get('cv_text_id')) return p.get('cv_text_id');
-    if (typeof window.cvTextId !== 'undefined') return window.cvTextId;
-    return null;
-  }
-
-  window.toggleRecPanel = function() {
-    const panel   = document.getElementById('rec-panel');
-    const overlay = document.getElementById('rec-overlay');
-    const isOpen  = panel.classList.contains('open');
-    if (isOpen) {
-      closeRecPanel();
-    } else {
-      panel.classList.add('open');
-      overlay.classList.add('open');
-      if (!loaded) loadRecommendations();
-    }
-  };
-
-  window.closeRecPanel = function() {
-    document.getElementById('rec-panel').classList.remove('open');
-    document.getElementById('rec-overlay').classList.remove('open');
-  };
-
-  window.loadRecommendations = async function(cvTextIdOverride) {
-    const cvTextId = cvTextIdOverride || getCvTextId();
-    if (!cvTextId) {
-      showState('empty');
-      return;
+    function chips(containerId, items, cls='neutral') {
+        const el = document.getElementById(containerId);
+        if (!el) return;
+        if (!items || !items.length) { el.innerHTML='<span class="empty">No information</span>'; return; }
+        el.innerHTML = items.map(s => {
+            const label = typeof s==='object' ? (s.skill||s.language||JSON.stringify(s)) : s;
+            return `<span class="chip ${cls}">${label}</span>`;
+        }).join('');
     }
 
-    showState('loading');
-    try {
-      const res  = await fetch(`/api/job-recommendations?cv_text_id=${cvTextId}`);
-      const data = await res.json();
-
-      if (!data.success || !data.recommendations || data.recommendations.length === 0) {
-        showState('empty');
-        return;
-      }
-
-      renderCards(data.recommendations);
-      loaded = true;
-
-      /* Badge güncelle */
-      const badge = document.getElementById('rec-badge');
-      badge.textContent = data.recommendations.length;
-      badge.style.display = 'flex';
-
-    } catch (e) {
-      console.error('Öneri yükleme hatası:', e);
-      showState('empty');
+    function scoreSetup(rawScore) {
+        if (rawScore===null||rawScore===undefined) return;
+        const pct = Math.round(parseFloat(rawScore)*100);
+        const color = pct>=75?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+        document.getElementById('scoreBlock').style.display='flex';
+        const rp = document.getElementById('ringPct');
+        rp.textContent = pct+'%'; rp.style.color = color;
+        setTimeout(() => { document.getElementById('ringFill').style.strokeDashoffset = 283-(pct/100)*283; }, 200);
+        const lbl = document.getElementById('scoreLbl');
+        const bgMap = {
+            'var(--green)':'rgba(44,122,94,0.1)',
+            'var(--amber)':'rgba(212,163,115,0.1)',
+            'var(--red)':'rgba(192,57,43,0.1)'
+        };
+        lbl.textContent = pct>=75?'🔥 High Completeness':pct>=50?'✅ Medium Completeness':'⚠️ Low Completeness';
+        lbl.style.cssText = `color:${color};border-color:${color};background:${bgMap[color]||'transparent'}`;
     }
-  };
 
-  function showState(state) {
-    document.getElementById('rec-loading').style.display = state === 'loading' ? 'block' : 'none';
-    document.getElementById('rec-empty').style.display   = state === 'empty'   ? 'block' : 'none';
-    document.getElementById('rec-cards').style.display   = state === 'cards'   ? 'block' : 'none';
-  }
+    // params
+    const p        = new URLSearchParams(location.search);
+    const jobId    = p.get('job_id');
+    const cvTextId = p.get('cv_text_id');
 
-  function renderCards(recs) {
-    const container = document.getElementById('rec-cards');
-    container.innerHTML = '';
+    // Interview links
+    function setupInterviewLinks(jobAnalysisId) {
+        const navBtn = document.getElementById('navInterviewBtn');
+        let interviewUrl = `/interview?job_id=${jobAnalysisId}`;
+        if (cvTextId) interviewUrl += `&cv_text_id=${cvTextId}`;
+        navBtn.href = interviewUrl;
+        navBtn.classList.add('visible');
+        document.getElementById('ctaInterviewBtn').href = interviewUrl;
+        document.getElementById('interviewCta').classList.add('visible');
+    }
 
-    recs.forEach(({ score, job }) => {
-      const scoreColor  = score >= 75 ? '#34d399' : score >= 50 ? '#fbbf24' : '#f87171';
-      /* strokeDashoffset = 100 - score (dasharray=100 → bir çember tam) */
-      const dashOffset  = 100 - score;
+    // Recommendation panel
+    let loaded = false;
 
-      const locParts = [job.location_city, job.location_country].filter(Boolean);
-      const locStr   = locParts.join(', ');
+    function getCvTextId() {
+        const p = new URLSearchParams(location.search);
+        if (p.get('cv_text_id')) return p.get('cv_text_id');
+        if (typeof window.cvTextId !== 'undefined') return window.cvTextId;
+        return null;
+    }
 
-      const card = document.createElement('a');
-      card.className = 'rec-card';
-      card.href = job.source_url
-        ? `/job-detail?job_id=${job.job_analysis_id}`
-        : '#';
+    window.toggleRecPanel = function() {
+        const panel   = document.getElementById('rec-panel');
+        const overlay = document.getElementById('rec-overlay');
+        const isOpen  = panel.classList.contains('open');
+        if (isOpen) {
+            closeRecPanel();
+        } else {
+            panel.classList.add('open');
+            overlay.classList.add('open');
+            if (!loaded) loadRecommendations();
+        }
+    };
 
-      card.innerHTML = `
-        <div class="rec-card-top">
-          <div>
-            <div class="rec-card-title">${esc(job.job_title || 'Position Not Specified')}</div>
-            <div class="rec-card-company">${esc(job.company_name || '')}</div>
-          </div>
-          <div class="rec-score-ring">
-            <svg viewBox="0 0 36 36" width="42" height="42">
-              <circle class="ring-bg"  cx="18" cy="18" r="15.9"/>
-              <circle class="ring-val" cx="18" cy="18" r="15.9"
-                stroke="${scoreColor}"
-                style="stroke-dashoffset:${dashOffset}"/>
-            </svg>
-            <div class="rec-score-num" style="color:${scoreColor}">${score}</div>
-          </div>
-        </div>
-        <div class="rec-card-meta">
-          ${locStr ? `<span class="rec-chip loc">📍 ${esc(locStr)}</span>` : ''}
-        </div>
-      `;
+    window.closeRecPanel = function() {
+        document.getElementById('rec-panel').classList.remove('open');
+        document.getElementById('rec-overlay').classList.remove('open');
+    };
 
-      container.appendChild(card);
-    });
+    window.loadRecommendations = async function(cvTextIdOverride) {
+        const cvTextIdVal = cvTextIdOverride || getCvTextId();
+        if (!cvTextIdVal) {
+            showRecState('empty');
+            return;
+        }
 
-    showState('cards');
-  }
+        showRecState('loading');
+        try {
+            const res  = await fetch(`/api/job-recommendations?cv_text_id=${cvTextIdVal}`);
+            const data = await res.json();
 
-  function esc(str) {
-    return String(str || '')
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-})();
-// ── helpers ──────────────────────────────────────────────────────────────────
-const pJ = v => { if(!v) return []; if(Array.isArray(v)) return v; try{return JSON.parse(v)||[];}catch{return[];} };
-const sf = (v,fb='—') => (v===null||v===undefined||v==='') ? fb : String(v);
-const st = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=sf(v); };
+            if (!data.success || !data.recommendations || data.recommendations.length === 0) {
+                showRecState('empty');
+                return;
+            }
 
-function chips(containerId, items, cls='neutral') {
-    const el = document.getElementById(containerId);
-    if (!el) return;
-    if (!items || !items.length) { el.innerHTML='<span class="empty">No information</span>'; return; }
-    el.innerHTML = items.map(s => {
-        const label = typeof s==='object' ? (s.skill||s.language||JSON.stringify(s)) : s;
-        return `<span class="chip ${cls}">${label}</span>`;
-    }).join('');
-}
+            renderRecCards(data.recommendations);
+            loaded = true;
 
-function scoreSetup(rawScore) {
-    if (rawScore===null||rawScore===undefined) return;
-    const pct = Math.round(parseFloat(rawScore)*100);
-    const color = pct>=75?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
-    document.getElementById('scoreBlock').style.display='flex';
-    const rp = document.getElementById('ringPct');
-    rp.textContent = pct+'%'; rp.style.color = color;
-    setTimeout(() => { document.getElementById('ringFill').style.strokeDashoffset = 283-(pct/100)*283; }, 200);
-    const lbl = document.getElementById('scoreLbl');
-    const bgMap = {'var(--green)':'rgba(52,211,153,.1)','var(--amber)':'rgba(251,191,36,.1)','var(--red)':'rgba(248,113,113,.1)'};
-    lbl.textContent = pct>=75?'🔥 Yüksek Completeness':pct>=50?'✅ Orta Completeness':'⚠️ Düşük Completeness';
-    lbl.style.cssText = `color:${color};border-color:${color};background:${bgMap[color]||'transparent'}`;
-}
+            const badge = document.getElementById('rec-badge');
+            badge.textContent = data.recommendations.length;
+            badge.style.display = 'flex';
+        } catch (e) {
+            console.error('Error loading recommendations:', e);
+            showRecState('empty');
+        }
+    };
 
-// ── params ───────────────────────────────────────────────────────────────────
-const p        = new URLSearchParams(location.search);
-const jobId    = p.get('job_id');
-const cvTextId = p.get('cv_text_id');
+    function showRecState(state) {
+        document.getElementById('rec-loading').style.display = state === 'loading' ? 'block' : 'none';
+        document.getElementById('rec-empty').style.display   = state === 'empty'   ? 'block' : 'none';
+        document.getElementById('rec-cards').style.display   = state === 'cards'   ? 'block' : 'none';
+    }
 
-// ── Mülakat linkini oluştur ve yerleştir ──────────────────────────────────────
-function setupInterviewLinks(jobAnalysisId) {
-    // Navbar butonu
-    const navBtn = document.getElementById('navInterviewBtn');
-    let interviewUrl = `/interview?job_id=${jobAnalysisId}`;
-    if (cvTextId) interviewUrl += `&cv_text_id=${cvTextId}`;
+    function renderRecCards(recs) {
+        const container = document.getElementById('rec-cards');
+        container.innerHTML = '';
 
-    navBtn.href = interviewUrl;
-    navBtn.classList.add('visible');
+        recs.forEach(({ score, job }) => {
+            const scoreColor  = score >= 75 ? '#2c7a5e' : score >= 50 ? '#d4a373' : '#c0392b';
+            const dashOffset  = 100 - score;
+            const locParts = [job.location_city, job.location_country].filter(Boolean);
+            const locStr   = locParts.join(', ');
 
-    // CTA banner
-    document.getElementById('ctaInterviewBtn').href = interviewUrl;
-    document.getElementById('interviewCta').classList.add('visible');
-}
+            const card = document.createElement('a');
+            card.className = 'rec-card';
+            card.href = `/job-detail?job_id=${job.job_analysis_id}`;
+            card.innerHTML = `
+                <div class="rec-card-top">
+                    <div>
+                        <div class="rec-card-title">${escapeHtml(job.job_title || 'Position Not Specified')}</div>
+                        <div class="rec-card-company">${escapeHtml(job.company_name || '')}</div>
+                    </div>
+                    <div class="rec-score-ring">
+                        <svg viewBox="0 0 36 36" width="44" height="44">
+                            <circle class="ring-bg"  cx="18" cy="18" r="15.9"/>
+                            <circle class="ring-val" cx="18" cy="18" r="15.9"
+                                stroke="${scoreColor}"
+                                style="stroke-dashoffset:${dashOffset}"/>
+                        </svg>
+                        <div class="rec-score-num" style="color:${scoreColor}">${score}</div>
+                    </div>
+                </div>
+                <div class="rec-card-meta">
+                    ${locStr ? `<span class="rec-chip loc">📍 ${escapeHtml(locStr)}</span>` : ''}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+        showRecState('cards');
+    }
 
-// ── main ─────────────────────────────────────────────────────────────────────
-async function loadAll() {
-    if (!jobId) { showErr('URL\'de job_id parametresi eksik.'); return; }
+    function escapeHtml(str) {
+        return String(str || '')
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
 
-    try {
-        // 1. İş detayı — job_routes.py /api/job-detail/<id>
-        const jr = await fetch(`/api/job-detail/${jobId}`);
-        if (!jr.ok) throw new Error(`HTTP ${jr.status}`);
-        const jd = await jr.json();
-        if (!jd.success) { showErr(jd.error||'Job analysis not found.'); return; }
-        renderJob(jd.job);
+    // Main load
+    async function loadAll() {
+        if (!jobId) { showErr('Missing job_id parameter in URL.'); return; }
 
-        // 2. CV analizi — /api/cv-analysis?cv_text_id=X
-        if (cvTextId) {
-            try {
-                const cr = await fetch(`/api/cv-analysis?cv_text_id=${cvTextId}`);
-                if (cr.ok) {
-                    const cd = await cr.json();
-                    if (cd.success && cd.cv) { renderCV(cd.cv); }
-                    else showCVNotice();
-                } else showCVNotice();
-            } catch { showCVNotice(); }
-        } else showCVNotice();
+        try {
+            const jr = await fetch(`/api/job-detail/${jobId}`);
+            if (!jr.ok) throw new Error(`HTTP ${jr.status}`);
+            const jd = await jr.json();
+            if (!jd.success) { showErr(jd.error||'Job analysis not found.'); return; }
+            renderJob(jd.job);
 
+            if (cvTextId) {
+                try {
+                    const cr = await fetch(`/api/cv-analysis?cv_text_id=${cvTextId}`);
+                    if (cr.ok) {
+                        const cd = await cr.json();
+                        if (cd.success && cd.cv) { renderCV(cd.cv); }
+                        else showCVNotice();
+                    } else showCVNotice();
+                } catch { showCVNotice(); }
+            } else showCVNotice();
+
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('content').style.display      = 'block';
+        } catch(e) {
+            showErr('Connection error: '+e.message);
+        }
+    }
+
+    function showErr(msg) {
         document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('content').style.display      = 'block';
-    } catch(e) {
-        showErr('Connection error: '+e.message);
-    }
-}
-
-function showErr(msg) {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('errorState').style.display   = 'block';
-    document.getElementById('errorMsg').textContent = msg;
-}
-
-function showCVNotice() {
-    document.getElementById('cvContent').style.display = 'none';
-    document.getElementById('cvNotice').style.display  = 'block';
-}
-
-// ── render job ───────────────────────────────────────────────────────────────
-function renderJob(job) {
-    const empMap  = {full_time:'Full-Time',part_time:'Part-Time',contract:'Contract',internship:'Internship',freelance:'Freelance'};
-    const workMap = {remote:'Remote',onsite:'Onsite',hybrid:'Hybrid'};
-
-    document.getElementById('heroTitle').textContent = sf(job.job_title,'Position Not Specified');
-    document.getElementById('heroCompany').textContent = sf(job.company_name,'');
-
-    const locParts = [job.location_district,job.location_city,job.location_country].filter(Boolean);
-    if (locParts.length) document.getElementById('heroLocation').textContent = '· '+locParts.join(', ');
-
-    // tags
-    const tEl = document.getElementById('heroTags');
-    [ {v:empMap[job.employment_type]||job.employment_type, c:'blue'},
-      {v:job.is_remote?'Remote':null, c:'green'},
-      {v:workMap[job.work_type]||job.work_type, c:'purple'},
-      {v:job.department, c:'amber'}
-    ].forEach(t => { if(t.v) tEl.innerHTML+=`<span class="tag ${t.c}">${t.v}</span>`; });
-
-    scoreSetup(job.completeness_score);
-
-    if (job.source_url) {
-        const sl = document.getElementById('srcLink');
-        sl.href=job.source_url; sl.style.display='inline-flex';
+        document.getElementById('errorState').style.display   = 'block';
+        document.getElementById('errorMsg').textContent = msg;
     }
 
-    st('jTitle',   job.job_title);
-    st('jCompany', job.company_name);
-    st('jDept',    job.department);
-    st('jLocation', locParts.length?locParts.join(', '):null);
-    st('jWorkType', workMap[job.work_type]||job.work_type);
-    st('jEmpType',  empMap[job.employment_type]||job.employment_type);
-
-    const expP = [];
-    if (job.exp_min_years!=null) expP.push(job.exp_min_years+(job.exp_max_years?'–'+job.exp_max_years:'+')+' years');
-    if (job.exp_description) expP.push(job.exp_description);
-    st('jExp', expP.join(' · ')||null);
-    st('jEdu', job.edu_min_level);
-
-    if (job.salary_min||job.salary_max) {
-        const sp=[job.salary_min,job.salary_max].filter(Boolean).map(n=>Number(n).toLocaleString('tr-TR'));
-        st('jSalary', sp.join(' – ')+' '+(job.salary_currency||''));
-    } else st('jSalary', null);
-
-    chips('reqSkills',  pJ(job.required_skills).map(s=>typeof s==='object'?(s.skill||s):s),  'neutral');
-    chips('prefSkills', pJ(job.preferred_skills).map(s=>typeof s==='object'?(s.skill||s):s), 'neutral');
-
-    // extra panel: benefits veya missing_fields
-    const benefits = pJ(job.benefits);
-    const missing  = pJ(job.missing_fields);
-    if (benefits.length) {
-        chips('extraChips', benefits, 'green');
-    } else if (missing.length) {
-        document.getElementById('extraTitle').innerHTML =
-            '<div class="panel-icon i-amber">⚠️</div>İlanda Not specified';
-        chips('extraChips', missing, 'amber');
-    } else {
-        document.getElementById('extraPanel').style.display='none';
+    function showCVNotice() {
+        document.getElementById('cvContent').style.display = 'none';
+        document.getElementById('cvNotice').style.display  = 'block';
     }
 
-    // ── Mülakat butonlarını aktif et ──────────────────────────────────────────
-    setupInterviewLinks(job.job_analysis_id);
-}
+    function renderJob(job) {
+        const empMap  = {full_time:'Full-Time',part_time:'Part-Time',contract:'Contract',internship:'Internship',freelance:'Freelance'};
+        const workMap = {remote:'Remote',onsite:'Onsite',hybrid:'Hybrid'};
 
-// ── render CV ────────────────────────────────────────────────────────────────
-function renderCV(cv) {
-    st('cvAddress',    cv.cv_address);
-    st('cvLanguages',  cv.cv_languages);
-    st('cvEducation',  cv.cv_education);
-    st('cvExperience', cv.cv_experience);
+        document.getElementById('heroTitle').textContent = sf(job.job_title,'Position Not Specified');
+        document.getElementById('heroCompany').textContent = sf(job.company_name,'');
 
-    let skills=[];
-    if(cv.cv_skills){ try{skills=JSON.parse(cv.cv_skills);}catch{skills=cv.cv_skills.split(',').map(s=>s.trim()).filter(Boolean);} }
-    if(Array.isArray(skills)&&skills.length) chips('cvSkills',skills,'neutral');
-    else if(cv.cv_skills) document.getElementById('cvSkills').innerHTML=`<span class="info-val">${cv.cv_skills}</span>`;
-    else document.getElementById('cvSkills').innerHTML='<span class="empty">No skill information</span>';
-}
+        const locParts = [job.location_district,job.location_city,job.location_country].filter(Boolean);
+        if (locParts.length) document.getElementById('heroLocation').textContent = '· '+locParts.join(', ');
 
-loadAll();
+        const tEl = document.getElementById('heroTags');
+        [ {v:empMap[job.employment_type]||job.employment_type, c:'blue'},
+          {v:job.is_remote?'Remote':null, c:'green'},
+          {v:workMap[job.work_type]||job.work_type, c:'purple'},
+          {v:job.department, c:'amber'}
+        ].forEach(t => { if(t.v) tEl.innerHTML+=`<span class="tag ${t.c}">${t.v}</span>`; });
+
+        scoreSetup(job.completeness_score);
+
+        if (job.source_url) {
+            const sl = document.getElementById('srcLink');
+            sl.href=job.source_url; sl.style.display='inline-flex';
+        }
+
+        st('jTitle',   job.job_title);
+        st('jCompany', job.company_name);
+        st('jDept',    job.department);
+        st('jLocation', locParts.length?locParts.join(', '):null);
+        st('jWorkType', workMap[job.work_type]||job.work_type);
+        st('jEmpType',  empMap[job.employment_type]||job.employment_type);
+
+        const expP = [];
+        if (job.exp_min_years!=null) expP.push(job.exp_min_years+(job.exp_max_years?'–'+job.exp_max_years:'+')+' years');
+        if (job.exp_description) expP.push(job.exp_description);
+        st('jExp', expP.join(' · ')||null);
+        st('jEdu', job.edu_min_level);
+
+        if (job.salary_min||job.salary_max) {
+            const sp=[job.salary_min,job.salary_max].filter(Boolean).map(n=>Number(n).toLocaleString('tr-TR'));
+            st('jSalary', sp.join(' – ')+' '+(job.salary_currency||''));
+        } else st('jSalary', null);
+
+        chips('reqSkills',  pJ(job.required_skills).map(s=>typeof s==='object'?(s.skill||s):s),  'neutral');
+        chips('prefSkills', pJ(job.preferred_skills).map(s=>typeof s==='object'?(s.skill||s):s), 'neutral');
+
+        const benefits = pJ(job.benefits);
+        const missing  = pJ(job.missing_fields);
+        if (benefits.length) {
+            chips('extraChips', benefits, 'green');
+        } else if (missing.length) {
+            document.getElementById('extraTitle').innerHTML =
+                '<div class="panel-icon i-amber">⚠️</div>Not Specified in Listing';
+            chips('extraChips', missing, 'amber');
+        } else {
+            document.getElementById('extraPanel').style.display='none';
+        }
+
+        setupInterviewLinks(job.job_analysis_id);
+    }
+
+    function renderCV(cv) {
+        st('cvAddress',    cv.cv_address);
+        st('cvLanguages',  cv.cv_languages);
+        st('cvEducation',  cv.cv_education);
+        st('cvExperience', cv.cv_experience);
+
+        let skills=[];
+        if(cv.cv_skills){
+            try{ skills=JSON.parse(cv.cv_skills); }catch{ skills=cv.cv_skills.split(',').map(s=>s.trim()).filter(Boolean); }
+        }
+        if(Array.isArray(skills)&&skills.length) chips('cvSkills',skills,'neutral');
+        else if(cv.cv_skills) document.getElementById('cvSkills').innerHTML=`<span class="info-val">${cv.cv_skills}</span>`;
+        else document.getElementById('cvSkills').innerHTML='<span class="empty">No skill information</span>';
+    }
+
+    loadAll();
 </script>
 </body>
 </html>

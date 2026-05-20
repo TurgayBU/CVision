@@ -8,12 +8,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#05050a; --s1:#0c0c16; --s2:#12121f; --s3:#1a1a2e;
-  --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.11);
-  --text:#e2e2f0; --muted:#5c5c80; --label:#9090b8;
-  --a1:#7b68ee; --a2:#00d4aa; --a3:#ff6b6b; --a4:#ffd93d;
-  --glow1:rgba(123,104,238,0.18); --glow2:rgba(0,212,170,0.14);
-  --r:14px; --r-sm:8px;
+  --bg:#f8f5f0;           /* sıcak kum/krem - afiş zemini */
+  --s1:#ffffff;           /* bembeyaz kartlar */
+  --s2:#fefaf5;          /* hafif sıcak hover */
+  --s3:#f5ede3;          /* soft sıcak ton */
+  --border:#e8e0d5;      /* yumuşak kum border */
+  --border2:#d9cfc0;     /* biraz daha koyu border */
+  --text:#3d3a36;        /* sıcak koyu gri - afiş metni */
+  --muted:#9a948c;       /* soft orta ton */
+  --label:#6b655d;       /* sıcak gri */
+  --a1:#e67e22;          /* afişteki turuncu vurgu */
+  --a2:#2c7a5e;          /* soft zümrüt - kontrast için */
+  --a3:#c0392b;          /* yumuşak kırmızı */
+  --a4:#d4a373;          /* sıcak amber/turuncu */
+  --glow1:rgba(230,126,34,0.08);
+  --glow2:rgba(44,122,94,0.06);
+  --r:16px;
+  --r-sm:10px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
@@ -45,7 +56,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 
 /* MAIN */
 .main{margin-left:240px;position:relative;z-index:1;min-height:100vh;}
-.topbar{height:64px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 36px;background:rgba(5,5,10,0.7);backdrop-filter:blur(20px);position:sticky;top:0;z-index:50;}
+.topbar{height:64px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 36px;background:rgba(248, 245, 240, 0.85);backdrop-filter:blur(20px);position:sticky;top:0;z-index:50;}
 .topbar-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;letter-spacing:-0.3px;}
 .topbar-right{display:flex;align-items:center;gap:10px;}
 .topbar-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--s2);color:var(--label);font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}

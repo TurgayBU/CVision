@@ -1,535 +1,644 @@
 <!DOCTYPE html>
-    <html lang="eng">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login Screen</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVision — Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            body {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 20px;
-            }
+        body {
+            background: #f8f5f0;  /* afişteki sıcak kum zemini */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
 
+        /* Soft ambient background - afiş hissi */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(230,126,34,0.06) 0%, transparent 70%);
+            top: -200px;
+            right: -150px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(44,122,94,0.04) 0%, transparent 70%);
+            bottom: -150px;
+            left: -100px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 440px;
+            padding: 48px 40px;
+            position: relative;
+            z-index: 1;
+            border: 1px solid #e8e0d5;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            color: #3d3a36;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header h1 span {
+            color: #e67e22;
+            font-style: italic;
+        }
+
+        .header p {
+            color: #9a948c;
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #6b655d;
+            font-weight: 500;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid #e8e0d5;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            color: #3d3a36;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #e67e22;
+            box-shadow: 0 0 0 3px rgba(230,126,34,0.1);
+        }
+
+        .input-group input::placeholder {
+            color: #cbc4b8;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b655d;
+            font-size: 13px;
+        }
+
+        .remember input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #e67e22;
+        }
+
+        .forgot-password {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .forgot-password:hover {
+            color: #c0392b;
+            text-decoration: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #e67e22;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .login-btn:hover {
+            background: #d46b1a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(230,126,34,0.3);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 24px;
+            color: #9a948c;
+            font-size: 14px;
+        }
+
+        .register-link a {
+            color: #e67e22;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .register-link a:hover {
+            color: #c0392b;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background-color: #fef3f2;
+            color: #c0392b;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background-color: #f0fdf4;
+            color: #2c7a5e;
+            border: 1px solid #bbf7d0;
+        }
+
+        .info-message {
+            background-color: #fef7e0;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(61,58,54,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 420px;
+            position: relative;
+            border: 1px solid #e8e0d5;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+
+        .modal-content h2 {
+            font-family: 'Playfair Display', serif;
+            color: #3d3a36;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .modal-content p {
+            color: #9a948c;
+            font-size: 13px;
+            margin-bottom: 24px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #9a948c;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: #3d3a36;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #e67e22;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Decorative line */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0 16px;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: #e8e0d5;
+        }
+
+        .divider-text {
+            padding: 0 12px;
+            font-size: 11px;
+            color: #cbc4b8;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
             .container {
-                background: white;
-                border-radius: 20px;
-                box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-                width: 100%;
-                max-width: 400px;
-                padding: 40px;
+                padding: 32px 24px;
             }
-
-            .header {
-                text-align: center;
-                margin-bottom: 30px;
-            }
-
             .header h1 {
-                color: #333;
                 font-size: 28px;
-                font-weight: 600;
             }
-
-            .header p {
-                color: #666;
-                margin-top: 5px;
-            }
-
-            .input-group {
-                margin-bottom: 20px;
-            }
-
-            .input-group label {
-                display: block;
-                margin-bottom: 8px;
-                color: #555;
-                font-weight: 500;
-            }
-
-            .input-group input {
-                width: 100%;
-                padding: 12px 15px;
-                border: 2px solid #e1e1e1;
-                border-radius: 10px;
-                font-size: 15px;
-                transition: all 0.3s ease;
-            }
-
-            .input-group input:focus {
-                outline: none;
-                border-color: #667eea;
-                box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
-            }
-
-            .remember-forgot {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 20px;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
-            .remember {
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                color: #555;
-            }
-
-            .remember input[type="checkbox"] {
-                width: 16px;
-                height: 16px;
-                cursor: pointer;
-            }
-
-            .forgot-password {
-                color: #667eea;
-                text-decoration: none;
-                font-weight: 500;
-                transition: color 0.3s ease;
-                cursor: pointer;
-            }
-
-            .forgot-password:hover {
-                color: #764ba2;
-                text-decoration: underline;
-            }
-
-            .login-btn {
-                width: 100%;
-                padding: 14px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                border: none;
-                border-radius: 10px;
-                color: white;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-            }
-
-            .login-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(102,126,234,0.4);
-            }
-
-            .register-link {
-                text-align: center;
-                margin-top: 20px;
-                color: #666;
-            }
-
-            .register-link a {
-                color: #667eea;
-                text-decoration: none;
-                font-weight: 600;
-                margin-left: 5px;
-                cursor: pointer;
-            }
-
-            .register-link a:hover {
-                color: #764ba2;
-                text-decoration: underline;
-            }
-
-            .message {
-                padding: 12px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-                text-align: center;
-                display: none;
-            }
-
-            .error-message {
-                background-color: #fee;
-                color: #c33;
-                border: 1px solid #fcc;
-            }
-
-            .success-message {
-                background-color: #e8f5e9;
-                color: #2e7d32;
-                border: 1px solid #a5d6a7;
-            }
-
-            .info-message {
-                background-color: #e3f2fd;
-                color: #1976d2;
-                border: 1px solid #90caf9;
-            }
-
-            .modal {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0,0,0,0.5);
-                justify-content: center;
-                align-items: center;
-                z-index: 1000;
-            }
-
-            .modal-content {
-                background: white;
-                padding: 30px;
-                border-radius: 20px;
-                width: 90%;
-                max-width: 400px;
-                position: relative;
-            }
-
-            .close-modal {
-                position: absolute;
-                top: 15px;
-                right: 20px;
-                font-size: 24px;
-                cursor: pointer;
-                color: #666;
-            }
-
-            .close-modal:hover {
-                color: #333;
-            }
-
-            .loading {
-                display: inline-block;
-                width: 20px;
-                height: 20px;
-                border: 3px solid #f3f3f3;
-                border-top: 3px solid #667eea;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-                margin-right: 10px;
-                vertical-align: middle;
-            }
-
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>Welcome to CVision</h1>
-                <p>Login to continue</p>
-            </div>
-
-            <div class="message error-message" id="errorMessage"></div>
-            <div class="message success-message" id="successMessage"></div>
-            <div class="message info-message" id="infoMessage"></div>
-
-            <form id="loginForm">
-                <div class="input-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter your username" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
-                </div>
-
-                <div class="remember-forgot">
-                    <div class="remember">
-                        <input type="checkbox" id="remember">
-                        <label for="remember">Remember me</label>
-                    </div>
-                    <a class="forgot-password" id="forgotPassword">Forgot Password</a>
-                </div>
-
-                <button type="submit" class="login-btn" id="loginBtn">
-                    <span>Login</span>
-                </button>
-
-                <div class="register-link">
-                    Don't you have account?<a id="registerLink">Register</a>
-                </div>
-            </form>
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CV<span>ision</span></h1>
+            <p>Get ready for your dream company</p>
         </div>
 
-        <!-- Forgot Password Modal -->
-        <div class="modal" id="forgotModal">
-            <div class="modal-content">
-                <span class="close-modal" id="closeForgotModal">&times;</span>
-                <h2 style="margin-bottom: 20px; color: #333;">Forgot Password</h2>
-                <p style="margin-bottom: 20px; color: #666;">Enter your e-mail, therefore we will send you to link.</p>
+        <div class="message error-message" id="errorMessage"></div>
+        <div class="message success-message" id="successMessage"></div>
+        <div class="message info-message" id="infoMessage"></div>
 
-                <div class="input-group">
-                    <label for="forgotEmail">E-mail Address</label>
-                    <input type="email" id="forgotEmail" placeholder="example@email.com" required>
-                </div>
-
-                <button class="login-btn" id="sendResetLink">
-                    <span>Send</span>
-                </button>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
             </div>
-        </div>
 
-        <!-- Register Modal -->
-        <div class="modal" id="registerModal">
-            <div class="modal-content">
-                <span class="close-modal" id="closeRegisterModal">&times;</span>
-                <h2 style="margin-bottom: 20px; color: #333;">Register</h2>
-
-                <div class="input-group">
-                    <label for="regUsername">Username</label>
-                    <input type="text" id="regUsername" placeholder="Username" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="regEmail">E-mail</label>
-                    <input type="email" id="regEmail" placeholder="example@email.com" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="regPassword">Password</label>
-                    <input type="password" id="regPassword" placeholder="Password" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="regPasswordConfirm">Password Again</label>
-                    <input type="password" id="regPasswordConfirm" placeholder="Password Again" required>
-                </div>
-
-                <button class="login-btn" id="registerBtn">
-                    <span>Register</span>
-                </button>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
             </div>
+
+            <div class="remember-forgot">
+                <div class="remember">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+                <a class="forgot-password" id="forgotPassword">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">
+                <span>Login</span>
+            </button>
+
+            <div class="divider">
+                <div class="divider-line"></div>
+                <div class="divider-text">NEW HERE?</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <div class="register-link">
+                Create an account<a id="registerLink"> Register →</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal" id="forgotModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeForgotModal">&times;</span>
+            <h2>Reset password</h2>
+            <p>Enter your email address and we'll send you a link to reset your password.</p>
+
+            <div class="input-group">
+                <label for="forgotEmail">Email Address</label>
+                <input type="email" id="forgotEmail" placeholder="example@email.com" required>
+            </div>
+
+            <button class="login-btn" id="sendResetLink">
+                <span>Send Reset Link</span>
+            </button>
         </div>
+    </div>
 
-        <script>
-            // Modal işlemleri
-            const forgotModal = document.getElementById('forgotModal');
-            const registerModal = document.getElementById('registerModal');
-            const forgotPassword = document.getElementById('forgotPassword');
-            const registerLink = document.getElementById('registerLink');
-            const closeForgotModal = document.getElementById('closeForgotModal');
-            const closeRegisterModal = document.getElementById('closeRegisterModal');
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeRegisterModal">&times;</span>
+            <h2>Create account</h2>
+            <p>Join CVision to start your journey</p>
 
-            forgotPassword.onclick = function() {
-                forgotModal.style.display = 'flex';
-            }
+            <div class="input-group">
+                <label for="regUsername">Username</label>
+                <input type="text" id="regUsername" placeholder="Choose a username" required>
+            </div>
 
-            registerLink.onclick = function() {
-                registerModal.style.display = 'flex';
-            }
+            <div class="input-group">
+                <label for="regEmail">Email</label>
+                <input type="email" id="regEmail" placeholder="your@email.com" required>
+            </div>
 
-            closeForgotModal.onclick = function() {
+            <div class="input-group">
+                <label for="regPassword">Password</label>
+                <input type="password" id="regPassword" placeholder="At least 6 characters" required>
+            </div>
+
+            <div class="input-group">
+                <label for="regPasswordConfirm">Confirm Password</label>
+                <input type="password" id="regPasswordConfirm" placeholder="Confirm your password" required>
+            </div>
+
+            <button class="login-btn" id="registerBtn">
+                <span>Register</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Modal operations
+        const forgotModal = document.getElementById('forgotModal');
+        const registerModal = document.getElementById('registerModal');
+        const forgotPassword = document.getElementById('forgotPassword');
+        const registerLink = document.getElementById('registerLink');
+        const closeForgotModal = document.getElementById('closeForgotModal');
+        const closeRegisterModal = document.getElementById('closeRegisterModal');
+
+        forgotPassword.onclick = function() {
+            forgotModal.style.display = 'flex';
+        }
+
+        registerLink.onclick = function() {
+            registerModal.style.display = 'flex';
+        }
+
+        closeForgotModal.onclick = function() {
+            forgotModal.style.display = 'none';
+        }
+
+        closeRegisterModal.onclick = function() {
+            registerModal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == forgotModal) {
                 forgotModal.style.display = 'none';
             }
-
-            closeRegisterModal.onclick = function() {
+            if (event.target == registerModal) {
                 registerModal.style.display = 'none';
             }
+        }
 
-            window.onclick = function(event) {
-                if (event.target == forgotModal) {
-                    forgotModal.style.display = 'none';
+        // Message display function
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = 'message ' + type + '-message';
+            element.style.display = 'block';
+
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // Login process
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const loginBtn = document.getElementById('loginBtn');
+
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="loading"></span>Logging in...';
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        remember: remember
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(successMessage, data.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    showMessage(errorMessage, data.message, 'error');
                 }
-                if (event.target == registerModal) {
-                    registerModal.style.display = 'none';
-                }
+            } catch (error) {
+                showMessage(errorMessage, 'Cannot connect to server!', 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<span>Login</span>';
+            }
+        });
+
+        // Forgot password - send email
+        document.getElementById('sendResetLink').addEventListener('click', async function() {
+            const email = document.getElementById('forgotEmail').value;
+            const infoMessage = document.getElementById('infoMessage');
+            const sendBtn = this;
+
+            if (!email) {
+                showMessage(infoMessage, 'Please enter your email address!', 'error');
+                return;
             }
 
-            // Mesaj gösterme fonksiyonu
-            function showMessage(element, message, type) {
-                element.textContent = message;
-                element.className = 'message ' + type + '-message';
-                element.style.display = 'block';
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="loading"></span>Sending...';
 
-                setTimeout(() => {
-                    element.style.display = 'none';
-                }, 5000);
+            try {
+                const response = await fetch('/api/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(infoMessage, data.message, 'success');
+                    setTimeout(() => {
+                        forgotModal.style.display = 'none';
+                        document.getElementById('forgotEmail').value = '';
+                    }, 2000);
+                } else {
+                    showMessage(infoMessage, data.message, 'error');
+                }
+            } catch (error) {
+                showMessage(infoMessage, 'Cannot connect to server!', 'error');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<span>Send Reset Link</span>';
+            }
+        });
+
+        // Registration process
+        document.getElementById('registerBtn').addEventListener('click', async function() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            const infoMessage = document.getElementById('infoMessage');
+            const registerBtn = this;
+
+            if (!username || !email || !password || !passwordConfirm) {
+                showMessage(infoMessage, 'Please fill in all fields!', 'error');
+                return;
             }
 
-            // Login process
-            document.getElementById('loginForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                const remember = document.getElementById('remember').checked;
-                const errorMessage = document.getElementById('errorMessage');
-                const successMessage = document.getElementById('successMessage');
-                const loginBtn = document.getElementById('loginBtn');
-
-                // Disable button and add loading
-                loginBtn.disabled = true;
-                loginBtn.innerHTML = '<span class="loading"></span>Entering...';
-
-                try {
-                    const response = await fetch('/api/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            username: username,
-                            password: password,
-                            remember: remember
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        showMessage(successMessage, data.message, 'success');
-
-                        // Redirect after 2 seconds
-                        setTimeout(() => {
-                            window.location.href = '/dashboard';
-                        }, 2000);
-                    } else {
-                        showMessage(errorMessage, data.message, 'error');
-                    }
-                } catch (error) {
-                    showMessage(errorMessage, 'Cannot connect server!', 'error');
-                } finally {
-                    // Restore button
-                    loginBtn.disabled = false;
-                    loginBtn.innerHTML = '<span>Login</span>';
-                }
-            });
-
-            // Forgot password - send email
-            document.getElementById('sendResetLink').addEventListener('click', async function() {
-                const email = document.getElementById('forgotEmail').value;
-                const infoMessage = document.getElementById('infoMessage');
-                const sendBtn = this;
-
-                if (!email) {
-                    showMessage(infoMessage, 'Please enter your e-mail!', 'error');
-                    return;
-                }
-
-                sendBtn.disabled = true;
-                sendBtn.innerHTML = '<span class="loading"></span>Sending...';
-
-                try {
-                    const response = await fetch('/api/forgot-password', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email: email })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        showMessage(infoMessage, data.message, 'success');
-                        setTimeout(() => {
-                            forgotModal.style.display = 'none';
-                            document.getElementById('forgotEmail').value = '';
-                        }, 2000);
-                    } else {
-                        showMessage(infoMessage, data.message, 'error');
-                    }
-                } catch (error) {
-                    showMessage(infoMessage, 'Cannot connect server!', 'error');
-                } finally {
-                    sendBtn.disabled = false;
-                    sendBtn.innerHTML = '<span>Send</span>';
-                }
-            });
-
-            // Registration process
-            document.getElementById('registerBtn').addEventListener('click', async function() {
-                const username = document.getElementById('regUsername').value;
-                const email = document.getElementById('regEmail').value;
-                const password = document.getElementById('regPassword').value;
-                const passwordConfirm = document.getElementById('regPasswordConfirm').value;
-                const infoMessage = document.getElementById('infoMessage');
-                const registerBtn = this;
-
-                // Validations
-                if (!username || !email || !password || !passwordConfirm) {
-                    showMessage(infoMessage, 'Please fill all spaces!', 'error');
-                    return;
-                }
-
-                if (password !== passwordConfirm) {
-                    showMessage(infoMessage, 'Passwords not matching!', 'error');
-                    return;
-                }
-
-                if (password.length < 6) {
-                    showMessage(infoMessage, 'Password at least should be 6 character!', 'error');
-                    return;
-                }
-
-                registerBtn.disabled = true;
-                registerBtn.innerHTML = '<span class="loading"></span>Reading your account...';
-
-                try {
-                    const response = await fetch('/api/register', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            username: username,
-                            email: email,
-                            password: password
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        showMessage(infoMessage, data.message, 'success');
-                        setTimeout(() => {
-                            registerModal.style.display = 'none';
-                            // Formu temizle
-                            document.getElementById('regUsername').value = '';
-                            document.getElementById('regEmail').value = '';
-                            document.getElementById('regPassword').value = '';
-                            document.getElementById('regPasswordConfirm').value = '';
-                        }, 2000);
-                    } else {
-                        showMessage(infoMessage, data.message, 'error');
-                    }
-                } catch (error) {
-                    showMessage(infoMessage, 'Cannot connect server! 404 not found', 'error');
-                } finally {
-                    registerBtn.disabled = false;
-                    registerBtn.innerHTML = '<span>Register</span>';
-                }
-            });
-
-            // Session check
-            async function checkSession() {
-                try {
-                    const response = await fetch('/api/check-session');
-                    const data = await response.json();
-
-                    if (data.logged_in) {
-                        showMessage(document.getElementById('infoMessage'),
-                            `Welcome, ${data.username}!`, 'success');
-                    }
-                } catch (error) {
-                    console.log('Control of account failed!');
-                }
+            if (password !== passwordConfirm) {
+                showMessage(infoMessage, 'Passwords do not match!', 'error');
+                return;
             }
 
-            // Check session on page load
-            checkSession();
-        </script>
-    </body>
-    </html>
+            if (password.length < 6) {
+                showMessage(infoMessage, 'Password must be at least 6 characters!', 'error');
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<span class="loading"></span>Creating account...';
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(infoMessage, data.message, 'success');
+                    setTimeout(() => {
+                        registerModal.style.display = 'none';
+                        document.getElementById('regUsername').value = '';
+                        document.getElementById('regEmail').value = '';
+                        document.getElementById('regPassword').value = '';
+                        document.getElementById('regPasswordConfirm').value = '';
+                    }, 2000);
+                } else {
+                    showMessage(infoMessage, data.message, 'error');
+                }
+            } catch (error) {
+                showMessage(infoMessage, 'Cannot connect to server!', 'error');
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = '<span>Register</span>';
+            }
+        });
+
+        // Session check
+        async function checkSession() {
+            try {
+                const response = await fetch('/api/check-session');
+                const data = await response.json();
+
+                if (data.logged_in) {
+                    showMessage(document.getElementById('infoMessage'),
+                        `Welcome back, ${data.username}!`, 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1500);
+                }
+            } catch (error) {
+                console.log('Session check failed');
+            }
+        }
+
+        checkSession();
+    </script>
+</body>
+</html>
