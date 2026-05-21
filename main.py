@@ -494,6 +494,9 @@ def analyze_cv():
         if not cv_data:
             return jsonify({'success': False, 'error': 'AI analizi başarısız'})
 
+        # 2.5. Missing skills, roadmap ve CV improvement önerileri üret
+        cv_enhancements = ai_cv.GenerateCVEnhancements(raw_text, cv_data)
+
         # 3. ⭐ OTOMATIK DB'ye kaydet
         success, message = save_cv_analysis_to_db(user_id, cv_text_id, cv_data)
         if not success:
@@ -504,6 +507,7 @@ def analyze_cv():
         return jsonify({
             'success': True,
             'cv_data': cv_data,
+            'cv_enhancements': cv_enhancements,
             'raw_text': preview,
             'saved_to_db': success,
             'message': message

@@ -6,16 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="3f8465f1-1d46-4758-9585-e0794c173ed6" name="Changes" comment="English Translation">
       <change beforePath="$PROJECT_DIR$/.idea/CVision.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/CVision.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cv_ai_extract.py" beforeDir="false" afterPath="$PROJECT_DIR$/cv_ai_extract.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/cv_analysis.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/cv_analysis.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/cv_and_link_upload.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/cv_and_link_upload.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/dashboard_main.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard_main.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/interview.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/interview.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/job_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/job_detail.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,8 +20,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -56,8 +51,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
-    "url": "https://TurgayBU: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@github.com/TurgayBU/CVision.git",
-    "accountId": "c71b41b4-bfb3-4fb2-aaa5-e5f16661d176"
+    "url": "https://github.com/TurgayBU/CVision.git",
+    "accountId": "9bf2dc1b-4a4a-46dd-b298-125998048ff0"
   }
 }]]></component>
   <component name="ProblemsViewState">
@@ -67,7 +62,6 @@
   &quot;associatedIndex&quot;: 8
 }</component>
   <component name="ProjectId" id="3AF1SOVd2mgk0nRcPlweKWrnTVJ" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -83,7 +77,10 @@
     &quot;Python.extract_link.executor&quot;: &quot;Run&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/Berat/PycharmProjects/CVision&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -103,8 +100,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-PY-243.25659.43" />
-        <option value="bundled-python-sdk-181015f7ab06-4df51de95216-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.25659.43" />
+        <option value="bundled-python-sdk-c59985aa861c-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.24374.152" />
       </set>
     </attachedChunks>
   </component>
@@ -207,10 +203,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="English Translation" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/CVision$main.coverage" NAME="main Coverage Results" MODIFIED="1779273983109" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CVision$extract_link.coverage" NAME="extract_link Coverage Results" MODIFIED="1774590023157" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/CVision$cv_ai_extract.coverage" NAME="cv_ai_extract Coverage Results" MODIFIED="1772904848141" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CVision$extract_cv.coverage" NAME="extract_cv Coverage Results" MODIFIED="1774595236198" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CVision$main.coverage" NAME="main Coverage Results" MODIFIED="1776408071330" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/CVision$config.coverage" NAME="config Coverage Results" MODIFIED="1772293850476" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CVision$cv_ai_extract.coverage" NAME="cv_ai_extract Coverage Results" MODIFIED="1772904848141" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

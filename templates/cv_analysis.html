@@ -764,6 +764,21 @@
                         <div class="result-field full-width">
                             <div class="result-field-label">💼 Work Experience</div>
                             <div class="result-field-content" id="cvExperience">—</div>
+                        <div class="result-field full-width">
+                            <div class="result-field-label">🧩 Missing Skills & Learning Roadmap</div>
+                            <div class="result-field-content" id="missingSkillsRoadmap">—</div>
+                        </div>
+
+                        <div class="result-field full-width">
+                            <div class="result-field-label">✍️ CV Improvement Suggestions</div>
+                            <div class="result-field-content" id="cvImprovementSuggestions">—</div>
+                        </div>
+
+                        <div class="result-field full-width">
+                            <div class="result-field-label">💡 General Advice</div>
+                            <div class="result-field-content" id="generalAdvice">—</div>
+                        </div>
+
                         </div>
                     </div>
                     <div class="btn-group">
@@ -971,6 +986,75 @@
             showAlert('Could not load CV list', 'error');
         }
     }
+    function renderCVEnhancements(enhancements) {
+    const roadmapEl = document.getElementById('missingSkillsRoadmap');
+    const improveEl = document.getElementById('cvImprovementSuggestions');
+    const adviceEl = document.getElementById('generalAdvice');
+
+    if (!enhancements) {
+        roadmapEl.innerHTML = '—';
+        improveEl.innerHTML = '—';
+        adviceEl.innerHTML = '—';
+        return;
+    }
+
+    const missingSkills = enhancements.missing_skills || [];
+    const improvements = enhancements.cv_improvements || [];
+    const advice = enhancements.general_advice || [];
+
+    if (missingSkills.length > 0) {
+        roadmapEl.innerHTML = missingSkills.map(item => {
+            const roadmap = item.roadmap || [];
+            return `
+                <div style="margin-bottom:16px;">
+                    <strong style="color:var(--accent2);">${item.skill || 'Unknown Skill'}</strong>
+                    <span style="font-size:11px; color:var(--text-muted); margin-left:6px;">
+                        Priority: ${item.priority || 'medium'} · ${item.estimated_time || 'N/A'}
+                    </span>
+                    <div style="margin-top:6px; color:var(--text-muted);">
+                        ${item.reason || ''}
+                    </div>
+                    <ul style="margin-top:8px; padding-left:20px;">
+                        ${roadmap.map(step => `<li>${step}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }).join('');
+    } else {
+        roadmapEl.innerHTML = 'No major missing skills detected.';
+    }
+
+    if (improvements.length > 0) {
+        improveEl.innerHTML = improvements.map(item => {
+            return `
+                <div style="margin-bottom:16px;">
+                    <strong style="color:var(--accent2);">${item.section || 'CV Section'}</strong>
+                    <div style="margin-top:6px;">
+                        <span style="color:var(--red);">Problem:</span> ${item.problem || ''}
+                    </div>
+                    <div style="margin-top:6px;">
+                        <span style="color:var(--text-muted);">Original:</span> ${item.original || 'Not specified'}
+                    </div>
+                    <div style="margin-top:6px;">
+                        <span style="color:var(--green);">Improved:</span> ${item.improved || ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else {
+        improveEl.innerHTML = 'No specific CV improvement suggestions generated.';
+    }
+
+    if (advice.length > 0) {
+        adviceEl.innerHTML = `
+            <ul style="padding-left:20px;">
+                ${advice.map(a => `<li>${a}</li>`).join('')}
+            </ul>
+        `;
+    } else {
+        adviceEl.innerHTML = '—';
+    }
+}
 
     async function analyzeCV() {
         const cvTextId = document.getElementById('cvSelect').value;
@@ -1002,6 +1086,8 @@
                 document.getElementById('cvExperience').textContent = d.cv_data[2] || '—';
                 document.getElementById('cvEducation').textContent  = d.cv_data[3] || '—';
                 document.getElementById('cvLanguages').textContent  = d.cv_data[4] || '—';
+
+                renderCVEnhancements(d.cv_enhancements);
 
                 document.getElementById('cvSelectionCard').style.display = 'block';
                 document.getElementById('resultCard').style.display      = 'block';
@@ -1169,6 +1255,9 @@
         currentCVData = null; currentCvTextId = null; currentRawText = null;
         document.getElementById('cvSelect').value = '';
         document.getElementById('resultCard').style.display = 'none';
+        document.getElementById('missingSkillsRoadmap').innerHTML = '—';
+        document.getElementById('cvImprovementSuggestions').innerHTML = '—';
+        document.getElementById('generalAdvice').innerHTML = '—';
         loadUserCVs();
     }
 

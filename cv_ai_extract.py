@@ -3,6 +3,8 @@ from config import DB_CONFIG, api_key
 from groq import Groq
 import time
 from functools import wraps
+import json
+import re
 
 class AICVResponseGroq:
     def __init__(self, db_config, api_key):
@@ -130,6 +132,108 @@ cv_languages='Answer is here'
         except Exception as e:
             print(f"❌ AI query error: {e}")
             return None
+
+    @rate_limit(max_per_minute=20)
+    def GenerateCVEnhancements(self, raw_text, cv_data):
+        """
+        CV'ye göre eksik yetenekler, öğrenme yol haritası ve CV iyileştirme önerileri üretir.
+        """
+
+        if not self.api_key:
+            print("❌ API key not found")
+            return None
+
+        try:
+            prompt = f"""
+    You are a professional IT recruiter and career coach.
+
+    Analyze this CV and generate:
+    1. Missing technical skills
+    2. Learning roadmap for missing skills
+    3. CV improvement suggestions
+
+    CV Raw Text:
+    {raw_text[:6000]}
+
+    Extracted CV Data:
+    Address: {cv_data[0] if len(cv_data) > 0 else ""}
+    Skills: {cv_data[1] if len(cv_data) > 1 else ""}
+    Experience: {cv_data[2] if len(cv_data) > 2 else ""}
+    Education: {cv_data[3] if len(cv_data) > 3 else ""}
+    Languages: {cv_data[4] if len(cv_data) > 4 else ""}
+
+    Return ONLY valid JSON. Do not write markdown. Do not use ```.
+
+    JSON format:
+    {{
+      "missing_skills": [
+        {{
+          "skill": "Docker",
+          "priority": "high",
+          "reason": "Docker is commonly expected in backend and DevOps-related IT roles.",
+          "roadmap": [
+            "Learn containers and images",
+            "Create a Dockerfile for a simple Flask app",
+            "Run Flask and MySQL using Docker Compose",
+            "Add the Dockerized project to your CV"
+          ],
+          "estimated_time": "1 week"
+        }}
+      ],
+      "cv_improvements": [
+        {{
+          "section": "Experience",
+          "problem": "The experience description is too general.",
+          "original": "Worked on backend development.",
+          "improved": "Developed REST APIs using Flask and MySQL, implemented authentication, and improved database-driven workflows."
+        }}
+      ],
+      "general_advice": [
+        "Add measurable achievements where possible.",
+        "Mention technologies used in each project.",
+        "Use action verbs such as developed, implemented, optimized, designed."
+      ]
+    }}
+    """
+
+            print("🔄 Sending CV enhancement request to Groq API...")
+
+            chat_completion = self.client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are an expert CV reviewer, IT recruiter, and career advisor."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                model=self.model,
+                temperature=0.4,
+                max_tokens=1800,
+                top_p=0.9,
+                stream=False
+            )
+
+            content = chat_completion.choices[0].message.content.strip()
+
+            # Bazen model ```json bloğu döndürebilir, temizliyoruz.
+            content = re.sub(r"^```json\s*", "", content)
+            content = re.sub(r"^```\s*", "", content)
+            content = re.sub(r"\s*```$", "", content)
+
+            return json.loads(content)
+
+        except Exception as e:
+            print(f"❌ CV enhancement error: {e}")
+            return {
+                "missing_skills": [],
+                "cv_improvements": [],
+                "general_advice": [
+                    "CV improvement analysis could not be generated."
+                ]
+            }
 
     def ParseResponse(self, response):
         cv_address = ""
